@@ -20,7 +20,7 @@ import numpy as np
 import pandas as pd
 
 WORKSPACE = Path(__file__).resolve().parents[1]
-SRC = Path(r"C:\Users\Courtney\Documents\VS CODE LIVE SHARE")
+SRC = Path(os.environ.get("GALECAST_SRC", WORKSPACE.parent / "VS CODE LIVE SHARE"))  # source checkout, read-only
 PRIVATE = WORKSPACE / "_private"
 RUNS = WORKSPACE / "runs"
 
