@@ -1,0 +1,569 @@
+{
+  "evaluation_id": "GCV-W1-v1",
+  "status": "provisional",
+  "revisions": [
+    {
+      "id": "R-1-01",
+      "chapter": 1,
+      "section": "Background of the Study",
+      "claim": "Maximum observed wind 11.0 m/s; 132 of 133 labelled events are pressure-triggered; label is a barometric storm-precursor criterion",
+      "verdict": "Correct",
+      "evidence": "Stage 2: max raw wind 11 m/s (NAIA, one day); 86 + 19 + 28 = 133 labelled positives across the four stations; AUDIT F-10.",
+      "replacement": ""
+    },
+    {
+      "id": "R-1-02",
+      "chapter": 1,
+      "section": "Background / Project Context",
+      "claim": "Cyclical wind-direction encoding (sine and cosine of bearing) is a model input",
+      "verdict": "Partly correct",
+      "evidence": "`_train_w3.py` 286-313: the station's own u, v and direction were removed from the inputs; the only direction inputs are lag-1 sine/cosine bearings of the four stations (`*_dir_sin_lag1`, `*_dir_cos_lag1`). The station's own direction is a regression target.",
+      "replacement": "Wind direction enters the model in two ways: the previous day's bearing at each of the four stations, encoded as sine and cosine components, is an input, and the next day's bearing at the forecast station is predicted as a sine/cosine pair by the regression head. The station's own same-day direction is not used as an input."
+    },
+    {
+      "id": "R-1-03",
+      "chapter": 1,
+      "section": "Project Context",
+      "claim": "Next-day gale-hazard classifier producing a probability from a 32-day sequence",
+      "verdict": "Partly correct",
+      "evidence": "True of the model and of offline evaluation. The deployed `/api/predict-next` builds 24-step windows and fails (C-04); dashboard values for 2025 onward come from an AR(1) simulation and PAGASA forecast overwrites (AUDIT \u00a71.1).",
+      "replacement": "The GALE-CAST model (W1) estimates, from a 32-day sequence of daily station observations, the probability that the next day meets the study's hazard label. In the deployed prototype, the displayed forecast values for 2025 onward are produced by a seeded statistical simulation and imported PAGASA ten-day forecasts rather than by the model run on current observations; the model's live endpoint is not operational because it supplies 24-day windows to a model that requires 32."
+    },
+    {
+      "id": "R-1-04",
+      "chapter": 1,
+      "section": "Scope and Limitation",
+      "claim": "Supplementary data used to pre-train the encoder; model then fine-tuned on the primary stations",
+      "verdict": "Wrong",
+      "evidence": "`_train_w3.py` 269-280 and 876-890: Port Area, supplementary and primary rows are concatenated and trained in a single `model.fit` call (C-07).",
+      "replacement": "Supplementary records (Port Area and 19 additional Luzon stations) were combined with the primary-station training rows and used in a single training run; there was no separate pre-training or fine-tuning stage. Primary-station rows were split chronologically, whereas Port Area and supplementary rows were used for training regardless of date, including dates inside the later evaluation period."
+    },
+    {
+      "id": "R-1-05",
+      "chapter": 1,
+      "section": "Scope and Limitation",
+      "claim": "Scored on their held-out test window; supplementary data excluded entirely from evaluation splits",
+      "verdict": "Partly correct",
+      "evidence": "Port Area and supplementary stations are excluded from all scores (correct). But 746 Port Area rows and 22,306 supplementary rows dated inside the test period were used in training, and the test period was used for model and threshold-rule selection (C-10, C-11, C-17).",
+      "replacement": "The three primary stations' records from 15 October 2021 to 31 December 2024 were used for the reported evaluation. This period was not fully independent: it was used historically to compare model variants and to choose the scoring procedure, and training included Port Area and supplementary records dated within it. Results on this period are therefore retrospective rather than independent out-of-sample estimates."
+    },
+    {
+      "id": "R-1-06",
+      "chapter": 1,
+      "section": "Scope and Limitation",
+      "claim": "Produces a calibrated gale probability displayed with a three-tier risk indicator",
+      "verdict": "Wrong",
+      "evidence": "No calibration is applied (Chapter 3 itself says the output is uncalibrated); Brier skill vs climatology is -2.80 (W1+X1). The displayed tier ignores the probability (C-05).",
+      "replacement": "The model outputs an uncalibrated score between 0 and 1 for each station and day. The Low/Moderate/High tier shown on the dashboard is assigned by a separate rule on displayed wind speed (10.8 and 17.2 m/s) and pressure drop (3 and 6 hPa) and does not use the model score."
+    },
+    {
+      "id": "R-1-07",
+      "chapter": 1,
+      "section": "Scope and Limitation",
+      "claim": "Historical dataset 1 Jan 2015 to 30 Dec 2024; not redistributed",
+      "verdict": "Partly correct",
+      "evidence": "Processed rows end 2024-12-30 (raw records to 2024-12-31; Port Area ends 2023-10-31). The GitHub repository and Space are private (HTTP 404/401 unauthenticated), so no public redistribution was observed; row-level data are nevertheless stored in those repositories (AUDIT F-15).",
+      "replacement": "The primary stations' daily records cover 1 January 2015 to 31 December 2024 (Port Area: to 31 October 2023). Row-level PAGASA data are not displayed on the public interface; copies are held in the project's private repositories."
+    },
+    {
+      "id": "R-1-08",
+      "chapter": 1,
+      "section": "Statement of the Problem 3 / Objective 3",
+      "claim": "Model evaluated with confusion-matrix metrics (accuracy, precision, recall, F1, PR-AUC)",
+      "verdict": "Partly correct",
+      "evidence": "Those metrics exist, but no reference forecast is named; accuracy is dominated by negatives (all-negative accuracy 0.9923). This evaluation adds same-case baselines.",
+      "replacement": "3. How does the model's next-day performance compare with simple reference forecasts (persistence and training-period climatology) on identical cases, in terms of: 3.1 wind-speed error (MAE, RMSE, bias); 3.2 event detection (hits, misses, false alarms, correct negatives, precision, recall, F1); 3.3 probabilistic ranking (PR-AUC) and accuracy relative to the all-negative reference?"
+    },
+    {
+      "id": "R-2-01",
+      "chapter": 2,
+      "section": "ANN / Hybrid architectures",
+      "claim": "ANN maps features into a nonlinear space before the LSTM; ANN processes the current step",
+      "verdict": "Wrong",
+      "evidence": "Stage 1 layer list: `lstm_normal` (64) \u2192 `dense_normal` (32); `lstm_anomaly_seq` \u2192 attention \u2192 `lstm_anomaly_out` (32) \u2192 `dense_anomaly` (16). Dense layers follow the LSTMs.",
+      "replacement": "In GALE-CAST the dense (ANN) layers follow the recurrent layers: each stream's LSTM summarises the 32-day sequence, and a fully connected layer then maps that summary before the two streams are merged."
+    },
+    {
+      "id": "R-2-02",
+      "chapter": 2,
+      "section": "Attention mechanisms",
+      "claim": "Additive attention dynamically weights pressure drop and wind acceleration features",
+      "verdict": "Partly correct",
+      "evidence": "Attention (`att_score` Dense(1, tanh) + softmax over time) applies only to the anomaly stream (pressure tendency, precipitation anomaly, pressure drop, storm signal); it weights time steps, not features. Wind acceleration is in the normal stream, which has no attention.",
+      "replacement": "The attention layer assigns a weight to each of the 32 days in the anomaly stream, whose inputs are pressure tendency, pressure drop, precipitation anomaly and a storm-signal flag; it does not weight individual features, and the wind-based inputs are not attended."
+    },
+    {
+      "id": "R-2-03",
+      "chapter": 2,
+      "section": "Dual-stream designs / Research gap",
+      "claim": "Dual streams separately learn normal baselines and rare anomalous gale patterns",
+      "verdict": "Partly correct",
+      "evidence": "Both streams receive every window and are trained jointly; they differ by input features, not by regime. AUDIT F-17: the normal stream's LSTM output is nearly constant on these inputs.",
+      "replacement": "Both streams process every input window and are trained jointly; the streams differ in their input features (32 general features versus 4 pressure- and rainfall-anomaly features) rather than in the cases they see."
+    },
+    {
+      "id": "R-2-04",
+      "chapter": 2,
+      "section": "Spatial hazard mapping",
+      "claim": "Probabilistic outputs classified into Low/Moderate/High and mapped",
+      "verdict": "Wrong",
+      "evidence": "C-05: the deployed tier uses wind and pressure thresholds only.",
+      "replacement": "The Low/Moderate/High tiers are rule-based categories computed from displayed wind speed and pressure drop; the model probability is not used to assign them."
+    },
+    {
+      "id": "R-3-01",
+      "chapter": 3,
+      "section": "Data Preprocessing",
+      "claim": "83,569 high-fidelity observations from two tiers",
+      "verdict": "Partly correct",
+      "evidence": "83,569 = 78,955 + 1,095 + 3,519 rows of three partitions, of which 69,388 are supplementary rows of unresolved provenance (C-20). It is not a count of primary-station observations.",
+      "replacement": "The modelling data comprise 83,569 daily rows: 10,914 primary-station rows (6,342 training, 1,095 tuning, 3,519 test), 3,225 Port Area rows and 69,388 supplementary rows whose origin is not documented."
+    },
+    {
+      "id": "R-3-02",
+      "chapter": 3,
+      "section": "Missing Value Imputation",
+      "claim": "Gaps limited to 83 MSLP readings across three stations; wind speed and rainfall have no missing values",
+      "verdict": "Wrong",
+      "evidence": "Stage 2 raw inventory, primary stations: wind missing 73 (NAIA 68, Sangley 1, Science Garden 4), rainfall 103, MSLP 57. The figure 83 is MSLP across all four stations (Port Area 26).",
+      "replacement": "Before imputation, the three primary stations' records lacked 73 wind-speed, 103 rainfall and 57 mean sea-level pressure values (Port Area: 26 of each); rainfall also contained trace entries coded \u22121, which were set to 0.05 mm."
+    },
+    {
+      "id": "R-3-03",
+      "chapter": 3,
+      "section": "Missing Value Imputation",
+      "claim": "Causal station-wise imputation; raw snapshot kept and every imputed value recorded",
+      "verdict": "Partly correct",
+      "evidence": "`process_weather.py:48`: per-station forward fill (causal) followed by an ungrouped backward fill (no effect on this data, AUDIT F-03). No record of imputed values is written. 79 benchmark cases had an imputed value in their 32-day window.",
+      "replacement": "Missing values were filled by carrying the previous valid observation of the same station forward. The pipeline does not record which values were imputed; the evaluation reconstructs this from the raw file."
+    },
+    {
+      "id": "R-3-04",
+      "chapter": 3,
+      "section": "Outlier handling",
+      "claim": "Soft-capping: values beyond 2.5 SD moved 20% toward the rolling mean",
+      "verdict": "Not found in the code",
+      "evidence": "No such step exists in `process_weather.py`, `_train_w3.py` or any other pipeline file on either branch (search for 2.5-SD/soft-cap logic).",
+      "replacement": "Delete this paragraph, or state: 'No outlier adjustment was applied.'"
+    },
+    {
+      "id": "R-3-05",
+      "chapter": 3,
+      "section": "Variable Transformation",
+      "claim": "MinMax fitted on training data only, one scaler per station",
+      "verdict": "Partly correct",
+      "evidence": "True for training (`_train_w3.py` 369-378), but only 12 of 32 normal and 3 of 4 anomaly inputs are scaled; the Port Area scaler includes test-period dates; the reported scorecard used pooled `scaled_weather` inputs instead (C-13).",
+      "replacement": "Twelve of the 32 normal-stream inputs and three of the four anomaly inputs were min-max scaled with one scaler per station fitted on that station's training rows; the remaining inputs entered unscaled. The historical evaluation, however, supplied inputs scaled by a single pooled scaler, which changes the model's scores materially (Section 4)."
+    },
+    {
+      "id": "R-3-06",
+      "chapter": 3,
+      "section": "Algorithm / Dual-stream design",
+      "claim": "Anomaly stream is trained exclusively on rare gale-positive observations",
+      "verdict": "Wrong",
+      "evidence": "Both streams are trained jointly on every training window (`_train_w3.py` 737-780, 876-890).",
+      "replacement": "Both streams are trained jointly on all training windows; the anomaly stream is distinguished by its inputs, not by training only on positive cases."
+    },
+    {
+      "id": "R-3-07",
+      "chapter": 3,
+      "section": "Target Variable Configuration",
+      "claim": "Regression loss minimises RMSE; loss weights 1.0 : 0.3",
+      "verdict": "Partly correct",
+      "evidence": "Loss is MSE with weights 1.0 : 0.3 (`_train_w3.py` 784-797). MSE and RMSE share the same minimiser.",
+      "replacement": "The regression head is trained with mean squared error, weighted 0.3 relative to the focal loss of the classification head."
+    },
+    {
+      "id": "R-3-08",
+      "chapter": 3,
+      "section": "Categorical Risk Derivation",
+      "claim": "Overrides first, then the model probability with a fixed cutoff / 0.33-0.66 split",
+      "verdict": "Wrong",
+      "evidence": "C-05: no fallback to the probability exists in `risk_level()` or `categorize_prob()`.",
+      "replacement": "The dashboard tier is assigned only by thresholds on displayed wind speed (10.8 and 17.2 m/s) and pressure drop (3 and 6 hPa). The model probability is stored but is not used for the tier."
+    },
+    {
+      "id": "R-3-09",
+      "chapter": 3,
+      "section": "Reported metrics",
+      "claim": "Classification metrics from the network output with one averaging step; MOS and persistence blending removed",
+      "verdict": "Partly correct",
+      "evidence": "Correct for the classification scorecard (C-12). But the regression metrics reported in Chapter 4 still include post-processing fitted in the test period (C-18, AUDIT F-07), and the last sentence ('integration ... with persistence-based data is standard practice') contradicts the removal.",
+      "replacement": "The classification metrics use the network's probability averaged across the three stations for each date, with no fitted calibration. Regression metrics in the historical scorecard included post-processing fitted on the test period and are replaced in this revision by neural-only values (Chapter 4)."
+    },
+    {
+      "id": "R-3-10",
+      "chapter": 3,
+      "section": "Data Partitioning / Data Gathering",
+      "claim": "Training set 1 Jan 2015 to 14 Oct 2020: 78,955 observations, 1,143 confirmed gale events",
+      "verdict": "Wrong",
+      "evidence": "Stage 2: 78,955 = 6,342 primary rows (to 2020-10-14) + 3,225 Port Area rows (to 2023-10-30) + 69,388 supplementary rows (to 2024-12-30). 1,143 = 86 real + 1,057 supplementary study-label positives (C-20), almost all pressure-fall proxies, not confirmed gales.",
+      "replacement": "The training set contained 78,955 rows: primary-station rows dated 1 January 2015 to 14 October 2020 (6,342), all Port Area rows (3,225; to 30 October 2023) and 69,388 supplementary rows (to 30 December 2024). It contained 1,143 positive labels under the study's wind-or-pressure rule, of which 86 came from the four Metro Manila stations; these are proxy events, not confirmed gale-force winds."
+    },
+    {
+      "id": "R-3-11",
+      "chapter": 3,
+      "section": "Data Partitioning",
+      "claim": "Tuning set 15 Oct 2020 to 14 Oct 2021: 1,095 observations, 19 events; used for early stopping and threshold selection",
+      "verdict": "Correct",
+      "evidence": "Stage 2 reproduces 1,095 rows and 19 positives; `_train_w3.py` 805-810. (A code comment says 17; the data give 19.)",
+      "replacement": ""
+    },
+    {
+      "id": "R-3-12",
+      "chapter": 3,
+      "section": "Data Partitioning",
+      "claim": "Test set 3,519 observations, 28 events, 3,423 windows; unseen, genuine out-of-sample",
+      "verdict": "Partly correct",
+      "evidence": "Counts reproduce exactly (C-12). 'Unseen' and 'genuine out-of-sample' are not supported (C-17).",
+      "replacement": "The test period (15 October 2021 to 31 December 2024) contains 3,519 primary-station rows, 28 positive labels and 3,423 scored 32-day windows. Because it was used historically for model comparison and for choosing the scoring procedure, results on it are retrospective rather than independent."
+    },
+    {
+      "id": "R-3-13",
+      "chapter": 3,
+      "section": "Operational Threshold Criteria",
+      "claim": "Cutoff fixed in advance on the tuning slice before the test window was scored; five independent pre-registered rules converged",
+      "verdict": "Wrong",
+      "evidence": "C-10: the declared max-F1 rule (0.62) was scored on TEST first; the five rules do return 0.601 (verified), but all choose the lowest threshold of the same TUNE band 0.601-0.627; two rules scale by TEST negatives; R80/R85 were pre-registered for v12, not W1.",
+      "replacement": "The operating threshold of 0.601 was computed on the tuning period. It was adopted, however, after a different tuning rule (maximum F1, threshold 0.62) had already been scored on the test period; every threshold between 0.601 and 0.627 gives identical tuning results, and the adopted rules select the lowest of them. The threshold choice was therefore informed by the test period."
+    },
+    {
+      "id": "R-3-14",
+      "chapter": 3,
+      "section": "Cross-Validation Framework",
+      "claim": "Time Series Split (rolling-origin) cross-validation implemented",
+      "verdict": "Wrong",
+      "evidence": "No cross-validation of the network exists for W1. `TimeSeriesSplit` appears only in `validate_model_multioutput.py:1075`, for post-processing fitted inside the evaluation period.",
+      "replacement": "The network was evaluated with a single chronological split (training, tuning, test); no cross-validation of the network was performed. Time-series splitting was used only in a since-withdrawn post-processing step."
+    },
+    {
+      "id": "R-3-15",
+      "chapter": 3,
+      "section": "Imbalance Mitigation",
+      "claim": "Non-gale class weighted 3.0 relative to the gale class, chosen by comparing tuning PR-AUC for \u00d73, \u00d76, \u00d710",
+      "verdict": "Wrong",
+      "evidence": "`_train_w3.py` 812-828: balanced weights with \u00d71.3 for class 1, then the class-0 (non-gale) weight multiplied by 3. The recorded W1/W2/W3 comparisons are TEST scorecards (`variant_score_w3/_w6/_w10*.json`); no saved tuning-PR-AUC comparison was found. With the batch-mean focal loss, class weights only rescale each batch (AUDIT F-16).",
+      "replacement": "Class weights were computed with scikit-learn's balanced scheme, the positive class was multiplied by 1.3, and the negative-class weight was then multiplied by 3. Multipliers of 3, 6 and 10 were trained; the saved comparison records report test-period scores, so the selection cannot be shown to rely on the tuning period alone."
+    },
+    {
+      "id": "R-3-16",
+      "chapter": 3,
+      "section": "Imbalance Mitigation",
+      "claim": "Oversampling with Gaussian jittering applied to the training split only",
+      "verdict": "Correct",
+      "evidence": "`_train_w3.py` 836-854 (positive windows duplicated, noise SD 0.01, seed 42).",
+      "replacement": ""
+    },
+    {
+      "id": "R-3-17",
+      "chapter": 3,
+      "section": "Operational benchmarks",
+      "claim": "\u22655 intervals of compliance, \u00b15 km/h tolerance, 92.5% acceptability rate",
+      "verdict": "Not found in the code",
+      "evidence": "These quantities are not computed anywhere in the repository and no result for them is reported.",
+      "replacement": "Remove these benchmarks, or compute and report them on the benchmark cases."
+    },
+    {
+      "id": "R-3-18",
+      "chapter": 3,
+      "section": "Regression validation / Table 3.1",
+      "claim": "MASE < 1 guarantees outperforming a naive baseline",
+      "verdict": "Partly correct",
+      "evidence": "The MASE denominator is the in-sample lag-365 seasonal-naive MAE of training rows (0.791 m/s for wind); it is not a same-case forecast. W1's neural-only wind MASE is 1.29; persistence MAE 0.467 m/s.",
+      "replacement": "MASE compares the model's error with the average error of a seasonal naive rule measured on training data; a value below 1 does not by itself show that the model beats simple forecasts on the same cases. This study therefore also reports same-case comparisons with persistence and climatology."
+    },
+    {
+      "id": "R-3-19",
+      "chapter": 3,
+      "section": "Regression validation",
+      "claim": "Rainfall inverse-transformed to mm before computing error",
+      "verdict": "Wrong",
+      "evidence": "The historical scorer computes rainfall error in log1p space while labelling it mm (`_w1_recall_floor.py` 419-421; AUDIT F-09).",
+      "replacement": "Historical rainfall errors were computed on log(1 + mm) values, not in millimetres; they are not comparable with millimetre-based benchmarks."
+    },
+    {
+      "id": "R-3-20",
+      "chapter": 3,
+      "section": "Baseline Comparison Framework",
+      "claim": "Benchmarks: Chen et al. (2023), Mesias & Bagtasa (2025), Racoma et al. (2023)",
+      "verdict": "Partly correct",
+      "evidence": "These are external studies on different data and tasks, not same-case baselines. The titles given here differ from the descriptions of the same citations in Chapter 2; check the reference list.",
+      "replacement": "External studies provide context but not a fair comparison, because their data, variables and tasks differ. The primary comparison uses persistence and training-period climatology computed on exactly the same GALE-CAST cases."
+    },
+    {
+      "id": "R-3-21",
+      "chapter": 3,
+      "section": "Computational efficiency",
+      "claim": "GALE-CAST targets sub-kilometre localized resolution",
+      "verdict": "Wrong",
+      "evidence": "The map interpolates three station values by inverse distance weighting; it adds no observed information below the station spacing (Chapter 4 concedes this).",
+      "replacement": "Hazard maps interpolate three station values by inverse distance weighting; they do not resolve conditions below the spacing of the stations."
+    },
+    {
+      "id": "R-3-22",
+      "chapter": 3,
+      "section": "Data Gathering",
+      "claim": "October 2021 to December 2024 set aside, untouched",
+      "verdict": "Wrong",
+      "evidence": "C-17.",
+      "replacement": "The October 2021 to December 2024 period was held out from training of the primary stations but was used to compare variants and to choose the scoring procedure."
+    },
+    {
+      "id": "R-3-23",
+      "chapter": 3,
+      "section": "Training set paragraph",
+      "claim": "Zonal/meridional wind vector decomposition used as inputs",
+      "verdict": "Wrong",
+      "evidence": "u, v, u_change and v_change were removed from the inputs (`_train_w3.py` 286-303; `THRESHOLD_CONFIG.md`: 'no U/V wind-vector-component columns anywhere in the model's input pipeline').",
+      "replacement": "Wind vector components (u, v) are not model inputs; they are used only to compute bearings."
+    },
+    {
+      "id": "R-3-24",
+      "chapter": 3,
+      "section": "Statistical Treatment",
+      "claim": "Only the weighted mean is declared",
+      "verdict": "Partly correct",
+      "evidence": "Chapter 4 also names the Content Validity Index and Aiken's V without declaring them here or reporting their values.",
+      "replacement": "Declare all statistics used for the survey (weighted mean, and CVI and Aiken's V if used, with formulas) and report their values."
+    },
+    {
+      "id": "R-4-01",
+      "chapter": 4,
+      "section": "SOP 1: Data Preprocessing",
+      "claim": "Nearest-neighbour interpolation, soft-capping, all inputs scaled 0-1",
+      "verdict": "Wrong",
+      "evidence": "R-3-02 to R-3-05: forward fill, no soft-capping, 15 of 36 inputs scaled.",
+      "replacement": "Missing values were forward-filled within each station; no outlier adjustment was applied; 12 normal-stream and 3 anomaly-stream inputs were min-max scaled per station and the rest entered unscaled; 32-day windows were then built."
+    },
+    {
+      "id": "R-4-02",
+      "chapter": 4,
+      "section": "SOP 2: Data Partitioning / Table 4.2",
+      "claim": "Three disjoint periods so that no evaluation information influenced training or model selection",
+      "verdict": "Wrong",
+      "evidence": "C-07, C-17; Table 4.2 also misaligns periods and purposes.",
+      "replacement": "Use the corrected partition table published with this evaluation (Table D1) and the wording in R-1-05."
+    },
+    {
+      "id": "R-4-03",
+      "chapter": 4,
+      "section": "SOP 2: Imbalance mitigation",
+      "claim": "\u00d76 and \u00d710 degraded on tuning PR-AUC; \u00d710 collapsed",
+      "verdict": "Partly correct",
+      "evidence": "The \u00d710 model's collapse is visible in its saved TEST record (with X1, 3 of 28 events detected; `variant_score_w10_x1.json`) and in this evaluation (X1 PR-AUC 0.265); no tuning-PR-AUC comparison was found.",
+      "replacement": "Models trained with negative-class multipliers of 6 and 10 performed worse in the saved comparison records, which report test-period scores; the \u00d710 model detected almost no events."
+    },
+    {
+      "id": "R-4-04",
+      "chapter": 4,
+      "section": "SOP 2: Risk tiering",
+      "claim": "Probability classified with 0.33/0.66 when no override fires",
+      "verdict": "Wrong",
+      "evidence": "C-05.",
+      "replacement": "See R-3-08."
+    },
+    {
+      "id": "R-4-05",
+      "chapter": 4,
+      "section": "Table 4.3",
+      "claim": "Post-processing listed as isotonic MOS calibration and persistence blending",
+      "verdict": "Wrong",
+      "evidence": "Contradicts the chapter's own text (these were removed) and C-06.",
+      "replacement": "Post-processing: same-date mean of the three station scores (X1); no fitted calibration. Tiering: rule-based on displayed wind speed and pressure drop."
+    },
+    {
+      "id": "R-4-06",
+      "chapter": 4,
+      "section": "SOP 3: Confusion matrix",
+      "claim": "TN 3,386, FP 9, FN 4, TP 24; accuracy 99.62%, precision 72.73%, recall 85.71%, F1 78.69%, PR-AUC 0.8302",
+      "verdict": "Partly correct",
+      "evidence": "Numbers reproduce exactly with the legacy procedure (C-12). But the description ('selected before the test period was scored', 'held out', 'gale events') is not supported (C-10, C-15, C-17), and the legacy procedure's input scaling differs from training (C-13).",
+      "replacement": "Using the historical scoring procedure, the model with cross-station averaging and a threshold of 0.601 produced 24 hits, 4 misses, 9 false alarms and 3,386 correct negatives on 3,423 windows (accuracy 99.62%, precision 72.73%, recall 85.71%, F1 0.787, PR-AUC 0.830). These figures are reproducible but retrospective: the threshold rule and the averaging step were adopted after test-period results had been seen, the 28 positive labels are pressure falls of at least 3 hPa rather than observed gale-force winds, and the procedure scaled inputs differently from training. Re-scored with training-consistent inputs on 3,520 identical cases, the same procedure detected 16 of 27 events with 8 false alarms (precision 0.667, recall 0.593, PR-AUC 0.487)."
+    },
+    {
+      "id": "R-4-07",
+      "chapter": 4,
+      "section": "SOP 3: Accuracy and PR-AUC baselines",
+      "claim": "All-negative accuracy 99.18%; chance PR-AUC 0.82%",
+      "verdict": "Correct",
+      "evidence": "3,395 / 3,423 = 0.9918; 28 / 3,423 = 0.0082 (C-12).",
+      "replacement": ""
+    },
+    {
+      "id": "R-4-08",
+      "chapter": 4,
+      "section": "SOP 3: Recall interpretation",
+      "claim": "Recall reflects the recall-oriented design (focal loss, class weighting, oversampling)",
+      "verdict": "Partly correct",
+      "evidence": "No ablation tested these causes; the \u00d73 multiplier increases the weight of negatives, which works against recall.",
+      "replacement": "The recall obtained is consistent with the imbalance-handling choices, but their individual contribution was not tested."
+    },
+    {
+      "id": "R-4-09",
+      "chapter": 4,
+      "section": "SOP 3: Conclusion",
+      "claim": "Conservative estimate of out-of-sample performance",
+      "verdict": "Wrong",
+      "evidence": "C-10, C-11, C-13, C-17.",
+      "replacement": "These values should be read as a retrospective, possibly optimistic, estimate: selection decisions were informed by the same period, and the score depends strongly on how inputs are scaled."
+    },
+    {
+      "id": "R-4-10",
+      "chapter": 4,
+      "section": "Table 4.5 / Table 4.6",
+      "claim": "Wind MAE 2.04 km/h, RMSE 2.92 km/h, MASE 0.715; all variables met their ceilings",
+      "verdict": "Wrong",
+      "evidence": "C-18: values belong to the pre-W1 model and include post-processing fitted in the test period; direction comes from a separate model. W1 neural-only next-day wind: MAE 1.021 m/s (3.68 km/h), RMSE 1.223 m/s; persistence 0.467 m/s; climatology 0.584 m/s.",
+      "replacement": "For the deployed model, next-day wind-speed error on 3,520 identical cases was MAE 1.021 m/s (3.68 km/h) and RMSE 1.223 m/s, compared with 0.467 m/s for persistence and 0.584 m/s for training-period climatology. The model's wind forecasts vary little (standard deviation 0.27 m/s against 1.16 m/s observed) and are less accurate than both reference forecasts. Humidity, rainfall, pressure and direction outputs were not re-evaluated in this revision."
+    },
+    {
+      "id": "R-4-11",
+      "chapter": 4,
+      "section": "Table 4.6",
+      "claim": "99.62% accuracy exceeds the 88% of Mesias & Bagtasa (2025)",
+      "verdict": "Wrong",
+      "evidence": "Different task, data and prevalence; 99.18% is reached by always forecasting 'no event'.",
+      "replacement": "Remove the accuracy comparison with external studies; compare against the all-negative reference and same-case baselines."
+    },
+    {
+      "id": "R-4-12",
+      "chapter": 4,
+      "section": "Throughout",
+      "claim": "'Gale events' / 'gale windows'",
+      "verdict": "Wrong",
+      "evidence": "C-15: every positive label in the benchmark period is a pressure fall \u2265 3 hPa; no gale-force wind was recorded 2015-2024.",
+      "replacement": "Replace 'gale event' with 'hazard-label event (wind \u2265 10.8 m/s or 24-hour pressure fall \u2265 3 hPa)' and state that all test-period events were pressure falls."
+    },
+    {
+      "id": "R-4-13",
+      "chapter": 4,
+      "section": "Website: High Gale Warning",
+      "claim": "Pop-up raised when the engine forecasts High risk",
+      "verdict": "Partly correct",
+      "evidence": "Alerts follow city wind values derived from the displayed (simulated or PAGASA-forecast) station values, not the model probability (AUDIT \u00a71.1, `app.py` alert routines).",
+      "replacement": "A warning pop-up and push notification are issued when the displayed next-day wind for a city reaches the Moderate or High wind threshold; the displayed values come from the system's simulation and imported PAGASA forecasts, not from the model probability."
+    },
+    {
+      "id": "R-4-14",
+      "chapter": 4,
+      "section": "SOP 4-7: Survey tables",
+      "claim": "Weighted means and general weighted means",
+      "verdict": "Not found in the code",
+      "evidence": "Raw survey responses are not in the repository. Spot checks: every GWM equals the mean of its listed WMs; 'n of 30' counts are consistent with the WMs. The DRRM Interaction table shows two overall values (3.80, 3.88); CVI and Aiken's V are named but not reported.",
+      "replacement": "Report survey results as user perceptions of usability; they do not measure forecast accuracy. Correct the DRRM Interaction table and report or remove CVI and Aiken's V."
+    },
+    {
+      "id": "R-5-01",
+      "chapter": 5,
+      "section": "Summary 1 / Conclusion 1",
+      "claim": "Nearest-neighbour interpolation, soft-capping Winsorization, all inputs normalised",
+      "verdict": "Wrong",
+      "evidence": "R-4-01.",
+      "replacement": "Use the R-4-01 wording."
+    },
+    {
+      "id": "R-5-02",
+      "chapter": 5,
+      "section": "Summary 2",
+      "claim": "Holdout testing proved the model reliably predicts wind speed, pressure, humidity, rainfall and direction",
+      "verdict": "Wrong",
+      "evidence": "C-14 for wind; other variables were not re-evaluated with neural-only outputs on same-case baselines.",
+      "replacement": "Retrospective testing showed that the model's next-day wind forecasts were less accurate than persistence and climatology; the other regression outputs have not been evaluated against reference forecasts."
+    },
+    {
+      "id": "R-5-03",
+      "chapter": 5,
+      "section": "Summary 3 / Conclusion 3",
+      "claim": "99.62% accuracy, 85.71% recall, 24 of 28 gale events, PR-AUC 0.8302, held-out test; wind MAE 2.04 km/h",
+      "verdict": "Partly correct",
+      "evidence": "Classification numbers reproduce (C-12) but are retrospective and input-scaling dependent; events are pressure-fall proxies; the wind MAE is from a different model (C-18).",
+      "replacement": "On the 2021-2024 evaluation period the historical procedure detected 24 of 28 hazard-label events (all but one defined by pressure falls) with 9 false alarms. Under training-consistent inputs on identical cases, it detected 16 of 27 with 8 false alarms and outperformed event persistence on F1, but its probabilities were not calibrated and its wind forecasts were less accurate than persistence and climatology. Because this period informed earlier modelling decisions, these results are retrospective."
+    },
+    {
+      "id": "R-5-04",
+      "chapter": 5,
+      "section": "Summaries / Conclusions 4-7",
+      "claim": "GWMs 3.69, 3.47, 3.85, 3.72; 'ready for deployment', 'definitive proof of operational utility'",
+      "verdict": "Partly correct",
+      "evidence": "The GWM arithmetic is correct. Usability ratings cannot establish forecast accuracy or deployment readiness.",
+      "replacement": "Evaluators rated the prototype's usability favourably (general weighted means 3.47-3.85 on a 4-point scale). These ratings describe perceived usability and do not establish forecast accuracy or operational readiness, which require prospective verification against observations."
+    },
+    {
+      "id": "R-5-05",
+      "chapter": 5,
+      "section": "Recommendation 1",
+      "claim": "Compare with simpler baselines such as persistence and climatology",
+      "verdict": "Correct",
+      "evidence": "This revision now performs that comparison (Section 4).",
+      "replacement": "Keep, and add: evaluate the frozen model prospectively on 2025+ observations before any operational claim."
+    }
+  ],
+  "omissions": [
+    [
+      "O-01",
+      "No same-case baseline comparison anywhere in Chapters 3-5 (added by this evaluation)."
+    ],
+    [
+      "O-02",
+      "The event label's composition (all test-period events are pressure falls) is not stated in Chapter 4."
+    ],
+    [
+      "O-03",
+      "The difference between the deployed system (24-step endpoint, simulated display values, rule-based tiers) and the evaluated model is not disclosed."
+    ],
+    [
+      "O-04",
+      "Training on Port Area and supplementary rows dated inside the test period is not disclosed."
+    ],
+    [
+      "O-05",
+      "No training history or seed exists; learning curves cannot be shown."
+    ],
+    [
+      "O-06",
+      "The provenance of the 69,388 supplementary rows is undocumented."
+    ],
+    [
+      "O-07",
+      "PAGASA metadata for the wind statistic (mean/maximum, averaging period, height) is not given."
+    ]
+  ],
+  "limitations": [
+    [
+      "L-01",
+      "The evaluation period was used historically for selection; all scores are retrospective and exploratory."
+    ],
+    [
+      "L-02",
+      "Only 27 events, all pressure falls; event metrics have wide intervals, and no gale-force wind event exists to evaluate."
+    ],
+    [
+      "L-03",
+      "W1's event scores depend strongly on input scaling; which scaling the historical decisions assumed differs from training."
+    ],
+    [
+      "L-04",
+      "CSV files are assumed, not proven, to equal the database tables W1 was trained and scored on."
+    ],
+    [
+      "L-05",
+      "Next-day only; no valid two- or three-day procedure exists for W1."
+    ],
+    [
+      "L-06",
+      "The block bootstrap (14-day blocks) captures short-range dependence only; seasonal dependence is not fully represented."
+    ],
+    [
+      "L-07",
+      "Supplementary data provenance is unresolved; its contribution to W1 cannot be separated."
+    ],
+    [
+      "L-08",
+      "The running Hugging Face container was not inspected; deployment identity rests on the Space repository contents."
+    ],
+    [
+      "L-09",
+      "Humidity, rainfall, pressure and direction outputs were not re-evaluated against baselines."
+    ]
+  ]
+}

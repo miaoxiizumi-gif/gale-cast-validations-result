@@ -1,0 +1,122 @@
+[
+  {
+    "id": "C-01",
+    "class": "repo",
+    "claim": "The deployed model file `gale_cast_model_multioutput.keras` (SHA-256 `f2db5aa9\u20269d14b0`) is byte-identical to W1 (`gale_cast_model_multioutput_w3.keras` on `exp/precision-targeting`); all three scalers are identical too.",
+    "evidence": "Stage 1 run s1-identity-20261023T162358Z-33487d; LFS pointer oid; scaler blob hashes."
+  },
+  {
+    "id": "C-02",
+    "class": "repo",
+    "claim": "The Hugging Face Space `main` (`8ffbbb5`, 2026-10-13) references the same model oid, the same three scalers and the same thresholds file.",
+    "evidence": "Read-only blobless clone of the Space, 2026-10-24. The running container itself was not inspected (API returns 401)."
+  },
+  {
+    "id": "C-03",
+    "class": "repo",
+    "claim": "W1 is a dual-stream network with 40,872 parameters: inputs 32 days \u00d7 32 features (normal stream) and 32 days \u00d7 4 features (anomaly stream); outputs one sigmoid probability and six regression values.",
+    "evidence": "Stage 1 run s1-identity-20261023T162358Z-33487d; `_train_w3.py` lines 737-780."
+  },
+  {
+    "id": "C-04",
+    "class": "repo",
+    "claim": "Calling W1 with the 24-step windows that `app.py` builds (`SEQ_LENGTH = 24`, line 180) fails with `InvalidArgumentError`; the training and batch code use 32 steps (`predict_live.py:328`).",
+    "evidence": "Stage 1 run s1-identity-20261023T162358Z-33487d (tested on the frozen model)."
+  },
+  {
+    "id": "C-05",
+    "class": "repo",
+    "claim": "The dashboard risk tier is not derived from the model probability: `risk_level()` (`predict_live.py:451`) and `categorize_prob()` (`app.py:764`) accept `prob` but classify only on wind speed \u2265 10.8/17.2 m/s or pressure drop \u2265 3/6 hPa.",
+    "evidence": "Source reading, source repo `1f2d5dd` (branch `backend-pagasa-privacy`) and Space `8ffbbb5`."
+  },
+  {
+    "id": "C-06",
+    "class": "repo",
+    "claim": "Neither the deployed app nor the batch predictor applies X1 or the 0.601 threshold; both exist only in the historical scoring script `_w1_recall_floor.py`.",
+    "evidence": "Source reading; `THRESHOLD_CONFIG.md` (\"the X1/threshold-0.601 scoring logic exists only in experiments/w1x1/_w1_recall_floor.py\")."
+  },
+  {
+    "id": "C-07",
+    "class": "repo",
+    "claim": "W1 trained on primary-station rows dated before 2020-10-15 **plus** all Port Area rows (to 2023-10-30) **plus** all 69,388 supplementary rows (to 2024-12-30), in one `model.fit` call. There is no pre-training/fine-tuning stage.",
+    "evidence": "`_train_w3.py` lines 205-211, 269-280, 876-890; Stage 2 run s2-partitions-20261023T162410Z-c21688."
+  },
+  {
+    "id": "C-08",
+    "class": "repo",
+    "claim": "Early stopping was configured on the three primary stations, 2020-10-15 to 2021-10-14 (`val_gale_prob_loss`, patience 12, best weights restored).",
+    "evidence": "`_train_w3.py` lines 68-69, 210, 805-810."
+  },
+  {
+    "id": "C-09",
+    "class": "hist",
+    "claim": "No training history, training log or random seed for W1 exists. The stopping epoch (\"stopped at epoch 49, best epoch 37\") is stated only in `THRESHOLD_CONFIG.md`. The committed `dataset_audit.log` belongs to an earlier run (its counts do not match W1's split).",
+    "evidence": "`_train_w3.py` never saves `history`; Stage 2 counts vs `dataset_audit.log`."
+  },
+  {
+    "id": "C-10",
+    "class": "hist",
+    "claim": "W1+X1's originally declared rule (max-F1 on TUNE) selected 0.62 and was scored on TEST (TP 20, FP 7). The 0.601 'recall-floor' rules were introduced afterwards; every threshold from 0.601 to 0.627 gives the identical TUNE matrix, so 0.601 vs 0.62 is decided only by tie-breaking direction.",
+    "evidence": "`variant_score_w3_x1.json`; `_w1_recall_floor.py` lines 1026-1159; Cohort A run a-legacy-20261023T162426Z-b5f446."
+  },
+  {
+    "id": "C-11",
+    "class": "hist",
+    "claim": "X1 (same-day mean across stations) was carried forward after it 'had the best TEST PR-AUC in the previous scan'.",
+    "evidence": "`pre_registration_x_sweep.json` (`exp/precision-targeting`)."
+  },
+  {
+    "id": "C-12",
+    "class": "new",
+    "claim": "The legacy scorecard (3,423 windows; TN 3386, FP 9, FN 4, TP 24; PR-AUC 0.8302) is reproduced exactly from the tracked CSVs using the legacy procedure.",
+    "evidence": "Cohort A run a-legacy-20261023T162426Z-b5f446: 13 of 13 reproduction checks pass."
+  },
+  {
+    "id": "C-13",
+    "class": "new",
+    "claim": "The legacy procedure feeds W1 inputs scaled by one pooled scaler (`scaled_weather`), whereas W1 was trained with per-station scalers. On identical cases the scaling alone moves W1+X1 PR-AUC from 0.487 (training-consistent) to 0.824 (legacy).",
+    "evidence": "Benchmark run b-benchmark-20261023T162436Z-874640; diagnostic runs diag-inputs-20261023T162554Z-f5aef8, diag-insample-20261023T162608Z-7618ef."
+  },
+  {
+    "id": "C-14",
+    "class": "new",
+    "claim": "On 3,520 identical next-day cases (2021-10-15 to 2024-12-31), W1's wind forecast has MAE 1.021 m/s versus 0.467 m/s for persistence and 0.584 m/s for training-period climatology. W1 is worse than both (established).",
+    "evidence": "Benchmark run b-benchmark-20261023T162436Z-874640; 14-day block bootstrap, B = 2,000."
+  },
+  {
+    "id": "C-15",
+    "class": "new",
+    "claim": "All 27 study-label events in the benchmark period are pressure falls \u2265 3 hPa; no day reached 10.8 m/s and no day in the record reached the 17.2 m/s gale threshold.",
+    "evidence": "Benchmark run b-benchmark-20261023T162436Z-874640; Stage 2 run s2-partitions-20261023T162410Z-c21688."
+  },
+  {
+    "id": "C-16",
+    "class": "new",
+    "claim": "With training-consistent inputs, W1+X1 at 0.601 detects 16 of 27 events with 8 false alarms (F1 0.627); event persistence reaches F1 0.226. The F1 difference is established; probabilities are not calibrated (Brier worse than climatology).",
+    "evidence": "Benchmark run b-benchmark-20261023T162436Z-874640."
+  },
+  {
+    "id": "C-17",
+    "class": "interp",
+    "claim": "The 2021-2024 period is not an independent test: it was used to compare W1 with other variants, to adopt X1 and to choose the threshold rule, and W1's training data include Port Area and supplementary rows dated inside it.",
+    "evidence": "C-07, C-10, C-11; Stage 2 run s2-partitions-20261023T162410Z-c21688."
+  },
+  {
+    "id": "C-18",
+    "class": "repo",
+    "claim": "Chapter 4's regression table (wind MAE 2.04 km/h, RMSE 2.92 km/h, MASE 0.715, wind direction 43.40\u00b0) reproduces the pre-W1 scorecard (`validation_cm3.json` before `84d9ae3`, threshold 0.4651, model retrained 2026-08-09); the direction row comes from a separate direction-only model.",
+    "evidence": "`git show 84d9ae3^:validation_cm3.json`; commit `24183d6` message."
+  },
+  {
+    "id": "C-19",
+    "class": "repo",
+    "claim": "`validation_timeline.json` (generated 2026-07-02, threshold 0.5834, 'gale' = wind \u2265 17.2 m/s, 3,426 rows from 2021-11-15) predates W1 and uses a different label and threshold from `validation_cm3.json`; the two cannot be combined.",
+    "evidence": "File metadata and aggregate outcome counts (TN/FP only)."
+  },
+  {
+    "id": "C-20",
+    "class": "hist",
+    "claim": "`Training.csv` reproduces the supplementary counts exactly (69,388 rows; 1,057 positives under the study label; 1,057 + 86 = 1,143, the paper's figure). Whether its rows are observations, synthetic, or verified PAGASA data is not established.",
+    "evidence": "Stage 2b run s2b-supplementary-20261023T162419Z-8ba62b; no construction script or source document found."
+  }
+]
