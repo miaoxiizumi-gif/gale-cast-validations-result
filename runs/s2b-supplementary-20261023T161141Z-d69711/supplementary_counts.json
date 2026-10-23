@@ -1,0 +1,23 @@
+{
+  "run_id": "s2b-supplementary-20261023T161141Z-d69711",
+  "documented": {
+    "train_rows": 78955,
+    "train_gale_events_paper": 1143,
+    "real_station_train_positives_stage2": 86
+  },
+  "section_A_study_rule": {
+    "rows": 69388,
+    "positives_ge1": 1057,
+    "positives_eq2": 151,
+    "positives_plus_real_86": 1143
+  },
+  "section_B_sign_reversed_rule": {
+    "rows": 69388,
+    "positives_ge1": 1430,
+    "positives_eq2": 0,
+    "positives_plus_real_86": 1516
+  },
+  "matches_1143_under": [
+    "section_A_study_rule"
+  ]
+}

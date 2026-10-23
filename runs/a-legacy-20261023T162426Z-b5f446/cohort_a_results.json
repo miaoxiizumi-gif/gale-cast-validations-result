@@ -1,0 +1,90 @@
+{
+  "run_id": "a-legacy-20261023T162426Z-b5f446",
+  "test_windows": 3423,
+  "test_pos": 28,
+  "tune_windows": 1092,
+  "tune_pos": 19,
+  "pr_auc": {
+    "test_raw": 0.7277791504254221,
+    "test_x1": 0.8302171573350975,
+    "tune_raw": 0.9062128003924779,
+    "tune_x1": 0.9257754212119896
+  },
+  "test_x1_0601": {
+    "tn": 3386,
+    "fp": 9,
+    "fn": 4,
+    "tp": 24,
+    "precision": 0.7272727272727273,
+    "recall": 0.8571428571428571,
+    "f1": 0.7868852459016394
+  },
+  "tune_x1_0601": {
+    "tn": 1070,
+    "fp": 3,
+    "fn": 1,
+    "tp": 18,
+    "precision": 0.8571428571428571,
+    "recall": 0.9473684210526315,
+    "f1": 0.9
+  },
+  "test_raw_064": {
+    "tn": 3388,
+    "fp": 7,
+    "fn": 8,
+    "tp": 20,
+    "precision": 0.7407407407407407,
+    "recall": 0.7142857142857143,
+    "f1": 0.7272727272727273
+  },
+  "test_x1_062": {
+    "tn": 3388,
+    "fp": 7,
+    "fn": 8,
+    "tp": 20,
+    "precision": 0.7407407407407407,
+    "recall": 0.7142857142857143,
+    "f1": 0.7272727272727273
+  },
+  "rule_check": {
+    "maxF1_raw": [
+      0.64,
+      0.8947368421052632
+    ],
+    "maxF1_x1": [
+      0.62,
+      0.9
+    ],
+    "fp_scale_factor_uses_TEST_negatives": 3.164026095060578,
+    "R_FP12": 0.601,
+    "R_FP10": 0.601,
+    "R_REC85": 0.601,
+    "tune_threshold_band_with_same_matrix": [
+      0.601,
+      0.627
+    ]
+  },
+  "neural_only_wind_legacy_windows": {
+    "n": 3423,
+    "mae": 0.9874551665389395,
+    "rmse": 1.1715888843733222,
+    "bias": 0.16639883163690636,
+    "pred_mean": 2.5038223266601562,
+    "pred_sd": 0.18272584676742554
+  },
+  "reproduction": {
+    "test_windows": true,
+    "test_pos": true,
+    "pr_auc_raw": true,
+    "pr_auc_x1": true,
+    "pr_auc_tune_raw": true,
+    "pr_auc_tune_x1": true,
+    "x1_0601_test": true,
+    "x1_0601_tune": true,
+    "raw_064_test": true,
+    "x1_062_test": true,
+    "rules_return_0601": true,
+    "maxF1_raw_064": true,
+    "maxF1_x1_062": true
+  }
+}

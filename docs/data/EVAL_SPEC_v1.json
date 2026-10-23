@@ -1,0 +1,102 @@
+{
+  "evaluation_id": "GCV-W1-v1",
+  "declared": "2026-10-24",
+  "governing_document": "spec/EVAL_SPEC_v1.md",
+  "frozen_sha256": {
+    "gale_cast_model_multioutput.keras": "f2db5aa93226225405914094a0855ac725734a0e2c1a2331e3ba69a8fd9d14b0",
+    "scaler_X_normal_mo.save": "c6ea01cbc9724907703439d2f89e7bdc758a3e17ba05716ab819287f88dfab9a",
+    "scaler_X_anomaly_mo.save": "d424175a99eeb9b10f106b2264ee9918ce1f374df29eb83b3b3a2a5820cef8f6",
+    "scaler_y_regression_mo.save": "98dd17a012611d3fde29ac2a81daa784c74e02ed8de518a42885db33c04b9ec8",
+    "galecast_thresholds.json": "476a5d0574a03ea4753fa395273da13832763de77582a585ce833a7723f3c13f"
+  },
+  "stations": [
+    "NAIA",
+    "Sangley Point",
+    "Science Garden"
+  ],
+  "target_dates": [
+    "2021-10-15",
+    "2024-12-31"
+  ],
+  "horizons_days": [
+    1
+  ],
+  "climatology_fit_dates": [
+    "2015-01-01",
+    "2020-10-14"
+  ],
+  "development_dates": [
+    "2020-10-15",
+    "2021-10-14"
+  ],
+  "event_rule": {
+    "wind_ge": 10.8,
+    "pressure_fall_ge_hpa": 3.0,
+    "gale_wind_ge": 17.2,
+    "imputation": "none"
+  },
+  "thresholds": {
+    "w1_raw": 0.64,
+    "w1_x1_primary": 0.601,
+    "w1_x1_secondary": 0.62,
+    "operator": ">=",
+    "event_climatology": "max-F1 on development dates, ties->larger"
+  },
+  "variants": {
+    "v12": 0.57,
+    "v11": 0.6614,
+    "v13": 0.53,
+    "v14": 0.53,
+    "_w6": 0.58,
+    "_w10": 0.56,
+    "_f1": 0.45,
+    "_f2": 0.36
+  },
+  "bootstrap": {
+    "type": "circular block over target dates",
+    "block_days": 14,
+    "B": 2000,
+    "seed": 20261024,
+    "ci": 0.95
+  },
+  "sensitivities": [
+    "by_station",
+    "by_year",
+    "S-LEGACY inputs",
+    "S-NOIMPUTE"
+  ],
+  "legacy_reproduction_targets": {
+    "test_windows": 3423,
+    "test_pos": 28,
+    "pr_auc_raw": 0.7278,
+    "pr_auc_x1": 0.8302,
+    "pr_auc_tune_raw": 0.9062,
+    "pr_auc_tune_x1": 0.9258,
+    "x1_0601_test": [
+      3386,
+      9,
+      4,
+      24
+    ],
+    "x1_0601_tune": [
+      1070,
+      3,
+      1,
+      18
+    ],
+    "raw_064_test": [
+      3388,
+      7,
+      8,
+      20
+    ],
+    "x1_062_test": [
+      3388,
+      7,
+      8,
+      20
+    ],
+    "count_tolerance": 0,
+    "pr_auc_tolerance": 0.001
+  }
+}

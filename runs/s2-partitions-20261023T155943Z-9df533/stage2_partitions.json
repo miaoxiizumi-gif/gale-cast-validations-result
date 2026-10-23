@@ -1,0 +1,301 @@
+{
+  "run_id": "s2-partitions-20261023T155943Z-9df533",
+  "inputs": {
+    "processed_weather.csv_sha256_lf": "6d5b7fb3d0f2b28a246c657bdb8e69a63c025d35b37c3be21d66ce49084cf05b",
+    "raw_csv_sha256": "f5b7bc022500865704de5b32e86e8d321adf49c459bcd4376a49c5722b36e167"
+  },
+  "raw_observations": {
+    "NAIA": {
+      "rows": 3653,
+      "first": "2015-01-01",
+      "last": "2024-12-31",
+      "missing_calendar_days": 0,
+      "duplicate_dates": 0,
+      "missing_wind_speed": 68,
+      "missing_mslp": 54,
+      "missing_rainfall": 99,
+      "non_integer_wind_values": 0,
+      "days_wind_ge_10_8": 1,
+      "days_wind_ge_17_2": 0,
+      "max_wind_ms": 11.0
+    },
+    "Port Area": {
+      "rows": 3226,
+      "first": "2015-01-01",
+      "last": "2023-10-31",
+      "missing_calendar_days": 0,
+      "duplicate_dates": 0,
+      "missing_wind_speed": 26,
+      "missing_mslp": 26,
+      "missing_rainfall": 26,
+      "non_integer_wind_values": 0,
+      "days_wind_ge_10_8": 0,
+      "days_wind_ge_17_2": 0,
+      "max_wind_ms": 10.0
+    },
+    "Sangley Point": {
+      "rows": 3653,
+      "first": "2015-01-01",
+      "last": "2024-12-31",
+      "missing_calendar_days": 0,
+      "duplicate_dates": 0,
+      "missing_wind_speed": 1,
+      "missing_mslp": 0,
+      "missing_rainfall": 0,
+      "non_integer_wind_values": 0,
+      "days_wind_ge_10_8": 0,
+      "days_wind_ge_17_2": 0,
+      "max_wind_ms": 10.0
+    },
+    "Science Garden": {
+      "rows": 3653,
+      "first": "2015-01-01",
+      "last": "2024-12-31",
+      "missing_calendar_days": 0,
+      "duplicate_dates": 0,
+      "missing_wind_speed": 4,
+      "missing_mslp": 3,
+      "missing_rainfall": 4,
+      "non_integer_wind_values": 0,
+      "days_wind_ge_10_8": 0,
+      "days_wind_ge_17_2": 0,
+      "max_wind_ms": 6.0
+    }
+  },
+  "processed_rows": {
+    "NAIA": {
+      "rows": 3652,
+      "first": "2015-01-01",
+      "last": "2024-12-30",
+      "label_pos_ge1": 38,
+      "label_pos_eq2": 5
+    },
+    "Port Area": {
+      "rows": 3225,
+      "first": "2015-01-01",
+      "last": "2023-10-30",
+      "label_pos_ge1": 35,
+      "label_pos_eq2": 7
+    },
+    "Sangley Point": {
+      "rows": 3652,
+      "first": "2015-01-01",
+      "last": "2024-12-30",
+      "label_pos_ge1": 29,
+      "label_pos_eq2": 3
+    },
+    "Science Garden": {
+      "rows": 3652,
+      "first": "2015-01-01",
+      "last": "2024-12-30",
+      "label_pos_ge1": 31,
+      "label_pos_eq2": 3
+    }
+  },
+  "w1_split_reconstructed": {
+    "rule_source": "exp/precision-targeting:experiments/w1x1/_train_w3.py lines 37-38, 68-69, 205-211, 262-264",
+    "train_real": {
+      "total": {
+        "rows": 9567,
+        "first": "2015-01-01",
+        "last": "2023-10-30",
+        "label_pos_ge1": 86,
+        "label_pos_eq2": 11
+      },
+      "by_station": {
+        "NAIA": {
+          "rows": 2114,
+          "first": "2015-01-01",
+          "last": "2020-10-14",
+          "label_pos_ge1": 22,
+          "label_pos_eq2": 3
+        },
+        "Port Area": {
+          "rows": 3225,
+          "first": "2015-01-01",
+          "last": "2023-10-30",
+          "label_pos_ge1": 35,
+          "label_pos_eq2": 7
+        },
+        "Sangley Point": {
+          "rows": 2114,
+          "first": "2015-01-01",
+          "last": "2020-10-14",
+          "label_pos_ge1": 15,
+          "label_pos_eq2": 0
+        },
+        "Science Garden": {
+          "rows": 2114,
+          "first": "2015-01-01",
+          "last": "2020-10-14",
+          "label_pos_ge1": 14,
+          "label_pos_eq2": 1
+        }
+      }
+    },
+    "early_stop_narrow": {
+      "total": {
+        "rows": 1095,
+        "first": "2020-10-15",
+        "last": "2021-10-14",
+        "label_pos_ge1": 19,
+        "label_pos_eq2": 3
+      },
+      "by_station": {
+        "NAIA": {
+          "rows": 365,
+          "first": "2020-10-15",
+          "last": "2021-10-14",
+          "label_pos_ge1": 6,
+          "label_pos_eq2": 1
+        },
+        "Sangley Point": {
+          "rows": 365,
+          "first": "2020-10-15",
+          "last": "2021-10-14",
+          "label_pos_ge1": 6,
+          "label_pos_eq2": 1
+        },
+        "Science Garden": {
+          "rows": 365,
+          "first": "2020-10-15",
+          "last": "2021-10-14",
+          "label_pos_ge1": 7,
+          "label_pos_eq2": 1
+        }
+      }
+    },
+    "early_stop_widened_context": {
+      "total": {
+        "rows": 1191,
+        "first": "2020-09-13",
+        "last": "2021-10-14",
+        "label_pos_ge1": 19,
+        "label_pos_eq2": 3
+      }
+    },
+    "test": {
+      "total": {
+        "rows": 3519,
+        "first": "2021-10-15",
+        "last": "2024-12-30",
+        "label_pos_ge1": 28,
+        "label_pos_eq2": 4
+      },
+      "by_station": {
+        "NAIA": {
+          "rows": 1173,
+          "first": "2021-10-15",
+          "last": "2024-12-30",
+          "label_pos_ge1": 10,
+          "label_pos_eq2": 1
+        },
+        "Sangley Point": {
+          "rows": 1173,
+          "first": "2021-10-15",
+          "last": "2024-12-30",
+          "label_pos_ge1": 8,
+          "label_pos_eq2": 2
+        },
+        "Science Garden": {
+          "rows": 1173,
+          "first": "2021-10-15",
+          "last": "2024-12-30",
+          "label_pos_ge1": 10,
+          "label_pos_eq2": 1
+        }
+      }
+    },
+    "port_area_rows_dated_in_es_period": 365,
+    "port_area_rows_dated_in_test_period": 746,
+    "windows_train_real_only": {
+      "windows": 9439,
+      "positive_windows": 86,
+      "dropped_cross_station": 96,
+      "by_station": {
+        "NAIA": {
+          "windows": 2082,
+          "positive": 22
+        },
+        "Port Area": {
+          "windows": 3193,
+          "positive": 35
+        },
+        "Sangley Point": {
+          "windows": 2082,
+          "positive": 15
+        },
+        "Science Garden": {
+          "windows": 2082,
+          "positive": 14
+        }
+      }
+    },
+    "windows_early_stop_widened": {
+      "windows": 1095,
+      "positive_windows": 19,
+      "dropped_cross_station": 64,
+      "by_station": {
+        "NAIA": {
+          "windows": 365,
+          "positive": 6
+        },
+        "Sangley Point": {
+          "windows": 365,
+          "positive": 6
+        },
+        "Science Garden": {
+          "windows": 365,
+          "positive": 7
+        }
+      }
+    },
+    "windows_test_strict_per_station": {
+      "windows": 3423
+    }
+  },
+  "documented_claims": {
+    "THRESHOLD_CONFIG.md": {
+      "TRAIN_rows": 78955,
+      "TUNE_rows": 1095,
+      "TEST_rows": 3519,
+      "TEST_windows": 3423,
+      "real_train_rows_implied": 9567,
+      "supplementary_rows_implied": 69388
+    },
+    "_train_w3.py comment line 247": {
+      "tune_rows": 1095,
+      "tune_gale_days": 17
+    }
+  },
+  "supplementary_Training_csv": {
+    "available": true,
+    "file_sha256": "15d24927c637dd5913ab2b5cc2e31d291ddc3a0cbba455533da029dff1d2aeb4",
+    "rows": 69407,
+    "stations": 19,
+    "first": "2015-01-01",
+    "last": "2024-12-31",
+    "rows_per_station_min_max": [
+      3653,
+      3653
+    ],
+    "fraction_wind_non_integer": 0.0,
+    "fraction_mslp_not_0p1_resolution": 0.0,
+    "fraction_days_study_rule_positive": 0.015229011482991628,
+    "fraction_days_sign_reversed_rule_positive": 0.020588701427809875,
+    "days_wind_ge_10_8": 62,
+    "days_wind_ge_17_2": 4,
+    "overlaps_primary_test_dates": true,
+    "rows_dated_in_es_period": 6935,
+    "rows_dated_in_test_period": 22306,
+    "rows_minus_one_per_station": 69388
+  },
+  "claim_checks": {
+    "train_real_rows_match_9567": true,
+    "tune_rows_match_1095": true,
+    "test_rows_match_3519": true,
+    "test_windows_match_3423": true,
+    "supplementary_rows_match_69388_plus_one_per_station": true,
+    "TRAIN_78955_equals_real_plus_69388": true
+  }
+}

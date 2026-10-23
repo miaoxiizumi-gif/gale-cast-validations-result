@@ -1,0 +1,1 @@
+FAILED: manifest step raised CalledProcessError (workspace git had no commit). stage1_identity.json in this folder was written before the failure; superseded by the next s1-identity run.

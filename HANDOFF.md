@@ -35,3 +35,9 @@ Every script creates a new run directory. Never overwrite or delete a run; mark 
 ## Rules followed
 
 No retraining, rescoring of production, database access, server start, or production edits. The specification was committed before scoring. Only aggregates are published.
+
+## Run provenance note
+
+Each stage was run twice: first during development (runs timestamped ~15:58-16:14 UTC, code not yet committed), then once more at the
+committed code `ed43f73` (~16:24-16:27 UTC). The two passes give identical results for every stage, and the site cites the second pass.
+The first-stage run `s1-identity-20261023T155839Z-f080ae` is preceded by a failed run marked `FAILED.txt` (a manifest-writing bug, since fixed).

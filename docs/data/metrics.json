@@ -1,0 +1,1422 @@
+{
+  "evaluation_id": "GCV-W1-v1",
+  "metrics": [
+    {
+      "id": "M-W-POO-W1-MAE",
+      "metric": "Wind MAE m/s, pooled, W1",
+      "value": 1.0210015133700587,
+      "ci95": {
+        "lo": 0.986940389047515,
+        "hi": 1.0604765697708138,
+        "undefined_resamples": 0
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-POO-W1-RMSE",
+      "metric": "Wind RMSE m/s, pooled, W1",
+      "value": 1.2231096082408317,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-POO-W1-BIAS",
+      "metric": "Wind bias m/s (forecast-observed), pooled, W1",
+      "value": 0.3035253434695981,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-POO-PER-MAE",
+      "metric": "Wind MAE m/s, pooled, persistence",
+      "value": 0.46732954545454547,
+      "ci95": {
+        "lo": 0.4360370125717091,
+        "hi": 0.4983096752232718,
+        "undefined_resamples": 0
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-POO-PER-RMSE",
+      "metric": "Wind RMSE m/s, pooled, persistence",
+      "value": 0.7911082560100563,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-POO-PER-BIAS",
+      "metric": "Wind bias m/s (forecast-observed), pooled, persistence",
+      "value": -0.0008522727272727272,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-POO-CLI-MAE",
+      "metric": "Wind MAE m/s, pooled, climatology",
+      "value": 0.584124970631096,
+      "ci95": {
+        "lo": 0.5489471298905895,
+        "hi": 0.6234777778798134,
+        "undefined_resamples": 0
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-POO-CLI-RMSE",
+      "metric": "Wind RMSE m/s, pooled, climatology",
+      "value": 0.794836943405769,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-POO-CLI-BIAS",
+      "metric": "Wind bias m/s (forecast-observed), pooled, climatology",
+      "value": 0.02347899199606757,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-POO-DMAE_W1_PERSISTENCE",
+      "metric": "Paired MAE difference W1 minus persistence, pooled",
+      "value": null,
+      "ci95": {
+        "lo": 0.5184664507379586,
+        "hi": 0.5947193096644461,
+        "undefined_resamples": 0,
+        "verdict": "established: positive"
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-POO-DMAE_W1_CLIMATOLOGY",
+      "metric": "Paired MAE difference W1 minus climatology, pooled",
+      "value": null,
+      "ci95": {
+        "lo": 0.41093939517627115,
+        "hi": 0.4626802257016298,
+        "undefined_resamples": 0,
+        "verdict": "established: positive"
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-NAI-W1-MAE",
+      "metric": "Wind MAE m/s, NAIA, W1",
+      "value": 0.7386075845162751,
+      "ci95": {
+        "lo": 0.6752570047035331,
+        "hi": 0.8150801664519757,
+        "undefined_resamples": 0
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-NAI-W1-RMSE",
+      "metric": "Wind RMSE m/s, NAIA, W1",
+      "value": 0.9621416466125632,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-NAI-W1-BIAS",
+      "metric": "Wind bias m/s (forecast-observed), NAIA, W1",
+      "value": -0.2825397149464544,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-NAI-PER-MAE",
+      "metric": "Wind MAE m/s, NAIA, persistence",
+      "value": 0.524701873935264,
+      "ci95": {
+        "lo": 0.4778534923339012,
+        "hi": 0.5715502555366269,
+        "undefined_resamples": 0
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-NAI-PER-RMSE",
+      "metric": "Wind RMSE m/s, NAIA, persistence",
+      "value": 0.8448662484994252,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-NAI-PER-BIAS",
+      "metric": "Wind bias m/s (forecast-observed), NAIA, persistence",
+      "value": 0.0,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-NAI-CLI-MAE",
+      "metric": "Wind MAE m/s, NAIA, climatology",
+      "value": 0.6856500992173621,
+      "ci95": {
+        "lo": 0.6257991583964349,
+        "hi": 0.7499609619278274,
+        "undefined_resamples": 0
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-NAI-CLI-RMSE",
+      "metric": "Wind RMSE m/s, NAIA, climatology",
+      "value": 0.9122381881385406,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-NAI-CLI-BIAS",
+      "metric": "Wind bias m/s (forecast-observed), NAIA, climatology",
+      "value": 0.07932463110299431,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-NAI-DMAE_W1_PERSISTENCE",
+      "metric": "Paired MAE difference W1 minus persistence, NAIA",
+      "value": null,
+      "ci95": {
+        "lo": 0.1604494678405522,
+        "hi": 0.2810221317679553,
+        "undefined_resamples": 0,
+        "verdict": "established: positive"
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-NAI-DMAE_W1_CLIMATOLOGY",
+      "metric": "Paired MAE difference W1 minus climatology, NAIA",
+      "value": null,
+      "ci95": {
+        "lo": 0.0007024394145139782,
+        "hi": 0.11085677413844985,
+        "undefined_resamples": 0,
+        "verdict": "established: positive"
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SAN-W1-MAE",
+      "metric": "Wind MAE m/s, Sangley Point, W1",
+      "value": 0.8231212783592146,
+      "ci95": {
+        "lo": 0.75820326929192,
+        "hi": 0.9007367829010483,
+        "undefined_resamples": 0
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SAN-W1-RMSE",
+      "metric": "Wind RMSE m/s, Sangley Point, W1",
+      "value": 1.0503827140604425,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SAN-W1-BIAS",
+      "metric": "Wind bias m/s (forecast-observed), Sangley Point, W1",
+      "value": -0.3075060461975202,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SAN-PER-MAE",
+      "metric": "Wind MAE m/s, Sangley Point, persistence",
+      "value": 0.6629692832764505,
+      "ci95": {
+        "lo": 0.6117699836037933,
+        "hi": 0.7163543441226575,
+        "undefined_resamples": 0
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SAN-PER-RMSE",
+      "metric": "Wind RMSE m/s, Sangley Point, persistence",
+      "value": 0.9665921276820582,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SAN-PER-BIAS",
+      "metric": "Wind bias m/s (forecast-observed), Sangley Point, persistence",
+      "value": -0.002559726962457338,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SAN-CLI-MAE",
+      "metric": "Wind MAE m/s, Sangley Point, climatology",
+      "value": 0.7280882139941154,
+      "ci95": {
+        "lo": 0.676764595707133,
+        "hi": 0.788625903728739,
+        "undefined_resamples": 0
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SAN-CLI-RMSE",
+      "metric": "Wind RMSE m/s, Sangley Point, climatology",
+      "value": 0.946190839792312,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SAN-CLI-BIAS",
+      "metric": "Wind bias m/s (forecast-observed), Sangley Point, climatology",
+      "value": -0.08989942847910823,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SAN-DMAE_W1_PERSISTENCE",
+      "metric": "Paired MAE difference W1 minus persistence, Sangley Point",
+      "value": null,
+      "ci95": {
+        "lo": 0.09413547280293717,
+        "hi": 0.2361849740997021,
+        "undefined_resamples": 0,
+        "verdict": "established: positive"
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SAN-DMAE_W1_CLIMATOLOGY",
+      "metric": "Paired MAE difference W1 minus climatology, Sangley Point",
+      "value": null,
+      "ci95": {
+        "lo": 0.05844703628244785,
+        "hi": 0.13430599875212715,
+        "undefined_resamples": 0,
+        "verdict": "established: positive"
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SCI-W1-MAE",
+      "metric": "Wind MAE m/s, Science Garden, W1",
+      "value": 1.5009385729160991,
+      "ci95": {
+        "lo": 1.4605816247109864,
+        "hi": 1.5427114998258562,
+        "undefined_resamples": 0
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SCI-W1-RMSE",
+      "metric": "Wind RMSE m/s, Science Garden, W1",
+      "value": 1.5678973065062038,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SCI-W1-BIAS",
+      "metric": "Wind bias m/s (forecast-observed), Science Garden, W1",
+      "value": 1.4995808522177312,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SCI-PER-MAE",
+      "metric": "Wind MAE m/s, Science Garden, persistence",
+      "value": 0.21465076660988075,
+      "ci95": {
+        "lo": 0.1805579216354344,
+        "hi": 0.2504258943781942,
+        "undefined_resamples": 0
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SCI-PER-RMSE",
+      "metric": "Wind RMSE m/s, Science Garden, persistence",
+      "value": 0.47956539097903245,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SCI-PER-BIAS",
+      "metric": "Wind bias m/s (forecast-observed), Science Garden, persistence",
+      "value": 0.0,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SCI-CLI-MAE",
+      "metric": "Wind MAE m/s, Science Garden, climatology",
+      "value": 0.3388818512258704,
+      "ci95": {
+        "lo": 0.31784167540338665,
+        "hi": 0.36068841941064084,
+        "undefined_resamples": 0
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SCI-CLI-RMSE",
+      "metric": "Wind RMSE m/s, Science Garden, climatology",
+      "value": 0.41023236658470313,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SCI-CLI-BIAS",
+      "metric": "Wind bias m/s (forecast-observed), Science Garden, climatology",
+      "value": 0.08081862443676098,
+      "ci95": null,
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SCI-DMAE_W1_PERSISTENCE",
+      "metric": "Paired MAE difference W1 minus persistence, Science Garden",
+      "value": null,
+      "ci95": {
+        "lo": 1.218372038961269,
+        "hi": 1.3527753317224107,
+        "undefined_resamples": 0,
+        "verdict": "established: positive"
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-W-SCI-DMAE_W1_CLIMATOLOGY",
+      "metric": "Paired MAE difference W1 minus climatology, Science Garden",
+      "value": null,
+      "ci95": {
+        "lo": 1.105901768009978,
+        "hi": 1.216600237018064,
+        "undefined_resamples": 0,
+        "verdict": "established: positive"
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-E-POO-W1_raw@0.64",
+      "metric": "Event confusion matrix and scores, pooled, W1_raw@0.64",
+      "value": {
+        "tp": 11.0,
+        "fn": 16.0,
+        "fp": 20.0,
+        "tn": 3473.0,
+        "n": 3520.0,
+        "accuracy": 0.9897727272727272,
+        "precision": 0.3548387096774194,
+        "recall": 0.4074074074074074,
+        "f1": 0.3793103448275862,
+        "prevalence": 0.007670454545454545,
+        "all_negative_accuracy": 0.9923295454545454
+      },
+      "ci95": {
+        "precision": {
+          "lo": 0.1,
+          "hi": 0.5666891891891891,
+          "undefined_resamples": 0
+        },
+        "recall": {
+          "lo": 0.14285714285714285,
+          "hi": 0.6666666666666666,
+          "undefined_resamples": 1
+        },
+        "f1": {
+          "lo": 0.11994117647058823,
+          "hi": 0.5555555555555556,
+          "undefined_resamples": 0
+        }
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-E-POO-W1+X1@0.601",
+      "metric": "Event confusion matrix and scores, pooled, W1+X1@0.601",
+      "value": {
+        "tp": 16.0,
+        "fn": 11.0,
+        "fp": 8.0,
+        "tn": 3485.0,
+        "n": 3520.0,
+        "accuracy": 0.9946022727272728,
+        "precision": 0.6666666666666666,
+        "recall": 0.5925925925925926,
+        "f1": 0.6274509803921569,
+        "prevalence": 0.007670454545454545,
+        "all_negative_accuracy": 0.9923295454545454
+      },
+      "ci95": {
+        "precision": {
+          "lo": 0.3333333333333333,
+          "hi": 0.9333333333333333,
+          "undefined_resamples": 4
+        },
+        "recall": {
+          "lo": 0.23076923076923078,
+          "hi": 0.8888888888888888,
+          "undefined_resamples": 1
+        },
+        "f1": {
+          "lo": 0.2852216748768473,
+          "hi": 0.8387096774193549,
+          "undefined_resamples": 1
+        }
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-E-POO-W1+X1@0.62",
+      "metric": "Event confusion matrix and scores, pooled, W1+X1@0.62",
+      "value": {
+        "tp": 10.0,
+        "fn": 17.0,
+        "fp": 8.0,
+        "tn": 3485.0,
+        "n": 3520.0,
+        "accuracy": 0.9928977272727273,
+        "precision": 0.5555555555555556,
+        "recall": 0.37037037037037035,
+        "f1": 0.4444444444444444,
+        "prevalence": 0.007670454545454545,
+        "all_negative_accuracy": 0.9923295454545454
+      },
+      "ci95": {
+        "precision": {
+          "lo": 0.2,
+          "hi": 0.8333333333333334,
+          "undefined_resamples": 12
+        },
+        "recall": {
+          "lo": 0.08695652173913043,
+          "hi": 0.6334848484848483,
+          "undefined_resamples": 1
+        },
+        "f1": {
+          "lo": 0.125,
+          "hi": 0.6341463414634146,
+          "undefined_resamples": 1
+        }
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-E-POO-event_persistence",
+      "metric": "Event confusion matrix and scores, pooled, event_persistence",
+      "value": {
+        "tp": 6.0,
+        "fn": 21.0,
+        "fp": 20.0,
+        "tn": 3473.0,
+        "n": 3520.0,
+        "accuracy": 0.9883522727272728,
+        "precision": 0.23076923076923078,
+        "recall": 0.2222222222222222,
+        "f1": 0.22641509433962265,
+        "prevalence": 0.007670454545454545,
+        "all_negative_accuracy": 0.9923295454545454
+      },
+      "ci95": {
+        "precision": {
+          "lo": 0.0625,
+          "hi": 0.3889492753623185,
+          "undefined_resamples": 0
+        },
+        "recall": {
+          "lo": 0.05555555555555555,
+          "hi": 0.375,
+          "undefined_resamples": 1
+        },
+        "f1": {
+          "lo": 0.058823529411764705,
+          "hi": 0.375,
+          "undefined_resamples": 0
+        }
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-E-POO-event_climatology@0.0355",
+      "metric": "Event confusion matrix and scores, pooled, event_climatology@0.0355",
+      "value": {
+        "tp": 11.0,
+        "fn": 16.0,
+        "fp": 317.0,
+        "tn": 3176.0,
+        "n": 3520.0,
+        "accuracy": 0.9053977272727273,
+        "precision": 0.03353658536585366,
+        "recall": 0.4074074074074074,
+        "f1": 0.061971830985915494,
+        "prevalence": 0.007670454545454545,
+        "all_negative_accuracy": 0.9923295454545454
+      },
+      "ci95": {
+        "precision": {
+          "lo": 0.0,
+          "hi": 0.08248004030695291,
+          "undefined_resamples": 0
+        },
+        "recall": {
+          "lo": 0.0,
+          "hi": 0.8129464285714282,
+          "undefined_resamples": 1
+        },
+        "f1": {
+          "lo": 0.0,
+          "hi": 0.14254692968501426,
+          "undefined_resamples": 0
+        }
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-P-POO-W1_raw",
+      "metric": "Probabilistic scores, pooled, W1_raw",
+      "value": {
+        "pr_auc": 0.3552285039896026,
+        "brier": 0.03584419511904231,
+        "brier_skill_vs_climatology": -3.7424924572918954
+      },
+      "ci95": {
+        "lo": 0.14346815878487343,
+        "hi": 0.6171286177044469,
+        "undefined_resamples": 1
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-P-POO-W1+X1",
+      "metric": "Probabilistic scores, pooled, W1+X1",
+      "value": {
+        "pr_auc": 0.48679926153789843,
+        "brier": 0.028707340420738,
+        "brier_skill_vs_climatology": -2.798225764649231
+      },
+      "ci95": {
+        "lo": 0.2149053259647708,
+        "hi": 0.7881416611287739,
+        "undefined_resamples": 1
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-P-POO-event_climatology",
+      "metric": "Probabilistic scores, pooled, event_climatology",
+      "value": {
+        "pr_auc": 0.022075980615074285,
+        "brier": 0.007558092172382793,
+        "brier_skill_vs_climatology": 0.0
+      },
+      "ci95": {
+        "lo": 0.0037638793927343168,
+        "hi": 0.060803776953533346,
+        "undefined_resamples": 1
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-P-POO-W1_raw_legacy_inputs",
+      "metric": "Probabilistic scores, pooled, W1_raw_legacy_inputs",
+      "value": {
+        "pr_auc": 0.7167074328595157,
+        "brier": 0.0362295889003351,
+        "brier_skill_vs_climatology": -3.793483338654921
+      },
+      "ci95": {
+        "lo": 0.5341671721428516,
+        "hi": 0.8712372092039405,
+        "undefined_resamples": 1
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-P-POO-W1+X1_legacy_inputs",
+      "metric": "Probabilistic scores, pooled, W1+X1_legacy_inputs",
+      "value": {
+        "pr_auc": 0.824435797649987,
+        "brier": 0.03506941794076813,
+        "brier_skill_vs_climatology": -3.639982834413094
+      },
+      "ci95": {
+        "lo": 0.6242373982905244,
+        "hi": 0.9520227720717915,
+        "undefined_resamples": 1
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-E-NAI-W1_raw@0.64",
+      "metric": "Event confusion matrix and scores, NAIA, W1_raw@0.64",
+      "value": {
+        "tp": 4.0,
+        "fn": 6.0,
+        "fp": 3.0,
+        "tn": 1161.0,
+        "n": 1174.0,
+        "accuracy": 0.9923339011925043,
+        "precision": 0.5714285714285714,
+        "recall": 0.4,
+        "f1": 0.47058823529411764,
+        "prevalence": 0.008517887563884156,
+        "all_negative_accuracy": 0.9914821124361158
+      },
+      "ci95": {
+        "precision": {
+          "lo": 0.2,
+          "hi": 1.0,
+          "undefined_resamples": 5
+        },
+        "recall": {
+          "lo": 0.1111111111111111,
+          "hi": 0.7,
+          "undefined_resamples": 1
+        },
+        "f1": {
+          "lo": 0.16666666666666666,
+          "hi": 0.6666666666666666,
+          "undefined_resamples": 0
+        }
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-E-NAI-W1+X1@0.601",
+      "metric": "Event confusion matrix and scores, NAIA, W1+X1@0.601",
+      "value": {
+        "tp": 6.0,
+        "fn": 4.0,
+        "fp": 2.0,
+        "tn": 1162.0,
+        "n": 1174.0,
+        "accuracy": 0.9948892674616695,
+        "precision": 0.75,
+        "recall": 0.6,
+        "f1": 0.6666666666666666,
+        "prevalence": 0.008517887563884156,
+        "all_negative_accuracy": 0.9914821124361158
+      },
+      "ci95": {
+        "precision": {
+          "lo": 0.41458333333333336,
+          "hi": 1.0,
+          "undefined_resamples": 4
+        },
+        "recall": {
+          "lo": 0.3333333333333333,
+          "hi": 0.8888888888888888,
+          "undefined_resamples": 1
+        },
+        "f1": {
+          "lo": 0.4,
+          "hi": 0.8571428571428571,
+          "undefined_resamples": 1
+        }
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-E-NAI-W1+X1@0.62",
+      "metric": "Event confusion matrix and scores, NAIA, W1+X1@0.62",
+      "value": {
+        "tp": 4.0,
+        "fn": 6.0,
+        "fp": 2.0,
+        "tn": 1162.0,
+        "n": 1174.0,
+        "accuracy": 0.9931856899488927,
+        "precision": 0.6666666666666666,
+        "recall": 0.4,
+        "f1": 0.5,
+        "prevalence": 0.008517887563884156,
+        "all_negative_accuracy": 0.9914821124361158
+      },
+      "ci95": {
+        "precision": {
+          "lo": 0.3333333333333333,
+          "hi": 1.0,
+          "undefined_resamples": 12
+        },
+        "recall": {
+          "lo": 0.14285714285714285,
+          "hi": 0.625,
+          "undefined_resamples": 1
+        },
+        "f1": {
+          "lo": 0.2,
+          "hi": 0.6666666666666666,
+          "undefined_resamples": 1
+        }
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-E-NAI-event_persistence",
+      "metric": "Event confusion matrix and scores, NAIA, event_persistence",
+      "value": {
+        "tp": 3.0,
+        "fn": 7.0,
+        "fp": 7.0,
+        "tn": 1157.0,
+        "n": 1174.0,
+        "accuracy": 0.9880749574105622,
+        "precision": 0.3,
+        "recall": 0.3,
+        "f1": 0.3,
+        "prevalence": 0.008517887563884156,
+        "all_negative_accuracy": 0.9914821124361158
+      },
+      "ci95": {
+        "precision": {
+          "lo": 0.0,
+          "hi": 0.5,
+          "undefined_resamples": 0
+        },
+        "recall": {
+          "lo": 0.0,
+          "hi": 0.4707430340557274,
+          "undefined_resamples": 1
+        },
+        "f1": {
+          "lo": 0.0,
+          "hi": 0.46153846153846156,
+          "undefined_resamples": 0
+        }
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-E-NAI-event_climatology@0.0355",
+      "metric": "Event confusion matrix and scores, NAIA, event_climatology@0.0355",
+      "value": {
+        "tp": 4.0,
+        "fn": 6.0,
+        "fp": 106.0,
+        "tn": 1058.0,
+        "n": 1174.0,
+        "accuracy": 0.9045996592844975,
+        "precision": 0.03636363636363636,
+        "recall": 0.4,
+        "f1": 0.06666666666666667,
+        "prevalence": 0.008517887563884156,
+        "all_negative_accuracy": 0.9914821124361158
+      },
+      "ci95": {
+        "precision": {
+          "lo": 0.0,
+          "hi": 0.0895606238470568,
+          "undefined_resamples": 0
+        },
+        "recall": {
+          "lo": 0.0,
+          "hi": 0.8,
+          "undefined_resamples": 1
+        },
+        "f1": {
+          "lo": 0.0,
+          "hi": 0.15384615384615385,
+          "undefined_resamples": 0
+        }
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-P-NAI-W1_raw",
+      "metric": "Probabilistic scores, NAIA, W1_raw",
+      "value": {
+        "pr_auc": 0.5884456419134235,
+        "brier": 0.03384573927567466,
+        "brier_skill_vs_climatology": -3.047097819207706
+      },
+      "ci95": {
+        "lo": 0.31912025226618357,
+        "hi": 0.8078685030247529,
+        "undefined_resamples": 1
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-P-NAI-W1+X1",
+      "metric": "Probabilistic scores, NAIA, W1+X1",
+      "value": {
+        "pr_auc": 0.633728198130372,
+        "brier": 0.02835148218442471,
+        "brier_skill_vs_climatology": -2.390123075324794
+      },
+      "ci95": {
+        "lo": 0.39113305322128855,
+        "hi": 0.8481950027643806,
+        "undefined_resamples": 1
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-P-NAI-event_climatology",
+      "metric": "Probabilistic scores, NAIA, event_climatology",
+      "value": {
+        "pr_auc": 0.025488806413215548,
+        "brier": 0.008362965460098662,
+        "brier_skill_vs_climatology": 0.0
+      },
+      "ci95": {
+        "lo": 0.0051305074527240825,
+        "hi": 0.06721117366114204,
+        "undefined_resamples": 1
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-P-NAI-W1_raw_legacy_inputs",
+      "metric": "Probabilistic scores, NAIA, W1_raw_legacy_inputs",
+      "value": {
+        "pr_auc": 0.8276758241758241,
+        "brier": 0.03527050253133569,
+        "brier_skill_vs_climatology": -3.21746361378845
+      },
+      "ci95": {
+        "lo": 0.6416097308488612,
+        "hi": 1.0,
+        "undefined_resamples": 1
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-P-NAI-W1+X1_legacy_inputs",
+      "metric": "Probabilistic scores, NAIA, W1+X1_legacy_inputs",
+      "value": {
+        "pr_auc": 0.9733333333333333,
+        "brier": 0.03448122234909567,
+        "brier_skill_vs_climatology": -3.1230855865197933
+      },
+      "ci95": {
+        "lo": 0.8908080808080809,
+        "hi": 1.0,
+        "undefined_resamples": 1
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-E-SAN-W1_raw@0.64",
+      "metric": "Event confusion matrix and scores, Sangley Point, W1_raw@0.64",
+      "value": {
+        "tp": 2.0,
+        "fn": 5.0,
+        "fp": 6.0,
+        "tn": 1159.0,
+        "n": 1172.0,
+        "accuracy": 0.9906143344709898,
+        "precision": 0.25,
+        "recall": 0.2857142857142857,
+        "f1": 0.26666666666666666,
+        "prevalence": 0.005972696245733789,
+        "all_negative_accuracy": 0.9940273037542662
+      },
+      "ci95": {
+        "precision": {
+          "lo": 0.0,
+          "hi": 0.5462121212121216,
+          "undefined_resamples": 2
+        },
+        "recall": {
+          "lo": 0.0,
+          "hi": 0.6,
+          "undefined_resamples": 2
+        },
+        "f1": {
+          "lo": 0.0,
+          "hi": 0.5,
+          "undefined_resamples": 0
+        }
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-E-SAN-W1+X1@0.601",
+      "metric": "Event confusion matrix and scores, Sangley Point, W1+X1@0.601",
+      "value": {
+        "tp": 5.0,
+        "fn": 2.0,
+        "fp": 3.0,
+        "tn": 1162.0,
+        "n": 1172.0,
+        "accuracy": 0.9957337883959044,
+        "precision": 0.625,
+        "recall": 0.7142857142857143,
+        "f1": 0.6666666666666666,
+        "prevalence": 0.005972696245733789,
+        "all_negative_accuracy": 0.9940273037542662
+      },
+      "ci95": {
+        "precision": {
+          "lo": 0.24375,
+          "hi": 1.0,
+          "undefined_resamples": 4
+        },
+        "recall": {
+          "lo": 0.25,
+          "hi": 1.0,
+          "undefined_resamples": 2
+        },
+        "f1": {
+          "lo": 0.25,
+          "hi": 0.9230769230769231,
+          "undefined_resamples": 2
+        }
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-E-SAN-W1+X1@0.62",
+      "metric": "Event confusion matrix and scores, Sangley Point, W1+X1@0.62",
+      "value": {
+        "tp": 3.0,
+        "fn": 4.0,
+        "fp": 3.0,
+        "tn": 1162.0,
+        "n": 1172.0,
+        "accuracy": 0.9940273037542662,
+        "precision": 0.5,
+        "recall": 0.42857142857142855,
+        "f1": 0.46153846153846156,
+        "prevalence": 0.005972696245733789,
+        "all_negative_accuracy": 0.9940273037542662
+      },
+      "ci95": {
+        "precision": {
+          "lo": 0.0,
+          "hi": 1.0,
+          "undefined_resamples": 12
+        },
+        "recall": {
+          "lo": 0.0,
+          "hi": 0.8333333333333334,
+          "undefined_resamples": 2
+        },
+        "f1": {
+          "lo": 0.0,
+          "hi": 0.7272727272727273,
+          "undefined_resamples": 2
+        }
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-E-SAN-event_persistence",
+      "metric": "Event confusion matrix and scores, Sangley Point, event_persistence",
+      "value": {
+        "tp": 1.0,
+        "fn": 6.0,
+        "fp": 5.0,
+        "tn": 1160.0,
+        "n": 1172.0,
+        "accuracy": 0.9906143344709898,
+        "precision": 0.16666666666666666,
+        "recall": 0.14285714285714285,
+        "f1": 0.15384615384615385,
+        "prevalence": 0.005972696245733789,
+        "all_negative_accuracy": 0.9940273037542662
+      },
+      "ci95": {
+        "precision": {
+          "lo": 0.0,
+          "hi": 0.4444444444444444,
+          "undefined_resamples": 8
+        },
+        "recall": {
+          "lo": 0.0,
+          "hi": 0.375,
+          "undefined_resamples": 2
+        },
+        "f1": {
+          "lo": 0.0,
+          "hi": 0.4,
+          "undefined_resamples": 1
+        }
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-E-SAN-event_climatology@0.0355",
+      "metric": "Event confusion matrix and scores, Sangley Point, event_climatology@0.0355",
+      "value": {
+        "tp": 3.0,
+        "fn": 4.0,
+        "fp": 105.0,
+        "tn": 1060.0,
+        "n": 1172.0,
+        "accuracy": 0.9069965870307167,
+        "precision": 0.027777777777777776,
+        "recall": 0.42857142857142855,
+        "f1": 0.05217391304347826,
+        "prevalence": 0.005972696245733789,
+        "all_negative_accuracy": 0.9940273037542662
+      },
+      "ci95": {
+        "precision": {
+          "lo": 0.0,
+          "hi": 0.06977764177886571,
+          "undefined_resamples": 0
+        },
+        "recall": {
+          "lo": 0.0,
+          "hi": 0.8760416666666673,
+          "undefined_resamples": 2
+        },
+        "f1": {
+          "lo": 0.0,
+          "hi": 0.1257883625808154,
+          "undefined_resamples": 0
+        }
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-P-SAN-W1_raw",
+      "metric": "Probabilistic scores, Sangley Point, W1_raw",
+      "value": {
+        "pr_auc": 0.23938703686602847,
+        "brier": 0.02878807669288024,
+        "brier_skill_vs_climatology": -3.8460218742189936
+      },
+      "ci95": {
+        "lo": 0.03990438495016123,
+        "hi": 0.6558991356753506,
+        "undefined_resamples": 2
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-P-SAN-W1+X1",
+      "metric": "Probabilistic scores, Sangley Point, W1+X1",
+      "value": {
+        "pr_auc": 0.45642318510982105,
+        "brier": 0.028731831320573466,
+        "brier_skill_vs_climatology": -3.836553846624443
+      },
+      "ci95": {
+        "lo": 0.17369835880022635,
+        "hi": 0.8916654592871632,
+        "undefined_resamples": 2
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-P-SAN-event_climatology",
+      "metric": "Probabilistic scores, Sangley Point, event_climatology",
+      "value": {
+        "pr_auc": 0.015841425183914595,
+        "brier": 0.00594055855299247,
+        "brier_skill_vs_climatology": 0.0
+      },
+      "ci95": {
+        "lo": 0.0024765717639912755,
+        "hi": 0.05101303793923321,
+        "undefined_resamples": 2
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-P-SAN-W1_raw_legacy_inputs",
+      "metric": "Probabilistic scores, Sangley Point, W1_raw_legacy_inputs",
+      "value": {
+        "pr_auc": 0.773051948051948,
+        "brier": 0.03623939110482354,
+        "brier_skill_vs_climatology": -5.100333963810268
+      },
+      "ci95": {
+        "lo": 0.5110813492063492,
+        "hi": 1.0,
+        "undefined_resamples": 2
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-P-SAN-W1+X1_legacy_inputs",
+      "metric": "Probabilistic scores, Sangley Point, W1+X1_legacy_inputs",
+      "value": {
+        "pr_auc": 0.7953308596165738,
+        "brier": 0.035232320968833455,
+        "brier_skill_vs_climatology": -4.93080947768551
+      },
+      "ci95": {
+        "lo": 0.5118452380952381,
+        "hi": 1.0,
+        "undefined_resamples": 2
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-E-SCI-W1_raw@0.64",
+      "metric": "Event confusion matrix and scores, Science Garden, W1_raw@0.64",
+      "value": {
+        "tp": 5.0,
+        "fn": 5.0,
+        "fp": 11.0,
+        "tn": 1153.0,
+        "n": 1174.0,
+        "accuracy": 0.9863713798977853,
+        "precision": 0.3125,
+        "recall": 0.5,
+        "f1": 0.38461538461538464,
+        "prevalence": 0.008517887563884156,
+        "all_negative_accuracy": 0.9914821124361158
+      },
+      "ci95": {
+        "precision": {
+          "lo": 0.06666666666666667,
+          "hi": 0.5885294117647043,
+          "undefined_resamples": 0
+        },
+        "recall": {
+          "lo": 0.125,
+          "hi": 0.8571428571428571,
+          "undefined_resamples": 1
+        },
+        "f1": {
+          "lo": 0.09090909090909091,
+          "hi": 0.6363636363636364,
+          "undefined_resamples": 0
+        }
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-E-SCI-W1+X1@0.601",
+      "metric": "Event confusion matrix and scores, Science Garden, W1+X1@0.601",
+      "value": {
+        "tp": 5.0,
+        "fn": 5.0,
+        "fp": 3.0,
+        "tn": 1161.0,
+        "n": 1174.0,
+        "accuracy": 0.9931856899488927,
+        "precision": 0.625,
+        "recall": 0.5,
+        "f1": 0.5555555555555556,
+        "prevalence": 0.008517887563884156,
+        "all_negative_accuracy": 0.9914821124361158
+      },
+      "ci95": {
+        "precision": {
+          "lo": 0.0,
+          "hi": 1.0,
+          "undefined_resamples": 4
+        },
+        "recall": {
+          "lo": 0.0,
+          "hi": 0.8571428571428571,
+          "undefined_resamples": 1
+        },
+        "f1": {
+          "lo": 0.0,
+          "hi": 0.8571428571428571,
+          "undefined_resamples": 1
+        }
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-E-SCI-W1+X1@0.62",
+      "metric": "Event confusion matrix and scores, Science Garden, W1+X1@0.62",
+      "value": {
+        "tp": 3.0,
+        "fn": 7.0,
+        "fp": 3.0,
+        "tn": 1161.0,
+        "n": 1174.0,
+        "accuracy": 0.9914821124361158,
+        "precision": 0.5,
+        "recall": 0.3,
+        "f1": 0.375,
+        "prevalence": 0.008517887563884156,
+        "all_negative_accuracy": 0.9914821124361158
+      },
+      "ci95": {
+        "precision": {
+          "lo": 0.0,
+          "hi": 1.0,
+          "undefined_resamples": 12
+        },
+        "recall": {
+          "lo": 0.0,
+          "hi": 0.6428571428571429,
+          "undefined_resamples": 1
+        },
+        "f1": {
+          "lo": 0.0,
+          "hi": 0.7142857142857143,
+          "undefined_resamples": 1
+        }
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-E-SCI-event_persistence",
+      "metric": "Event confusion matrix and scores, Science Garden, event_persistence",
+      "value": {
+        "tp": 2.0,
+        "fn": 8.0,
+        "fp": 8.0,
+        "tn": 1156.0,
+        "n": 1174.0,
+        "accuracy": 0.9863713798977853,
+        "precision": 0.2,
+        "recall": 0.2,
+        "f1": 0.2,
+        "prevalence": 0.008517887563884156,
+        "all_negative_accuracy": 0.9914821124361158
+      },
+      "ci95": {
+        "precision": {
+          "lo": 0.0,
+          "hi": 0.4,
+          "undefined_resamples": 0
+        },
+        "recall": {
+          "lo": 0.0,
+          "hi": 0.4,
+          "undefined_resamples": 1
+        },
+        "f1": {
+          "lo": 0.0,
+          "hi": 0.4,
+          "undefined_resamples": 0
+        }
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-E-SCI-event_climatology@0.0355",
+      "metric": "Event confusion matrix and scores, Science Garden, event_climatology@0.0355",
+      "value": {
+        "tp": 4.0,
+        "fn": 6.0,
+        "fp": 106.0,
+        "tn": 1058.0,
+        "n": 1174.0,
+        "accuracy": 0.9045996592844975,
+        "precision": 0.03636363636363636,
+        "recall": 0.4,
+        "f1": 0.06666666666666667,
+        "prevalence": 0.008517887563884156,
+        "all_negative_accuracy": 0.9914821124361158
+      },
+      "ci95": {
+        "precision": {
+          "lo": 0.0,
+          "hi": 0.08889880952380948,
+          "undefined_resamples": 0
+        },
+        "recall": {
+          "lo": 0.0,
+          "hi": 0.8,
+          "undefined_resamples": 1
+        },
+        "f1": {
+          "lo": 0.0,
+          "hi": 0.15157342657342626,
+          "undefined_resamples": 0
+        }
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-P-SCI-W1_raw",
+      "metric": "Probabilistic scores, Science Garden, W1_raw",
+      "value": {
+        "pr_auc": 0.27828137965497163,
+        "brier": 0.04488674874389375,
+        "brier_skill_vs_climatology": -4.364097193846964
+      },
+      "ci95": {
+        "lo": 0.08364084217836418,
+        "hi": 0.6399545967376848,
+        "undefined_resamples": 1
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-P-SCI-W1+X1",
+      "metric": "Probabilistic scores, Science Garden, W1+X1",
+      "value": {
+        "pr_auc": 0.4578871661752096,
+        "brier": 0.02903874947936205,
+        "brier_skill_vs_climatology": -2.4702151292760086
+      },
+      "ci95": {
+        "lo": 0.13345303176032836,
+        "hi": 0.8702065084673781,
+        "undefined_resamples": 1
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-P-SCI-event_climatology",
+      "metric": "Probabilistic scores, Science Garden, event_climatology",
+      "value": {
+        "pr_auc": 0.024571238154022377,
+        "brier": 0.008367996910157096,
+        "brier_skill_vs_climatology": 0.0
+      },
+      "ci95": {
+        "lo": 0.005028967716228105,
+        "hi": 0.06688903059303286,
+        "undefined_resamples": 1
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-P-SCI-W1_raw_legacy_inputs",
+      "metric": "Probabilistic scores, Science Garden, W1_raw_legacy_inputs",
+      "value": {
+        "pr_auc": 0.5943185754171455,
+        "brier": 0.037178889763661196,
+        "brier_skill_vs_climatology": -3.4429855989231264
+      },
+      "ci95": {
+        "lo": 0.3507687681861759,
+        "hi": 0.8905357142857143,
+        "undefined_resamples": 1
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-P-SCI-W1+X1_legacy_inputs",
+      "metric": "Probabilistic scores, Science Garden, W1+X1_legacy_inputs",
+      "value": {
+        "pr_auc": 0.7464260545655893,
+        "brier": 0.035494988022310645,
+        "brier_skill_vs_climatology": -3.2417544369820135
+      },
+      "ci95": {
+        "lo": 0.49004253125978015,
+        "hi": 1.0,
+        "undefined_resamples": 1
+      },
+      "source_run": "b-benchmark-20261023T162436Z-874640"
+    },
+    {
+      "id": "M-A-REPRO",
+      "metric": "Cohort A legacy reproduction (all checks)",
+      "value": {
+        "test_windows": true,
+        "test_pos": true,
+        "pr_auc_raw": true,
+        "pr_auc_x1": true,
+        "pr_auc_tune_raw": true,
+        "pr_auc_tune_x1": true,
+        "x1_0601_test": true,
+        "x1_0601_tune": true,
+        "raw_064_test": true,
+        "x1_062_test": true,
+        "rules_return_0601": true,
+        "maxF1_raw_064": true,
+        "maxF1_x1_062": true
+      },
+      "ci95": null,
+      "source_run": "a-legacy-20261023T162426Z-b5f446"
+    }
+  ]
+}

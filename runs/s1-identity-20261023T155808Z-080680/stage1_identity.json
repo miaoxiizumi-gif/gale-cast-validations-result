@@ -1,0 +1,209 @@
+{
+  "run_id": "s1-identity-20261023T155808Z-080680",
+  "deployed_files_in_source_checkout": {
+    "commit": "1f2d5dda889c0cf14144ccd2ddc1c60c2a02b915",
+    "sha256": {
+      "gale_cast_model_multioutput.keras": "f2db5aa93226225405914094a0855ac725734a0e2c1a2331e3ba69a8fd9d14b0",
+      "scaler_X_normal_mo.save": "c6ea01cbc9724907703439d2f89e7bdc758a3e17ba05716ab819287f88dfab9a",
+      "scaler_X_anomaly_mo.save": "d424175a99eeb9b10f106b2264ee9918ce1f374df29eb83b3b3a2a5820cef8f6",
+      "scaler_y_regression_mo.save": "98dd17a012611d3fde29ac2a81daa784c74e02ed8de518a42885db33c04b9ec8",
+      "galecast_thresholds.json": "476a5d0574a03ea4753fa395273da13832763de77582a585ce833a7723f3c13f"
+    }
+  },
+  "w1_branch_artifacts": {
+    "branch_head": "b9ea8586663cb18dc1c1db750d0a4952d5ea8c40",
+    "gale_cast_model_multioutput_w3.keras_lfs_oid": "f2db5aa93226225405914094a0855ac725734a0e2c1a2331e3ba69a8fd9d14b0",
+    "scaler_X_normal_mo_w3.save": "c6ea01cbc9724907703439d2f89e7bdc758a3e17ba05716ab819287f88dfab9a",
+    "scaler_X_anomaly_mo_w3.save": "d424175a99eeb9b10f106b2264ee9918ce1f374df29eb83b3b3a2a5820cef8f6",
+    "scaler_y_regression_mo_w3.save": "98dd17a012611d3fde29ac2a81daa784c74e02ed8de518a42885db33c04b9ec8",
+    "scaler_X_normal_mo_v12.save": "c6ea01cbc9724907703439d2f89e7bdc758a3e17ba05716ab819287f88dfab9a"
+  },
+  "identity_checks": {
+    "model_equals_w3": true,
+    "scaler_normal_equals_w3": true,
+    "scaler_anomaly_equals_w3": true,
+    "scaler_y_equals_w3": true,
+    "w3_scalers_equal_v12_scalers": true
+  },
+  "keras_archive_metadata": {
+    "keras_version": "3.13.2",
+    "date_saved": "2026-09-15@16:16:46"
+  },
+  "layers": [
+    {
+      "name": "input_anomaly",
+      "class": "InputLayer"
+    },
+    {
+      "name": "lstm_anomaly_seq",
+      "class": "LSTM",
+      "units": 32,
+      "activation": "tanh"
+    },
+    {
+      "name": "exp_weight",
+      "class": "Multiply"
+    },
+    {
+      "name": "att_score",
+      "class": "Dense",
+      "units": 1,
+      "activation": "tanh"
+    },
+    {
+      "name": "softmax",
+      "class": "Softmax"
+    },
+    {
+      "name": "input_normal",
+      "class": "InputLayer"
+    },
+    {
+      "name": "att_apply",
+      "class": "Multiply"
+    },
+    {
+      "name": "lstm_normal",
+      "class": "LSTM",
+      "units": 64,
+      "activation": "tanh"
+    },
+    {
+      "name": "lstm_anomaly_out",
+      "class": "LSTM",
+      "units": 32,
+      "activation": "tanh"
+    },
+    {
+      "name": "dense_normal",
+      "class": "Dense",
+      "units": 32,
+      "activation": "relu"
+    },
+    {
+      "name": "dense_anomaly",
+      "class": "Dense",
+      "units": 16,
+      "activation": "relu"
+    },
+    {
+      "name": "merged",
+      "class": "Concatenate"
+    },
+    {
+      "name": "dropout",
+      "class": "Dropout",
+      "rate": 0.2
+    },
+    {
+      "name": "weather_raw",
+      "class": "Dense",
+      "units": 6,
+      "activation": "linear"
+    },
+    {
+      "name": "gale_prob",
+      "class": "Dense",
+      "units": 1,
+      "activation": "sigmoid"
+    },
+    {
+      "name": "weather_vars",
+      "class": "Lambda"
+    }
+  ],
+  "model": {
+    "name": "galecast_multioutput",
+    "inputs": {
+      "input_normal": [
+        null,
+        32,
+        32
+      ],
+      "input_anomaly": [
+        null,
+        32,
+        4
+      ]
+    },
+    "outputs": [
+      [
+        null,
+        1
+      ],
+      [
+        null,
+        6
+      ]
+    ],
+    "output_names": [
+      "gale_prob",
+      "weather_vars"
+    ],
+    "params_total": 40872
+  },
+  "inference_32_step": {
+    "ok": true,
+    "output_shapes": [
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        6
+      ]
+    ]
+  },
+  "inference_24_step": {
+    "ok": false,
+    "error_class": "InvalidArgumentError",
+    "message_head": "Graph execution error:"
+  },
+  "scalers": {
+    "scaler_X_normal_mo": {
+      "type": "dict",
+      "keys": [
+        "NAIA",
+        "Port Area",
+        "Sangley Point",
+        "Science Garden",
+        "_global_fallback"
+      ],
+      "n_features_each": [
+        12
+      ]
+    },
+    "scaler_X_anomaly_mo": {
+      "type": "dict",
+      "keys": [
+        "NAIA",
+        "Port Area",
+        "Sangley Point",
+        "Science Garden",
+        "_global_fallback"
+      ],
+      "n_features_each": [
+        3
+      ]
+    },
+    "scaler_y_regression_mo": {
+      "type": "MinMaxScaler",
+      "n_features": 6,
+      "wind_col_data_min": 0.0,
+      "wind_col_data_max": 35.0
+    }
+  },
+  "thresholds_file": {
+    "wind_high_ms": 17.2,
+    "wind_moderate_ms": 10.8,
+    "pressure_high_hpa": 6.0,
+    "pressure_moderate_hpa": 3.0,
+    "prob_high": 0.66,
+    "prob_moderate": 0.33,
+    "source": "process_weather.py canonical thresholds"
+  },
+  "notes": [
+    "Hugging Face Space main 8ffbbb5 (2026-10-13) pointer oid and scaler blob hashes were checked separately by a read-only blobless clone; see STAGE1 report."
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "run_id": "s2b-supplementary-20261023T162419Z-8ba62b",
+  "written_utc": "2026-10-23T16:24:19+00:00",
+  "source_repo_head": "1f2d5dda889c0cf14144ccd2ddc1c60c2a02b915",
+  "workspace_head": "ed43f7357fc48fe649f04fa1c66434d2805b7e46",
+  "frozen_artifacts_sha256": {
+    "gale_cast_model_multioutput.keras": "f2db5aa93226225405914094a0855ac725734a0e2c1a2331e3ba69a8fd9d14b0",
+    "scaler_X_normal_mo.save": "c6ea01cbc9724907703439d2f89e7bdc758a3e17ba05716ab819287f88dfab9a",
+    "scaler_X_anomaly_mo.save": "d424175a99eeb9b10f106b2264ee9918ce1f374df29eb83b3b3a2a5820cef8f6",
+    "scaler_y_regression_mo.save": "98dd17a012611d3fde29ac2a81daa784c74e02ed8de518a42885db33c04b9ec8",
+    "galecast_thresholds.json": "476a5d0574a03ea4753fa395273da13832763de77582a585ce833a7723f3c13f"
+  },
+  "eval_code_sha256_lf": {
+    "benchmark.py": "aaceba62f0345d2f11f00e7bd213ff3e4cba75f70481e845119880267a7a6390",
+    "build_site.py": "8ec697ba3b24c23d475f53142ae5b3092e64eba2faa192606747f8301a7c69b9",
+    "cohort_a_legacy.py": "3d01e9c5dc53b828545b8342ffdd7a502ab7b537734bd3b46e9db1b99648d8cd",
+    "cohort_b.py": "d2cc185610032125bd0b8936078358828428fee7c255fb7e8889fc6575207a38",
+    "common.py": "7750a5758d889a225f84649bafc1e64f300192b1c81cea75925f17a63cdc928a",
+    "content.py": "ba548ca8868ede464ffccd0fa35404cea45d79ea498618b573757f98d089d872",
+    "diag_inputs.py": "152c0a908aa72526f0aeeafddaa74a9f8f9cd3f7042ffc15bd2fcd391947f0be",
+    "diag_insample.py": "49f1406a8dbc38c6bcabe3e46a7cce47a3a30cf6f5a6f244e8c956bcaf5bb6f4",
+    "figures.py": "4afe3f62be41da533aeb02104b83f8d1659e3cc636f69f435d62c77da215e81d",
+    "metrics.py": "7d240838c46a0c281a65c3e0372e91f1b21e6ffeb68f0f0a7896ec3e0a085ed8",
+    "stage1_identity.py": "7a5cf5b09e58fc5b7396588ec8d81adea6228118deecba05b71086749d4d6977",
+    "stage2_partitions.py": "cc4db7b73504d1fa53f47cbe3b02b072a825631d78ca1d88e55a3dc7ac01278b",
+    "stage2b_supplementary.py": "14a8a3f69ee33d7add97671dd2ae9e1e048109ae1342e5db917c3c836830d201",
+    "variants.py": "96c0086109f94d7481a6f5710740a33bdddbe124c5dbfae27db6c0da4fc6d59f"
+  },
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "tensorflow": "2.16.1",
+    "keras": "3.13.2",
+    "numpy": "1.26.4",
+    "pandas": "2.2.2",
+    "scikit_learn": "1.7.2"
+  },
+  "stage": "2b"
+}

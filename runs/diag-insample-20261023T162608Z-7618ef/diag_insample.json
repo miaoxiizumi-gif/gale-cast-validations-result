@@ -1,0 +1,30 @@
+{
+  "run_id": "diag-insample-20261023T162608Z-7618ef",
+  "label": "post-hoc diagnostic; selects nothing",
+  "results": {
+    "station|train_in_sample": {
+      "cases": 6096,
+      "events": 47,
+      "pr_auc_raw": 0.6882051434289893,
+      "brier_raw": 0.03333667617270304
+    },
+    "station|early_stop": {
+      "cases": 1090,
+      "events": 18,
+      "pr_auc_raw": 0.51343205888887,
+      "brier_raw": 0.038626906371152306
+    },
+    "pooled|train_in_sample": {
+      "cases": 6096,
+      "events": 47,
+      "pr_auc_raw": 0.6096236854329848,
+      "brier_raw": 0.03908878177503095
+    },
+    "pooled|early_stop": {
+      "cases": 1090,
+      "events": 18,
+      "pr_auc_raw": 0.9554675060157518,
+      "brier_raw": 0.037904206843112034
+    }
+  }
+}

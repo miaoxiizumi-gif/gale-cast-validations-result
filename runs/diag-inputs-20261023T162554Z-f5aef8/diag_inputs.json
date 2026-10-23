@@ -1,0 +1,105 @@
+{
+  "run_id": "diag-inputs-20261023T162554Z-f5aef8",
+  "label": "post-hoc diagnostic; selects nothing",
+  "configs": {
+    "scaling=station|flags=processed|cross=4": {
+      "pr_auc_raw": 0.3552285039896026,
+      "pr_auc_x1": 0.48679926153789843,
+      "x1@0.601": {
+        "tp": 16.0,
+        "fp": 8.0,
+        "fn": 11.0
+      },
+      "p_mean": 0.13394582271575928
+    },
+    "scaling=station|flags=processed|cross=3": {
+      "pr_auc_raw": 0.3552285039896026,
+      "pr_auc_x1": 0.48679926153789843,
+      "x1@0.601": {
+        "tp": 16.0,
+        "fp": 8.0,
+        "fn": 11.0
+      },
+      "p_mean": 0.13394582271575928
+    },
+    "scaling=station|flags=scaled|cross=4": {
+      "pr_auc_raw": 0.3552285039896026,
+      "pr_auc_x1": 0.48679926153789843,
+      "x1@0.601": {
+        "tp": 16.0,
+        "fp": 8.0,
+        "fn": 11.0
+      },
+      "p_mean": 0.13394582271575928
+    },
+    "scaling=station|flags=scaled|cross=3": {
+      "pr_auc_raw": 0.3552285039896026,
+      "pr_auc_x1": 0.48679926153789843,
+      "x1@0.601": {
+        "tp": 16.0,
+        "fp": 8.0,
+        "fn": 11.0
+      },
+      "p_mean": 0.13394582271575928
+    },
+    "scaling=pooled|flags=processed|cross=4": {
+      "pr_auc_raw": 0.7167074328595157,
+      "pr_auc_x1": 0.824435797649987,
+      "x1@0.601": {
+        "tp": 23.0,
+        "fp": 9.0,
+        "fn": 4.0
+      },
+      "p_mean": 0.15646880865097046
+    },
+    "scaling=pooled|flags=processed|cross=3": {
+      "pr_auc_raw": 0.7167074328595157,
+      "pr_auc_x1": 0.824435797649987,
+      "x1@0.601": {
+        "tp": 23.0,
+        "fp": 9.0,
+        "fn": 4.0
+      },
+      "p_mean": 0.15646880865097046
+    },
+    "scaling=pooled|flags=scaled|cross=4": {
+      "pr_auc_raw": 0.7167074328595157,
+      "pr_auc_x1": 0.824435797649987,
+      "x1@0.601": {
+        "tp": 23.0,
+        "fp": 9.0,
+        "fn": 4.0
+      },
+      "p_mean": 0.15646880865097046
+    },
+    "scaling=pooled|flags=scaled|cross=3": {
+      "pr_auc_raw": 0.7167074328595157,
+      "pr_auc_x1": 0.824435797649987,
+      "x1@0.601": {
+        "tp": 23.0,
+        "fp": 9.0,
+        "fn": 4.0
+      },
+      "p_mean": 0.15646880865097046
+    }
+  },
+  "mean_abs_scaled_diff_eval_rows": {
+    "wind_acceleration": 0.0679,
+    "pressure_tendency": 0.0619,
+    "pressure_drop": 0.0619,
+    "rainfall_change": 0.0172,
+    "humidity_change": 0.0354,
+    "precip_anomaly": 0.0215,
+    "wind_speed_3day_avg": 0.0513,
+    "wind_speed_3day_max": 0.0568,
+    "wind_std_3": 0.0195,
+    "wind_speed_lag1": 0.0387,
+    "wind_speed_lag2": 0.0387,
+    "pressure_lag1": 0.0006
+  },
+  "flag_disagreement_rate_eval_rows": {
+    "heavy_rain_flag": 0.155573815393043,
+    "low_pressure_flag": 0.0,
+    "storm_signal": 0.0
+  }
+}
