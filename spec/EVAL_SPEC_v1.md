@@ -167,3 +167,15 @@ Existing frozen variants on `exp/precision-targeting` are re-run for inference o
 - **Run directories:** every execution writes a new `runs/<stage>-<UTC>-<hex>` directory with a manifest (code hashes, artifact hashes, environment). Failed runs are kept and marked `FAILED.txt`.
 - **Changes after scoring:** if this specification is changed after any score is seen, the change is recorded as an amendment with its date and reason, and both versions are kept.
 - **Public versus private outputs:** row-level predictions and observations stay in `_private/`, which is git-ignored. Only aggregates are published.
+
+## Amendment A1 (2026-10-24, after Cohort A, the Cohort B benchmark and two diagnostics were run)
+
+**What changed.** §10 (variants) adds a second input construction: the variants are also scored under **S-LEGACY** (pooled `scaled_weather` inputs), alongside S-TRAIN. Nothing else changes. The primary construction remains S-TRAIN for W1 and for the variants. No threshold, case, metric or baseline changes.
+
+**Why.**
+- The declared S-LEGACY sensitivity for W1 differed sharply from S-TRAIN on events (X1 PR-AUC 0.824 vs 0.487 on identical cases).
+- A post-hoc diagnostic (`runs/diag-inputs-*`) traced the whole difference to input scaling. Cross-station columns and flags had no effect.
+- The historical variant thresholds were all selected under pooled inputs.
+- Scoring every variant under both constructions avoids presenting only the construction that suits one model.
+
+**This amendment selects nothing.** The two post-hoc diagnostics (`diag_inputs.py`, `diag_insample.py`) are labelled as such and are not part of the declared evaluation.
