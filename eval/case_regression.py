@@ -144,7 +144,7 @@ def main():
         a = axs.ravel()
         CS.case_axes({"wind": a[0], "tend": a[4], "score": a[5]}, win)
         a[0].axhline(p90[s], color=S.INK2, lw=0.8, ls=":")
-        a[0].text(2.55, p90[s], f"station 90th pct (2015-2020): {p90[s]:.1f}", ha="right", va="bottom", fontsize=7, color=S.INK2)
+        a[0].text(-0.55, p90[s], f"station 90th percentile\n(2015-2020): {p90[s]:.1f} m/s", ha="left", va="bottom", fontsize=7, color=S.INK2)
         err_axes(a[1], win, "wind", "m/s")
         err_axes(a[2], win, "mslp", "hPa")
         grid_axes(a[3], win)

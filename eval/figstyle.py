@@ -26,9 +26,9 @@ EVIDENCE = {
 }
 
 
-def title(fig, main: str, sub: str):
+def title(fig, main: str, sub: str, width: int = 175):
     fig.suptitle(main, x=0.01, y=0.995, ha="left", va="top", fontsize=12, fontweight="bold", color=INK)
-    fig.text(0.01, 0.955, sub, ha="left", va="top", fontsize=9, color=INK2)
+    fig.text(0.01, 0.955, textwrap.fill(sub, width), ha="left", va="top", fontsize=9, color=INK2)
 
 
 def footer(fig, lines: list[str], width: int = 150):
