@@ -16,8 +16,9 @@ Last updated: 2026-10-25.
 
 `stage1_identity.py` → `stage2_partitions.py` → `stage2b_supplementary.py` → `cohort_a_legacy.py` → `benchmark.py` → `variants.py` →
 `diag_inputs.py`, `diag_insample.py` (post-hoc, labelled) → `figures.py` →
-amendment A2: `website_cohort.py` → `regression_provenance.py` → `split_facts.py` → `case_studies.py` → `paper_figures.py` →
-`build_site.py` (also runs `build_docs.py`). Then publish `docs/` to the `gh-pages` branch (`git subtree split --prefix docs`).
+amendment A2: `website_cohort.py` → `regression_provenance.py` → `split_facts.py` → `case_studies.py` → `case_regression.py`
+(selection v2) → `paper_figures.py` → `build_site.py` (also runs `build_docs.py`, which renders `figure_notes.py` into the site, the
+figure guide and the private `_private/thesis_export/INDEX.md`, and `tech_stack.py` into `TECH_STACK.md`). Then publish `docs/` to the `gh-pages` branch (`git subtree split --prefix docs`).
 Every script creates a new run directory. Never overwrite or delete a run; mark failures with `FAILED.txt`.
 
 ## Key results (details on the website)
@@ -31,7 +32,11 @@ Every script creates a new run directory. Never overwrite or delete a run; mark 
 - **Benchmark (Evidence B, 3,520 identical cases):** W1 wind MAE 1.021 m/s vs persistence 0.467 and climatology 0.584 (W1 worse, established).
   27 events, all pressure falls; W1+X1 at 0.601 gives 16 hits, 8 false alarms, 11 misses. F1 beats event persistence (established); probabilities are not calibrated.
 - The scaling choice moves W1+X1 PR-AUC between 0.487 (training-consistent) and 0.824 (legacy). The mechanism is unresolved.
-- **Selected cases (Evidence C):** chosen under `spec/CASE_SELECTION_v1.md`; figures are private (PAGASA terms).
+- **Selected cases (Evidence C):** set 1 under `spec/CASE_SELECTION_v1.md` (correct warnings; W1 wind closer than both baselines on only
+  3 of 9 station-days); set 2 under `spec/CASE_SELECTION_v2_regression.md` (relatively high wind, favourable-error selection: W1 wind closest
+  on 3/3 days at NAIA and Sangley Point, 1/3 at Science Garden; pressure rarely). Figures and dates are private (PAGASA terms); local index
+  `_private/thesis_export/INDEX.md`.
+- **Figure explanations:** every graph (public and private) has a nine-part explanation from `eval/figure_notes.py`.
 
 ## Open items (owner decisions; not decided here)
 

@@ -11,6 +11,9 @@
 | Scoring procedure behind the website | `_w1_recall_floor.py`: pooled `scaled_weather` inputs, X1 = same-date mean over the three stations, threshold 0.601 |
 | Live system | the dashboard tier uses wind/pressure rules, not the model score; the 24-step live endpoint fails on this 32-step model; displayed 2025+ values are simulated or imported PAGASA forecasts |
 
+Implementation technologies around the model (web, API, database, hosting) are listed separately in `TECH_STACK.md`; they are not
+evidence of forecast accuracy.
+
 ## Station groups
 
 - **Primary (evaluated):** NAIA, Sangley Point, Science Garden.

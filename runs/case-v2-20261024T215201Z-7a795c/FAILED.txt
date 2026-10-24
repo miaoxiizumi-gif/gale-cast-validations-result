@@ -1,0 +1,2 @@
+Superseded: PF-K subtitle ran off the right edge; PF-J percentile label overlapped a line. Selection identical.
+Superseded 2026-10-25: this manifest's workspace_head refers to a local commit that was rewritten before publication (the v2 spec's prior-exposure note named set-1 dates; they were removed, rule unchanged). Selection re-run at the published commit; results identical.

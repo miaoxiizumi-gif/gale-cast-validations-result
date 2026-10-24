@@ -1,36 +1,275 @@
 # Figure guide
 
-Public figures are aggregates. Each is downloadable as PNG (300 DPI), SVG and the CSV of the plotted numbers, from
-[`docs/figures/paper/`](../docs/figures/paper/) (site: https://miaoxiizumi-gif.github.io/gale-cast-validations-result/#figures). Figure run: `pf-20261024T210214Z-61902c`.
+Every figure has the same nine-part explanation (what it shows, purpose, how it was produced, how to read it, actual finding, what it
+supports, what it does not establish, use in the paper, source). The text is generated from `eval/figure_notes.py`, the single source used
+by the website too. Numbers are filled from the saved runs.
 
-## Public paper figures
+How to read numerical errors: Lower MAE/RMSE means smaller errors on these matching cases. Signed mean error (bias) shows systematic over- or under-forecasting and can hide errors that cancel. A good confusion matrix does not establish accurate numerical wind forecasts.
 
-| Files | Evidence | Caption and interpretation | Source runs |
-|---|---|---|---|
-| `PF-A_website_confusion_matrix.png` / `PF-A_website_confusion_matrix.svg` / `PF-A_website_confusion_matrix.csv` | A | The GALE-CAST website's binary scorecard (validation_cm3.json), reproduced case by case: 24 hits, 4 misses, 9 false alarms, 3,386 correct negatives. Accuracy is dominated by correct negatives; the all-negative forecast scores 99.18%. | `reg-prov-20261024T205749Z-ce57af`, `w-cohort-20261024T205646Z-6b7a96` |
-| `PF-B_station_outcomes.png` / `PF-B_station_outcomes.svg` / `PF-B_station_outcomes.csv` | A | The same 3,423 cases split by primary station. Because X1 averages the three stations, a warning is issued for all three stations on the same date; station results are therefore not independent. | `reg-prov-20261024T205749Z-ce57af`, `w-cohort-20261024T205646Z-6b7a96` |
-| `PF-C_event_metrics_overall.png` / `PF-C_event_metrics_overall.svg` / `PF-C_event_metrics_overall.csv` | A+B | Precision, recall and F1 with 95% intervals. On both cohorts W1+X1 beats both event baselines on F1 (established). The level depends on the input construction: 24/28 hits with the website's procedure, fewer with training-consistent inputs. | `b-benchmark-20261023T162436Z-874640`, `reg-prov-20261024T205749Z-ce57af`, `w-cohort-20261024T205646Z-6b7a96` |
-| `PF-D_event_metrics_by_station.png` / `PF-D_event_metrics_by_station.svg` / `PF-D_event_metrics_by_station.csv` | A | The PF-C comparison for each primary station. With 8-10 events per station the intervals are wide. | `reg-prov-20261024T205749Z-ce57af`, `w-cohort-20261024T205646Z-6b7a96` |
-| `PF-E_precision_recall_curves.png` / `PF-E_precision_recall_curves.svg` / `PF-E_precision_recall_curves.csv` | A | Curves traced from the 3,423 saved W1 scores (not reconstructed from a confusion matrix), with the historical 0.601 point marked. | `reg-prov-20261024T205749Z-ce57af`, `w-cohort-20261024T205646Z-6b7a96` |
-| `PF-F_wind_mae_rmse.png` / `PF-F_wind_mae_rmse.svg` / `PF-F_wind_mae_rmse.csv` | A | W1's neural wind output has larger MAE and RMSE than both baselines overall and at every station (established for MAE vs persistence everywhere). W1 does not show wind-forecast superiority. | `reg-prov-20261024T205749Z-ce57af`, `w-cohort-20261024T205646Z-6b7a96` |
-| `PF-F2_website_regression_provenance.png` / `PF-F2_website_regression_provenance.svg` / `PF-F2_website_regression_provenance.csv` | A | The website's wind MAE 0.5365 / RMSE 0.7723 / MASE 0.6782 are reproduced exactly only after two post-processing steps fitted on the evaluation period itself. W1's own wind output has MAE 0.987; issue-day persistence on the same cases has MAE 0.474. | `reg-prov-20261024T205749Z-ce57af`, `w-cohort-20261024T205646Z-6b7a96` |
-| `PF-F3_regression_variables_mae.png` / `PF-F3_regression_variables_mae.svg` / `PF-F3_regression_variables_mae.csv` | A | Each output in its own unit and panel. W1 has larger MAE than both baselines for wind, pressure and humidity. For rainfall W1's MAE is lower than both baselines (established), but its RMSE (17.1 mm) is above climatology's (16.1 mm) and it under-forecasts on average (bias -3.66 mm): a low forecast lowers MAE on skewed rainfall. | `reg-prov-20261024T205749Z-ce57af`, `w-cohort-20261024T205646Z-6b7a96` |
-| `PF-G_observed_vs_predicted.png` / `PF-G_observed_vs_predicted.svg` / `PF-G_observed_vs_predicted.csv` | A | Binned counts replace a scatter so that no individual station-day reading is published. Most wind forecasts sit at 2-3 m/s whatever was observed; humidity forecasts stay near 75-90%; pressure forecasts follow higher pressures but stay too high on low-pressure days; rainfall forecasts sit at 1-5 mm almost regardless of the observed amount (too wet on dry days, too dry on wet days). | `reg-prov-20261024T205749Z-ce57af`, `w-cohort-20261024T205646Z-6b7a96` |
+## Public paper figures (download PNG 300 DPI, SVG, CSV)
 
-Earlier evaluation figures F1-F8 (Group B benchmark and model variants) remain on the site and in `docs/figures/`.
+Files are in [`docs/figures/paper/`](../docs/figures/paper/) (site: https://miaoxiizumi-gif.github.io/gale-cast-validations-result/#figures). Figure run: `pf-20261024T210214Z-61902c`.
 
-## Selected case figures (private)
+### PF-A_website_confusion_matrix — `PF-A_website_confusion_matrix.png` / `.svg` / `.csv`
 
-These plot individual PAGASA station-day readings. PAGASA's data terms (CADS-07 Rev.6, condition 4, as recorded in the source project)
-forbid publishing station readings online and no permission was found, so they exist only in the private thesis-export folder and are
-**not** publicly available. Selection run: `case-20261024T205908Z-bc687f`; criteria: `spec/CASE_SELECTION_v1.md`.
+- **What this graph shows:** A 2×2 table of W1+X1 warnings against study-label outcomes for Evidence A: the website's 3,423 next-day windows (NAIA, Sangley Point, Science Garden, 1,141 each; target dates 2021-11-16 to 2024-12-30).
+- **Purpose:** To show exactly the matrix the GALE-CAST website reports, and what each cell means.
+- **How it was produced:** Counts from saved historical W1 scores from the old scoring procedure (pooled inputs, 32-day windows, X1 = mean over the three stations, warning if X1 ≥ 0.601); case identity checked against the original W1-branch record of false alarms and misses.
+- **How to read it:** Top-left = hits, top-right = misses, bottom-left = false alarms, bottom-right = correct negatives. The side panel gives the derived scores and two no-skill references.
+- **Actual finding:** TP 24, FN 4, FP 9, TN 3386; accuracy 99.62% (always 'no event' scores 99.18%); precision 0.727, recall 0.857, F1 0.787, PR-AUC 0.8302 vs no-skill 0.0082.
+- **What it supports:** The website's scorecard is reproducible case by case, and W1+X1 caught 24 of the 28 study-label events in this cohort.
+- **What it does not establish:** Not an independent test (the threshold rule and X1 were adopted after these results were seen); all 28 events are pressure falls, not gale-force winds; accuracy is inflated by correct negatives; says nothing about numerical forecasts.
+- **Use in the paper:** Chapter 4, Model Evaluation (replace Table 4.4's description). Caption: 'Figure 4.x. Historical scorecard of the deployed model (cross-station score X1 ≥ 0.601) on 3,423 next-day cases, 2021-11-16 to 2024-12-30; all 28 positive labels are 24-hour pressure falls of at least 3 hPa.'
+- **Source:** figures/paper/PF-A_website_confusion_matrix.csv; runs w-cohort-20261024T205646Z-6b7a96, pf-20261024T210214Z-61902c; spec/AMENDMENT_A2_website_cohort.md.
 
-| Figure | Evidence | Content | Availability |
-|---|---|---|---|
-| PF-H (NAIA) | C (selected) | 3-day window around a pressure fall-triggered event; outcomes: Hit, Hit, Correct negative; event persistence on the event day: warning; 9 eligible candidates | private only |
-| PF-H (Sangley Point) | C (selected) | 3-day window around a pressure fall-triggered event; outcomes: Correct negative, Hit, Correct negative; event persistence on the event day: no warning; 5 eligible candidates | private only |
-| PF-H (Science Garden) | C (selected) | 3-day window around a pressure fall-triggered event; outcomes: Correct negative, Hit, Correct negative; event persistence on the event day: no warning; 8 eligible candidates | private only |
-| PF-I (all three stations) | C (selected) | 3-day window around a date detected at all three stations | private only |
+### PF-B_station_outcomes — `PF-B_station_outcomes.png` / `.svg` / `.csv`
 
-Every case figure carries the label: "Selected successful case; chosen retrospectively for illustration; not representative of all dates."
-Each date shows a separate next-day forecast; the windows are not three-day-ahead forecasts.
+- **What this graph shows:** One 2×2 matrix per primary station (1,141 cases each), same cohort and decisions as PF-A.
+- **Purpose:** To show whether hits and false alarms are spread across stations or concentrated at one.
+- **How it was produced:** PF-A's cases split by station; saved historical W1 scores from the old scoring procedure (pooled inputs, 32-day windows, X1 = mean over the three stations, warning if X1 ≥ 0.601).
+- **How to read it:** Same cell layout as PF-A; darker blue marks hits. Compare misses and false alarms between stations.
+- **Actual finding:** NAIA: 9 hits, 1 misses, 2 false alarms, 1,129 correct negatives; Sangley Point: 7 hits, 1 misses, 4 false alarms, 1,129 correct negatives; Science Garden: 8 hits, 2 misses, 3 false alarms, 1,128 correct negatives.
+- **What it supports:** Detection is similar at the three stations; no single station carries the result.
+- **What it does not establish:** X1 is one network-wide score, so the three stations always receive the same decision on a date; station results are not independent. 8-10 events per station.
+- **Use in the paper:** Chapter 4, Model Evaluation (by-station paragraph). Caption: 'Figure 4.x. Historical scorecard by primary station; the cross-station score gives one decision per date.'
+- **Source:** figures/paper/PF-B_station_outcomes.csv; run w-cohort-20261024T205646Z-6b7a96.
+
+### PF-C_event_metrics_overall — `PF-C_event_metrics_overall.png` / `.svg` / `.csv`
+
+- **What this graph shows:** Precision, recall and F1 for W1+X1, event persistence and event climatology, in two panels: Evidence A (3,423 cases, 28 events) and Evidence B (3,520 cases, 27 events).
+- **Purpose:** To test whether W1+X1 detects study-label events better than two simple reference rules on identical cases.
+- **How it was produced:** Panel A: saved historical W1 scores from the old scoring procedure (pooled inputs, 32-day windows, X1 = mean over the three stations, warning if X1 ≥ 0.601); panel B: Evidence B: the training-consistent benchmark (3,520 event cases / 3,555 wind cases, target dates 2021-10-15 to 2024-12-31; inputs scaled per station as in training; raw unimputed truth). Baselines: event persistence = the issue day's label; event climatology = station × month label frequency 2015-2020, warning threshold chosen on the 2020-21 tuning year. 95% intervals from a paired 14-day block bootstrap (2,000 resamples).
+- **How to read it:** Higher is better for all three scores. Vertical lines are 95% intervals; compare methods within a panel only, because the cohorts differ.
+- **Actual finding:** A: F1 W1+X1 0.787 vs persistence 0.250 and climatology 0.078 (W1 − persistence established: positive). B: F1 0.627 vs 0.226 and 0.062 (established: positive).
+- **What it supports:** On both cohorts W1+X1 detects pressure-fall events better than repeating yesterday's label or using the monthly event rate.
+- **What it does not establish:** The level depends on input scaling (24/28 vs 16/27 hits); 27-28 events give wide intervals; events are pressure falls, not strong winds; the cohort-A threshold rule was chosen after seeing these dates.
+- **Use in the paper:** Chapter 4, Model Evaluation, baseline comparison. Caption: 'Figure 4.x. Event detection of the deployed model against event persistence and event climatology on identical cases, (a) historical scorecard procedure, (b) training-consistent inputs; bars are 95% block-bootstrap intervals.'
+- **Source:** figures/paper/PF-C_event_metrics_overall.csv; runs w-cohort-20261024T205646Z-6b7a96, b-benchmark-20261023T162436Z-874640.
+
+### PF-D_event_metrics_by_station — `PF-D_event_metrics_by_station.png` / `.svg` / `.csv`
+
+- **What this graph shows:** PF-C's Evidence A comparison repeated for each primary station.
+- **Purpose:** To check whether W1+X1's advantage over the baselines appears at every station.
+- **How it was produced:** saved historical W1 scores from the old scoring procedure (pooled inputs, 32-day windows, X1 = mean over the three stations, warning if X1 ≥ 0.601); baselines: event persistence = the issue day's label; event climatology = station × month label frequency 2015-2020, warning threshold chosen on the 2020-21 tuning year; station-level 95% block-bootstrap intervals.
+- **How to read it:** Higher is better; overlapping intervals mean the station-level difference is uncertain.
+- **Actual finding:** F1 W1+X1 vs persistence: NAIA 0.857 vs 0.300; Sangley Point 0.737 vs 0.250; Science Garden 0.762 vs 0.200.
+- **What it supports:** W1+X1's point estimates exceed both baselines at every station.
+- **What it does not establish:** Only 8-10 events per station, so intervals are wide; decisions are shared across stations (X1).
+- **Use in the paper:** Chapter 4 or Appendix (station detail). Caption: 'Figure 4.x. Event-detection scores by station, historical scorecard cases.'
+- **Source:** figures/paper/PF-D_event_metrics_by_station.csv; run w-cohort-20261024T205646Z-6b7a96.
+
+### PF-E_precision_recall_curves — `PF-E_precision_recall_curves.png` / `.svg` / `.csv`
+
+- **What this graph shows:** Precision against recall as the warning threshold varies, for the W1+X1 score, the W1 raw station score and event climatology (Evidence A: the website's 3,423 next-day windows (NAIA, Sangley Point, Science Garden, 1,141 each; target dates 2021-11-16 to 2024-12-30)); event persistence is a single point.
+- **Purpose:** To show how W1 ranks event days above ordinary days at every possible threshold, not only at 0.601.
+- **How it was produced:** Curves traced from the 3,423 saved scores (not reconstructed from one confusion matrix); the historical 0.601 operating point is marked.
+- **How to read it:** Curves nearer the top-right are better. The dashed line is the no-skill level (the event rate). Steps occur because there are only 28 events.
+- **Actual finding:** PR-AUC: W1+X1 0.830, W1 raw 0.728, event climatology 0.028; no-skill 0.0082. Operating point: precision 0.727, recall 0.857.
+- **What it supports:** W1's scores rank pressure-fall days far above ordinary days on this cohort; cross-station averaging (X1) improves the ranking.
+- **What it does not establish:** Scores are not calibrated probabilities (Brier skill vs climatology -3.44); with training-consistent inputs the X1 PR-AUC is 0.487 (Evidence B).
+- **Use in the paper:** Chapter 4, Model Evaluation (PR-AUC paragraph). Caption: 'Figure 4.x. Precision-recall curves of the deployed model's scores on the historical scorecard cases, with the 0.601 operating point.'
+- **Source:** figures/paper/PF-E_precision_recall_curves.csv; run w-cohort-20261024T205646Z-6b7a96.
+
+### PF-F_wind_mae_rmse — `PF-F_wind_mae_rmse.png` / `.svg` / `.csv`
+
+- **What this graph shows:** Mean absolute error and root-mean-square error (m/s) of next-day wind for W1, persistence and climatology, pooled and per station (3,421 of the 3,423 Evidence A cases).
+- **Purpose:** To test whether W1's numerical wind forecast is more accurate than two no-skill references.
+- **How it was produced:** W1 neural-only wind output on the website cases (no post-processing); raw unimputed observed wind; persistence = the issue day's observation; climatology = station × calendar-month mean of 2015-01-01 to 2020-10-14 observations; 95% block-bootstrap intervals.
+- **How to read it:** Lower bars are better. Lower MAE/RMSE means smaller errors on these matching cases. Signed mean error (bias) shows systematic over- or under-forecasting and can hide errors that cancel. A good confusion matrix does not establish accurate numerical wind forecasts.
+- **Actual finding:** Pooled MAE: W1 0.987, persistence 0.474, climatology 0.588 m/s; W1 bias 0.17 m/s. Science Garden: W1 1.334 vs persistence 0.216.
+- **What it supports:** W1's wind forecast is less accurate than persistence at every station and less accurate than climatology overall.
+- **What it does not establish:** Says nothing about event detection (PF-C) or about strong winds (none reached 10.8 m/s); the wind statistic, averaging period and sensor height are undocumented.
+- **Use in the paper:** Chapter 4, regression results (replacing Table 4.5). Caption: 'Figure 4.x. Next-day wind-speed error of the deployed model and two reference forecasts on identical cases.'
+- **Source:** figures/paper/PF-F_wind_mae_rmse.csv; run w-cohort-20261024T205646Z-6b7a96.
+
+### PF-F2_website_regression_provenance — `PF-F2_website_regression_provenance.png` / `.svg` / `.csv`
+
+- **What this graph shows:** How the website's wind MAE of 0.5365 m/s arises: W1's own error, then two post-processing steps, beside persistence on the same 3,423 cases.
+- **Purpose:** To show which procedure produced the website's regression numbers before they are attributed to W1.
+- **How it was produced:** Port of validate_model_multioutput.py at W1 commit 1fd1ef9 (isotonic MOS per station × season, then a persistence blend), run on the saved website cases; truth = processed (forward-filled) wind, as in that script.
+- **How to read it:** Shorter bars are smaller errors. Bars marked 'fitted on evaluation outcomes' used the same period's observations to tune themselves.
+- **Actual finding:** W1 neural 0.9875 → after MOS 0.5764 → after blend 0.5365 (website value reproduced exactly); persistence 0.4744 m/s.
+- **What it supports:** The website's regression block is post-processed, partly in-sample, and still has a larger MAE than persistence (its RMSE is slightly lower).
+- **What it does not establish:** Not a W1 result and not an out-of-sample estimate; the blend uses an observation two days before the target (script indexing). MASE < 1 here uses an in-sample denominator.
+- **Use in the paper:** Chapter 4, note under the regression results, or Appendix. Caption: 'Figure 4.x. Provenance of the previously reported wind error: model output, in-period calibration and blending, and same-case persistence.'
+- **Source:** figures/paper/PF-F2_website_regression_provenance.csv; run reg-prov-20261024T205749Z-ce57af.
+
+### PF-F3_regression_variables_mae — `PF-F3_regression_variables_mae.png` / `.svg` / `.csv`
+
+- **What this graph shows:** Pooled MAE of W1, persistence and climatology for each regression output in its own unit and panel: wind (m/s), MSLP (hPa), humidity (%), rainfall (mm).
+- **Purpose:** To check every supported regression output, not only wind, against the same references.
+- **How it was produced:** W1 neural-only outputs on Evidence A cases with complete raw observations; rainfall inverted from log1p to mm; persistence = the issue day's observation; climatology = station × calendar-month mean of 2015-01-01 to 2020-10-14 observations; 95% block-bootstrap intervals.
+- **How to read it:** Lower is better within each panel; panels have different units and must not be compared with each other. Lower MAE/RMSE means smaller errors on these matching cases. Signed mean error (bias) shows systematic over- or under-forecasting and can hide errors that cancel. A good confusion matrix does not establish accurate numerical wind forecasts.
+- **Actual finding:** W1 vs persistence vs climatology MAE: wind 0.99/0.47/0.59; MSLP 1.94/0.85/1.59; humidity 8.73/4.63/5.40; rainfall 6.74/7.76/7.47 (rainfall RMSE W1 17.1 vs climatology 16.1; W1 bias -3.66 mm).
+- **What it supports:** Rainfall is the only output where W1's MAE is lower than both references; for wind, pressure and humidity persistence is better.
+- **What it does not establish:** The rainfall MAE advantage comes with under-forecasting and a higher RMSE than climatology; a skewed variable can reward low forecasts on MAE.
+- **Use in the paper:** Chapter 4, regression results table/figure. Caption: 'Figure 4.x. Next-day error of each regression output of the deployed model and two reference forecasts (separate units).'
+- **Source:** figures/paper/PF-F3_regression_variables_mae.csv; run w-cohort-20261024T205646Z-6b7a96.
+
+### PF-G_observed_vs_predicted — `PF-G_observed_vs_predicted.png` / `.svg` / `.csv`
+
+- **What this graph shows:** For wind, MSLP, humidity and rainfall: the number of Evidence A cases in each observed-value bin (x) and W1-forecast bin (y), with the 1:1 line.
+- **Purpose:** To show the shape of W1's numerical errors (spread, bias, range) without publishing individual readings.
+- **How it was produced:** Counts of saved W1 neural outputs against raw observations on the website cases; values outside the plotted range are counted in the end cells; rainfall cells are uneven.
+- **How to read it:** Cells on the dashed 1:1 line are perfect forecasts; a horizontal band means the forecast hardly changes when the observation changes. Darker = more cases (log scale).
+- **Actual finding:** Most wind forecasts sit at 2-3 m/s whatever was observed; humidity forecasts stay near 75-90%; pressure forecasts follow higher pressures but stay too high on low-pressure days; rainfall forecasts sit at 1-5 mm, too wet on dry days and too dry on wet days.
+- **What it supports:** W1's regression outputs vary much less than the observations; this explains the larger errors in PF-F and PF-F3.
+- **What it does not establish:** Shows spread, not skill relative to baselines; binning hides exact values.
+- **Use in the paper:** Chapter 4 or Appendix (regression diagnostics). Caption: 'Figure 4.x. Observed versus forecast values of the deployed model (case counts per cell; dashed line = perfect forecast).'
+- **Source:** figures/paper/PF-G_observed_vs_predicted.csv; run w-cohort-20261024T205646Z-6b7a96.
+
+
+## Earlier benchmark figures (Evidence B unless stated; PNG on the site, data in `docs/data/`)
+
+### F1_partitions — `docs/figures/F1_partitions.png`
+
+- **What this graph shows:** A timeline of which rows W1 used for training, tuning and scoring, by data source (primary stations, Port Area, 19 supplementary stations).
+- **Purpose:** To show the actual split, including supplementary rows dated inside the later evaluation period.
+- **How it was produced:** Reconstructed from the W1 training recipe (_train_w3.py) applied to the processed data.
+- **How to read it:** Bars are date ranges; the shaded band marks dates later scored.
+- **Actual finding:** Primary training 2015-01-01 to 2020-10-14, tuning 2020-10-15 to 2021-10-14, evaluation from 2021-10-15; Port Area (to 2023-10-30) and supplementary rows (to 2024-12-30) were used for training.
+- **What it supports:** The split is chronological for the primary stations; other stations' training rows overlap the evaluation dates.
+- **What it does not establish:** Does not explain why these cut-off dates were chosen (not recorded) and does not prove the split valid.
+- **Use in the paper:** Chapter 3, Data Partitioning. Caption: 'Figure 3.x. Data allocation of the deployed model by source and date.'
+- **Source:** data/F1_partitions.csv; run fig-20261023T162618Z-2c75a3.
+
+### F2_wind_mae_by_station — `docs/figures/F2_wind_mae_by_station.png`
+
+- **What this graph shows:** Next-day wind MAE (m/s) by station for W1, persistence and climatology on 3,520 identical Evidence B cases.
+- **Purpose:** To test W1's wind forecast against two references with training-consistent inputs.
+- **How it was produced:** Evidence B: the training-consistent benchmark (3,520 event cases / 3,555 wind cases, target dates 2021-10-15 to 2024-12-31; inputs scaled per station as in training; raw unimputed truth); persistence = the issue day's observation; climatology = station × calendar-month mean of 2015-01-01 to 2020-10-14 observations; 95% block-bootstrap intervals.
+- **How to read it:** Lower is better. Lower MAE/RMSE means smaller errors on these matching cases. Signed mean error (bias) shows systematic over- or under-forecasting and can hide errors that cancel. A good confusion matrix does not establish accurate numerical wind forecasts.
+- **Actual finding:** Pooled MAE W1 1.021, persistence 0.467, climatology 0.584 m/s.
+- **What it supports:** With training-consistent inputs too, W1's wind forecast is less accurate than both references.
+- **What it does not establish:** No day reached 10.8 m/s, so strong-wind accuracy is untested.
+- **Use in the paper:** Chapter 4, regression results (training-consistent benchmark). Caption: 'Figure 4.x. Next-day wind MAE on the training-consistent benchmark.'
+- **Source:** data/F2_wind_mae_by_station.csv; run b-benchmark-20261023T162436Z-874640.
+
+### F3_wind_monthly_means — `docs/figures/F3_wind_monthly_means.png`
+
+- **What this graph shows:** Monthly means of observed wind and of each forecast, per station, over the whole Evidence B period (no dates selected).
+- **Purpose:** To show whether W1 follows seasonal and station differences in wind.
+- **How it was produced:** Daily Evidence B values averaged within each calendar month.
+- **How to read it:** A good forecast line follows the observed line; a flat line means the forecast ignores seasons.
+- **Actual finding:** W1 stays near 2.5 m/s at every station (forecast SD 0.27 vs observed 1.16 m/s) and is far too high at Science Garden.
+- **What it supports:** W1's wind output barely varies with season or station.
+- **What it does not establish:** Monthly averaging hides day-to-day behaviour.
+- **Use in the paper:** Appendix (regression diagnostics). Caption: 'Figure A.x. Monthly mean observed and forecast wind by station.'
+- **Source:** data/wind_monthly_means_by_station.csv; run b-benchmark-20261023T162436Z-874640.
+
+### F4_wind_obs_vs_pred_counts — `docs/figures/F4_wind_obs_vs_pred_counts.png`
+
+- **What this graph shows:** Counts of Evidence B cases by observed-wind bin and W1-forecast bin.
+- **Purpose:** To show the range of W1's wind forecasts relative to observations.
+- **How it was produced:** Binned counts of all Evidence B wind cases.
+- **How to read it:** Cases on the diagonal are accurate; a single row means the forecast hardly changes.
+- **Actual finding:** W1 never forecasts below about 2.25 m/s while observed winds range from 0 to above 6 m/s.
+- **What it supports:** W1's wind forecasts occupy a narrow band regardless of the observation.
+- **What it does not establish:** Does not show why (the audit points to the wind target's small share of the training loss and per-station scaling).
+- **Use in the paper:** Appendix. Caption: 'Figure A.x. Observed versus forecast wind (counts), training-consistent benchmark.'
+- **Source:** data/F4_wind_obs_vs_pred_counts.csv; run fig-20261023T162618Z-2c75a3.
+
+### F5_event_timeline_monthly — `docs/figures/F5_event_timeline_monthly.png`
+
+- **What this graph shows:** Monthly counts of hits, misses and false alarms per station for W1+X1 at 0.601 (Evidence B).
+- **Purpose:** To show when events and errors happened, without publishing exact dates.
+- **How it was produced:** Evidence B decisions aggregated by month; totals equal the PF-C panel B matrix.
+- **How to read it:** Bars above the axis are hits and misses; below are false alarms.
+- **Actual finding:** Events cluster in a few storm months; 27 events in total, all pressure falls.
+- **What it supports:** Results rest on a small number of episodes.
+- **What it does not establish:** Monthly counts cannot show lead-time behaviour; events are not independent.
+- **Use in the paper:** Appendix. Caption: 'Figure A.x. Monthly event outcomes by station, training-consistent benchmark.'
+- **Source:** data/event_outcomes_monthly_by_station.csv; run b-benchmark-20261023T162436Z-874640.
+
+### F6_confusion_matrices — `docs/figures/F6_confusion_matrices.png`
+
+- **What this graph shows:** 2×2 matrices with correct negatives for every Evidence B procedure on the same 3,520 cases.
+- **Purpose:** To compare the warning burden (misses vs false alarms) of W1 and the baselines.
+- **How it was produced:** Evidence B: the training-consistent benchmark (3,520 event cases / 3,555 wind cases, target dates 2021-10-15 to 2024-12-31; inputs scaled per station as in training; raw unimputed truth); frozen thresholds (W1 raw 0.64, W1+X1 0.601/0.62); event persistence = the issue day's label; event climatology = station × month label frequency 2015-2020, warning threshold chosen on the 2020-21 tuning year.
+- **How to read it:** Each matrix sums to the case count; compare hits against false alarms.
+- **Actual finding:** W1+X1 at 0.601: 16 hits, 11 misses, 8 false alarms; event persistence 6 hits, 20 false alarms.
+- **What it supports:** With training-consistent inputs W1+X1 at 0.601 still has the highest F1 of the procedures shown.
+- **What it does not establish:** Fewer hits than the historical scorecard (16 vs 24); events are pressure falls.
+- **Use in the paper:** Chapter 4, baseline comparison (training-consistent). Caption: 'Figure 4.x. Confusion matrices of all procedures on the training-consistent benchmark.'
+- **Source:** data/F6_confusion_matrices.csv; run b-benchmark-20261023T162436Z-874640.
+
+### F7_event_benchmarks — `docs/figures/F7_event_benchmarks.png`
+
+- **What this graph shows:** F1 and PR-AUC with 95% intervals for W1 and the event baselines (Evidence B).
+- **Purpose:** To show how certain the event-detection comparison is.
+- **How it was produced:** Paired circular block bootstrap over target dates (14-day blocks, 2,000 resamples).
+- **How to read it:** Higher is better; wide intervals mean uncertain values.
+- **Actual finding:** W1+X1 F1 0.627 vs persistence 0.226 (established: positive); PR-AUC 0.487 vs climatology 0.022.
+- **What it supports:** W1+X1 ranks pressure-fall days better than both baselines on training-consistent inputs.
+- **What it does not establish:** 27 events make intervals wide; no precise level of skill is established.
+- **Use in the paper:** Chapter 4, baseline comparison. Caption: 'Figure 4.x. Event-detection scores with 95% block-bootstrap intervals, training-consistent benchmark.'
+- **Source:** data/F7_event_benchmarks.csv; run b-benchmark-20261023T162436Z-874640.
+
+### F8_variants_and_inputs — `docs/figures/F8_variants_and_inputs.png`
+
+- **What this graph shows:** Each existing trained variant's X1 PR-AUC under two input constructions, and its wind MAE.
+- **Purpose:** To show whether W1's selection among its variants holds on identical cases.
+- **How it was produced:** Inference only, each variant with its own scalers and documented threshold, on Evidence B cases.
+- **How to read it:** Higher PR-AUC is better; lower MAE is better.
+- **Actual finding:** X1 PR-AUC (training-consistent / legacy inputs): W1 (deployed) 0.487/0.824; v12 0.321/0.757; v11 0.820/0.888; v13 (Split B) 0.619/0.564; every variant's wind MAE is far above persistence.
+- **What it supports:** Variant rankings change with input construction; no variant beats persistence on wind.
+- **What it does not establish:** All variants were informed by these dates; no variant is selected here.
+- **Use in the paper:** Appendix (model selection). Caption: 'Figure A.x. Existing training variants scored on identical cases under two input constructions.'
+- **Source:** data/F8_variants_and_inputs.csv; run s7-variants-20261023T162526Z-1f7250.
+
+
+## Selected illustrative case studies (private figures)
+
+These figures plot individual PAGASA station-day readings. PAGASA's data terms (CADS-07 Rev.6, condition 4, as recorded in the source project)
+forbid publishing station readings online and no permission was found, so they exist **only** in the private thesis-export folder
+(`_private/thesis_export/`, with a local `INDEX.md`). They are not available for download here. Exact dates are withheld from public files.
+
+Every case figure states: "Selected favourable example, chosen retrospectively for illustration; not representative of all dates." Each date shows a separate next-day forecast, not a +1/+2/+3-day forecast from one origin.
+
+### PF-H (private)
+
+- **What this graph shows:** Per station (one figure each), three consecutive target dates around a detected event: observed wind and the three wind forecasts; observed and forecast MSLP; observed 24-hour MSLP change and W1's implied change; the W1+X1 score, decision and outcome.
+- **Purpose:** To explain how W1 behaved around a correctly detected pressure-fall event. Selected favourable example, chosen retrospectively for illustration; not representative of all dates.
+- **How it was produced:** Selection v1 (spec/CASE_SELECTION_v1.md): from the 24 hits, complete raw records, raw-confirmed event, ranked by correct decisions in the window (favourable), then pressure fall, then date. Saved Evidence A values; no model run.
+- **How to read it:** Black diamonds are observations; blue W1, orange persistence, green climatology. In the score panel the dashed line is the 0.601 warning threshold. Each date is a separate next-day forecast.
+- **Actual finding:** Outcomes (day before, event, day after): NAIA: Hit, Hit, Correct negative; Sangley Point: Correct negative, Hit, Correct negative; Science Garden: Correct negative, Hit, Correct negative. All events were pressure-triggered. W1's wind error was smaller than both baselines on 2 of 3 NAIA dates (not the event day), on 0 of 3 Sangley Point dates and on 1 of 3 Science Garden dates.
+- **What it supports:** W1+X1 warned on the event days and stayed quiet on the neighbouring non-event days in these windows.
+- **What it does not establish:** Selected for correct decisions; a classification success is not a regression success (W1's wind was often the worst forecast); three dates cannot show general superiority.
+- **Use in the paper:** Chapter 4, new subsection 'Selected illustrative case studies' (printed thesis only). Caption: 'Figure 4.x. Selected illustrative case: next-day forecasts for three consecutive target dates around a correctly detected pressure-fall event. Selected favourable example, chosen retrospectively for illustration; not representative of all dates.'
+- **Source:** private: _private/thesis_export/case-20261024T205908Z-bc687f/; public summary: runs/case-20261024T205908Z-bc687f/case_selection_summary.json.
+
+### PF-I (private)
+
+- **What this graph shows:** The three primary stations on the same three target dates: wind, 24-hour MSLP change and the W1+X1 score/outcome per station.
+- **Purpose:** An overall view of one event across the network. Selected favourable example, chosen retrospectively for illustration; not representative of all dates.
+- **How it was produced:** Selection v1, output B (a date detected at all three stations).
+- **How to read it:** One row per station; same colours as PF-H.
+- **Actual finding:** Correct decisions in the window: 9 of 9 station-days; all three stations triggered by a pressure fall on the event day.
+- **What it supports:** X1 warned all three stations on the event date and none on the neighbouring days.
+- **What it does not establish:** Same as PF-H; X1 gives one shared decision, so the three rows are not independent.
+- **Use in the paper:** Chapter 4, selected case studies. Caption: 'Figure 4.x. Selected common window across the three primary stations. Selected favourable example, chosen retrospectively for illustration; not representative of all dates.'
+- **Source:** private: _private/thesis_export/case-20261024T205908Z-bc687f/.
+
+### PF-J (private)
+
+- **What this graph shows:** Per station, three consecutive target dates with relatively high observed wind: observed and forecast wind, absolute wind and MSLP errors, a 'closest forecast' grid for wind/MSLP/humidity/rainfall, 24-hour MSLP change, and the W1+X1 outcome.
+- **Purpose:** The panel's request: an example with stronger observed weather where W1's numbers were favourable. Selected favourable example, chosen retrospectively for illustration; not representative of all dates. Chosen because W1's wind error was smaller than both baselines (favourable-error selection).
+- **How it was produced:** Selection v2 (spec/CASE_SELECTION_v2_regression.md), recorded before the search: complete raw records d−2..d+1 for four variables; observed wind ≥ the station's 2015-2020 90th percentile on at least one date; windows with a detected event first; ranked by dates on which W1's wind error beat both baselines, then margin, then wind, then date.
+- **How to read it:** Error bars: shorter is better. The grid names the closest forecast per variable and date (W1 shaded). Each date is a separate next-day forecast.
+- **Actual finding:** W1 wind beat both baselines on NAIA 3/3 dates (MSLP 0, humidity 1, rainfall 1); Sangley Point 3/3 dates (MSLP 1, humidity 1, rainfall 2); Science Garden 1/3 dates (MSLP 1, humidity 1, rainfall 1). Outcomes: NAIA Correct negative, Hit, Correct negative; Sangley Point Correct negative, Miss, Hit; Science Garden Miss, False alarm, Hit.
+- **What it supports:** On selected dates with relatively strong wind, W1's wind forecast can be closer than both references.
+- **What it does not establish:** Chosen for low W1 wind error; does not hold for pressure in these windows; Science Garden's '90th percentile' is only 2 m/s and its window has 1 wind win, a miss and a false alarm; overall W1 wind error is larger than persistence (PF-F).
+- **Use in the paper:** Chapter 4, selected case studies (separate from PF-H). Caption: 'Figure 4.x. Selected favourable regression example: three consecutive next-day wind forecasts during relatively strong wind. Selected favourable example, chosen retrospectively for illustration; not representative of all dates. Selected for low model wind error.'
+- **Source:** private: _private/thesis_export/case-v2-20261024T220752Z-df6bb0/; public counts: runs/case-v2-20261024T220752Z-df6bb0/case_selection_v2_summary.json.
+
+### PF-K (private)
+
+- **What this graph shows:** The selection-v2 common window: wind, absolute wind error and W1+X1 outcome for all three stations on the same dates.
+- **Purpose:** An overall favourable-regression view across the network. Selected favourable example, chosen retrospectively for illustration; not representative of all dates.
+- **How it was produced:** Selection v2 common-window rule: complete at all three stations, relatively high wind at one or more, ranked by station-dates with a W1 wind win.
+- **How to read it:** One row per station; shorter error bars are better.
+- **Actual finding:** W1 wind beat both baselines on 5 of 9 station-dates.
+- **What it supports:** On these dates W1's wind was the closest forecast more often than not at NAIA and Sangley Point.
+- **What it does not establish:** At Science Garden W1's wind was the worst forecast on every date of this window; selected for favourable error.
+- **Use in the paper:** Chapter 4, selected case studies. Caption: 'Figure 4.x. Selected favourable regression window across the three primary stations. Selected favourable example, chosen retrospectively for illustration; not representative of all dates.'
+- **Source:** private: _private/thesis_export/case-v2-20261024T220752Z-df6bb0/.

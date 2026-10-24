@@ -1,0 +1,94 @@
+{
+  "run_id": "case-v2-20261024T220752Z-df6bb0",
+  "criteria": "spec/CASE_SELECTION_v2_regression.md",
+  "source_rows_run": "w-cohort-20261024T205646Z-6b7a96",
+  "station_wind_p90_training_ms": {
+    "NAIA": 4.0,
+    "Sangley Point": 4.0,
+    "Science Garden": 2.0
+  },
+  "windows_total": 3417,
+  "windows_complete": 3394,
+  "per_station": {
+    "NAIA": {
+      "complete_windows": 1120,
+      "higher_wind_windows": 332,
+      "higher_wind_tier1": 19,
+      "higher_wind_with_wind_win_ge1": 91,
+      "higher_wind_tier1_with_wind_win_ge1": 13,
+      "higher_wind_with_wind_win_all3": 2,
+      "selected": true,
+      "tier": 1,
+      "wind_wins_of_3": 3,
+      "wins_by_variable_of_3": {
+        "wind": 3,
+        "mslp": 0,
+        "humidity": 1,
+        "rainfall": 1
+      },
+      "outcomes": [
+        "Correct negative",
+        "Hit",
+        "Correct negative"
+      ],
+      "trigger_on_event_dates": [
+        "pressure fall"
+      ]
+    },
+    "Sangley Point": {
+      "complete_windows": 1135,
+      "higher_wind_windows": 518,
+      "higher_wind_tier1": 14,
+      "higher_wind_with_wind_win_ge1": 119,
+      "higher_wind_tier1_with_wind_win_ge1": 10,
+      "higher_wind_with_wind_win_all3": 1,
+      "selected": true,
+      "tier": 1,
+      "wind_wins_of_3": 3,
+      "wins_by_variable_of_3": {
+        "wind": 3,
+        "mslp": 1,
+        "humidity": 1,
+        "rainfall": 2
+      },
+      "outcomes": [
+        "Correct negative",
+        "Miss",
+        "Hit"
+      ],
+      "trigger_on_event_dates": [
+        "pressure fall"
+      ]
+    },
+    "Science Garden": {
+      "complete_windows": 1139,
+      "higher_wind_windows": 406,
+      "higher_wind_tier1": 18,
+      "higher_wind_with_wind_win_ge1": 323,
+      "higher_wind_tier1_with_wind_win_ge1": 9,
+      "higher_wind_with_wind_win_all3": 1,
+      "selected": true,
+      "tier": 1,
+      "wind_wins_of_3": 1,
+      "wins_by_variable_of_3": {
+        "wind": 1,
+        "mslp": 1,
+        "humidity": 1,
+        "rainfall": 1
+      },
+      "outcomes": [
+        "Miss",
+        "False alarm",
+        "Hit"
+      ],
+      "trigger_on_event_dates": [
+        "pressure fall"
+      ]
+    }
+  },
+  "common": {
+    "selected": true,
+    "station_dates_with_wind_win_of_9": 5
+  },
+  "dates": "withheld from public outputs"
+}

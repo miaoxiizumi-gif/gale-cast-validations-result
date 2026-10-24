@@ -12,7 +12,7 @@ Evidence for the thesis *GALE-CAST*, about the frozen, deployed model **W1** (`g
 |---|---|---|
 | **A. Website historical scorecard** | the 3,423 cases behind the website matrix, identified case by case | TN 3386, FP 9, FN 4, TP 24 at X1 ≥ 0.601; F1 0.787 vs event persistence 0.250 and event climatology 0.078 (difference vs persistence established) |
 | **B. Training-consistent benchmark** | 3,520 cases, inputs scaled as in training | 16 of 27 events, 8 false alarms |
-| **C. Selected case studies** | three-day windows chosen retrospectively for illustration | private figures only (PAGASA terms) |
+| **C. Selected illustrative case studies** | three-day windows chosen retrospectively for illustration: set 1 around detected events; set 2 with relatively high wind and favourable W1 wind error (disclosed) | private figures only (PAGASA terms); not representative |
 
 W1 ranks pressure-fall days well, but its neural wind, pressure and humidity forecasts are less accurate than persistence on the same
 cases, its scores are not calibrated probabilities, and every evaluation-period event is a pressure fall rather than gale-force wind.
@@ -27,6 +27,7 @@ cases, its scores are not calibrated probabilities, and every evaluation-period 
 | [`documentation/PAPER_REVISION_LEDGER.md`](documentation/PAPER_REVISION_LEDGER.md) | exact find/replace corrections for Chapters 1-5 |
 | [`documentation/SPLIT_DESIGN_ASSESSMENT.md`](documentation/SPLIT_DESIGN_ASSESSMENT.md) | documented split facts and a labelled present-day assessment |
 | [`documentation/SOURCE_DOCUMENTS.md`](documentation/SOURCE_DOCUMENTS.md) | source documents, branches, commits and chapter versions |
+| [`documentation/TECH_STACK.md`](documentation/TECH_STACK.md) | verified implementation stack with source and version evidence, and a Chapter 3 paragraph |
 | [`spec/`](spec/) | specification and amendments, each committed before its analysis |
 | [`HANDOFF.md`](HANDOFF.md) | run order and open items |
 
@@ -51,4 +52,5 @@ PAGASA is the source of the station observations.
 
 ## Implementation technology stack
 
-See [TECH_STACK.md](documentation/TECH_STACK.md) for the source-backed frontend, backend, database, ML, hosting, and report tooling inventory, including suggested Chapter 3 wording. Versions are configuration evidence, not a live runtime audit.
+See [TECH_STACK.md](documentation/TECH_STACK.md) for the source-backed frontend, backend, database, ML, hosting, and report tooling inventory,
+including a proposed Chapter 3 paragraph. Versions are configuration or environment evidence, not a live runtime audit.

@@ -35,4 +35,13 @@ See `EVALUATION_METHOD.md` § References (each read from the primary source on 2
 
 ## Implementation-stack supplement (2026-10-25)
 
-`TECH_STACK.md` additionally reviews `requirements.txt`, `Dockerfile`, `app.py`, `dashboard.html`, and the project deployment/structure documents at GALE-CAST commit `bb056a9`. This is a separate implementation inventory; it does not change or re-execute the earlier W1 evaluation. No live package inventory or private case values were inspected.
+`TECH_STACK.md` reviews the application at GALE-CAST commit `bb056a9` (`requirements.txt`, `requirements-dev.txt`, `Dockerfile`, `app.py`,
+`dashboard.html`, `static/sw.js`, `hosting/vercel.json`, `docker/db-init/schema.sql`, `.github/workflows/tests.yml`) together with
+`docs/PROJECT_STRUCTURE.md` and `docs/handoff/DEPLOYMENT_AND_GITHUB.md`. It was first compiled by Tinenen-cs (commit `8b32465`) and verified
+line by line on the same date. It is a separate implementation inventory; it does not change or re-execute the W1 evaluation, and no live
+package inventory or private case values were used for it.
+
+## Selection amendments
+
+`spec/CASE_SELECTION_v1.md` (classification case studies) and `spec/CASE_SELECTION_v2_regression.md` (favourable regression case), each
+committed before its search.
