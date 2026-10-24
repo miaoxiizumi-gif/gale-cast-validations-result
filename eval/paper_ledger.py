@@ -1,0 +1,198 @@
+"""Exact find/replace revision ledger for Chapters 1-5 (PDFs of 2026-10-23; SHA-256 prefixes in SOURCE_DOCUMENTS.md).
+
+Every `find` string is checked against the private text extraction of the chapter PDFs and its PDF page index is recorded.
+Numbers in replacements are filled from saved run outputs ({placeholders}); nothing numerical is typed by hand.
+Status of every entry: "proposed only" (only PDFs exist; no editable chapter source was found).
+"""
+from __future__ import annotations
+
+import re
+
+import common as C
+
+PAGES = C.PRIVATE / "chapters" / "pages"
+
+# (id, chapter, heading, find, replacement, reason, evidence, topic)
+LEDGER = [
+ ("P-01", 1, "Scope and Limitation",
+  "The supplementary Luzon/port data is first used for pre-training the dual-stream encoder",
+  "Supplementary PAGASA observations (owner-confirmed) from Port Area and 19 other Luzon stations were combined with the primary-station training rows and used in a single training run; there was no separate pre-training or fine-tuning stage. Primary-station records were split chronologically, whereas Port Area and supplementary records were used for training regardless of date, including dates inside the later evaluation period. (Replace the whole sentence.)",
+  "W1 was trained in one `model.fit` call on the concatenated primary, Port Area and supplementary windows.",
+  "`exp/precision-targeting:experiments/w1x1/_train_w3.py` lines 269-280 and 876-890; claim C-07.", "pretraining"),
+ ("P-02", 1, "Scope and Limitation",
+  "used exclusively within the training and pre-training sets and excluded entirely from the primary evaluation splits",
+  "used only for training (in a single combined training run) and excluded from every evaluation score; records dated inside the evaluation period were nevertheless used in training ({pa_rows_in_test} Port Area rows and {supp_rows_in_test} supplementary rows)",
+  "There is no pre-training set; date overlap with the evaluation period is not disclosed.",
+  "Stage 2 run counts; claim C-07.", "supplementary"),
+ ("P-03", 1, "Scope and Limitation",
+  "GALE-CAST produces a calibrated gale probability for each station and day",
+  "GALE-CAST produces an uncalibrated score between 0 and 1 for each station and day. The score ranks hazard-label days well (PR-AUC {a_prauc_x1} with the historical procedure) but is not a calibrated probability: its Brier skill relative to event climatology is {a_bss_x1}. The Low/Moderate/High tier on the dashboard is assigned by separate rules on displayed wind speed and pressure drop and does not use this score. (Replace the whole sentence.)",
+  "No calibration is applied; Brier skill is negative; the displayed tier ignores the model score.",
+  "Group A run (Brier); `predict_live.py:451`, `app.py:764`; claim C-05.", "calibration"),
+ ("P-04", 1, "Scope and Limitation",
+  "a three-day climatological outlook in which the displayed meteorological values are simulated from trained historical station statistics and forecast by the model",
+  "a three-day outlook whose displayed values come from a seeded statistical simulation of historical station statistics and from imported PAGASA forecasts; the W1 model itself produces next-day (+1 day) forecasts only, and no multi-day W1 forecast was evaluated",
+  "W1 is a direct next-day model; the 3-day display is not a model forecast.",
+  "`predict_live.py` AR(1) simulation (SEED = 42); EVAL_SPEC_v1 §5; AUDIT §1.1.", "three-day"),
+ ("P-05", 1, "Scope and Limitation",
+  "The limitation of the system lies in the 3-day forecast ahead and the fact that the system is trained on daily synoptic observations",
+  "The model forecasts one day ahead only, and it is trained on daily synoptic observations",
+  "No three-day model forecast exists.", "EVAL_SPEC_v1 §5.", "three-day"),
+ ("P-06", 1, "Project Context",
+  "GALE-CAST functions as a next-day gale-hazard classifier, producing a probability of hazardous conditions from a 32-day sequence of station observations",
+  "GALE-CAST functions as a next-day classifier, producing from a 32-day sequence of station observations a score (not a calibrated probability) for whether the next day meets the study's hazard label: wind speed ≥ 10.8 m/s or a same-station 24-hour pressure fall ≥ 3 hPa",
+  "The label is a combined wind-or-pressure proxy; the output is uncalibrated.", "`process_weather.py` lines 104-120; Group A label counts.", "label"),
+ ("P-07", 3, "Model Training and Validation Framework (introduction)",
+  "By implementing a strict temporal partitioning strategy, rolling-origin cross-validation, and an integrated imbalance mitigation suite",
+  "By partitioning the records chronologically, verifying the frozen model's retrospective next-day forecasts against recorded outcomes, comparing them with persistence and climatology on identical cases, and applying class-imbalance mitigation during training, the researchers assess how the model performed on a later period. No cross-validation of the network was performed, and the later period is not fully independent (see Data Partitioning). (Replace the whole sentence.)",
+  "No rolling-origin cross-validation of the network was executed.", "No such procedure in `_train_w3.py` or the scoring scripts; claim R-3-14.", "cross-validation"),
+ ("P-08", 3, "Cross-Validation Framework",
+  "To further validate the reliability of the attention-gated hybrid architecture across varying atmospheric regimes, the researchers implemented a Time Series Split (Rolling-Origin Validation) framework.",
+  "Rename the heading to \"Evaluation Framework\" and replace the paragraph with: \"The network was trained once and evaluated with a single chronological split (training, tuning, evaluation). The evaluation is a retrospective forecast verification with persistence and climatology benchmarking: the frozen model's next-day forecasts for the evaluation period are checked against recorded outcomes and compared with two reference forecasts on identical cases. No k-fold, rolling-origin or walk-forward cross-validation of the network was executed. A time-series split appears in the project only in a since-withdrawn post-processing step, where it was fitted on evaluation-period outcomes.\"",
+  "Calls a single split cross-validation; the only TimeSeriesSplit was inside evaluation-period post-processing.",
+  "`validate_model_multioutput.py@1fd1ef9` lines 1066-1205; regression-provenance run.", "cross-validation"),
+ ("P-09", 3, "Cross-Validation Framework",
+  "Following the canonical formulation of time-series cross-validation validated by Hyndman (n.d.)",
+  "Delete this sentence.", "Describes a procedure that was not applied to the network.", "As P-08.", "cross-validation"),
+ ("P-10", 3, "Cross-Validation Framework",
+  "By enforcing the mathematical constraint that the correction model is fit exclusively on prior data",
+  "The withdrawn correction steps were fitted on evaluation-period outcomes: isotonic MOS was cross-fitted within the period ({mos_fallback_rows} rows were calibrated by a fit on later evaluation rows), and the persistence-blend weight was selected on the same period. Metrics that include these steps are not out-of-sample. (Replace the whole sentence.)",
+  "The fallback MOS fit uses later evaluation rows; the blend weight is chosen on evaluation outcomes.",
+  "Regression-provenance run (reproduces the website's 0.5365 m/s exactly).", "independence"),
+ ("P-11", 3, "Data Partitioning",
+  "By strictly isolating these periods, the research confirms that GALE-CAST's predictive fidelity is representative of genuine out-of-sample forecasting performance.",
+  "Because the evaluation period was used historically to compare model variants, to adopt cross-station averaging and to choose the threshold rule, and because training included Port Area and supplementary records dated within it, results on this period are retrospective rather than independent out-of-sample estimates.",
+  "The period informed model and procedure selection.", "Claims C-10, C-11, C-17.", "independence"),
+ ("P-12", 3, "Data Partitioning",
+  "This unseen evaluation ensures that the physics-informed logic remains stable",
+  "Delete this sentence, or replace it with: \"The evaluation period was not unseen in the sense required for an independent test (see above).\"",
+  "Not unseen.", "Claims C-10, C-11, C-17.", "independence"),
+ ("P-13", 3, "Research Procedure (summary)",
+  "data from October 2021 to December 2024 was set aside, untouched, to test how well the system forecasts real-world weather events",
+  "data from October 2021 to December 2024 were withheld from training at the three primary stations and used to check the system's next-day forecasts against recorded outcomes; this period was also used to compare model versions and to choose the scoring procedure",
+  "Not untouched.", "Claims C-10, C-11, C-17.", "independence"),
+ ("P-14", 3, "Data Preprocessing",
+  "comprising 83,569 high-fidelity observations drawn from two distinct tiers",
+  "comprising 83,569 daily station records: {primary_rows} from the three primary stations (6,342 training, 1,095 tuning, 3,519 evaluation), 3,225 from Port Area and 69,388 from 19 additional Luzon stations. The Port Area and Luzon records are supplementary PAGASA observations (owner-confirmed)",
+  "The total is dominated by supplementary rows; Port Area belongs to the supplementary group.", "Stage 2 and 2b runs.", "provenance"),
+ ("P-15", 3, "Data Preprocessing",
+  "supplementary port data is used strictly as training data and is never incorporated into the primary station test or evaluation set",
+  "supplementary records (Port Area and the 19 Luzon stations) are used only as training data and are excluded from every evaluation score; however, {pa_rows_in_test} Port Area rows and {supp_rows_in_test} supplementary rows dated within the evaluation period were used in training",
+  "Correct about scoring; omits the date overlap.", "Stage 2 run.", "supplementary"),
+ ("P-16", 3, "Data Partitioning",
+  "The training set covers observations from January 1, 2015, to October 14, 2020, consisting of 78,955 observations and containing confirmed gale events.",
+  "The training set contains 78,955 rows: primary-station rows dated 1 January 2015 to 14 October 2020 (6,342), all Port Area rows (3,225; to 30 October 2023) and 69,388 supplementary rows (to 30 December 2024). Its 1,143 positive labels are study-label events (wind ≥ 10.8 m/s or a 24-hour pressure fall ≥ 3 hPa), not confirmed gale-force winds.",
+  "Date range applies only to primary rows; positives are proxy events.", "Stage 2 run; claim C-20.", "provenance"),
+ ("P-17", 3, "Model Output Classification and Risk Tiering",
+  "system falls back to the model's inferred probability",
+  "Replace the paragraph's fallback description with: \"The dashboard tier is assigned only by thresholds on displayed wind speed (10.8 and 17.2 m/s) and pressure drop (3 and 6 hPa). The model score is stored but is not used to assign the tier.\"",
+  "No probability fallback exists in the deployed tier code.", "`predict_live.py:451`, `app.py:764`; claim C-05.", "dashboard-risk"),
+ ("P-18", 3, "Operational Threshold Criteria",
+  "Five independent, pre-registered selection rules converged on the same value",
+  "The threshold 0.601 was computed on the tuning period, but it was adopted after a different tuning rule (maximum F1, threshold 0.62) had already been scored on the test period; every threshold from 0.601 to 0.627 gives the same tuning result, and the adopted rules select the lowest of them. (Replace the whole sentence.)",
+  "The rules were introduced after test scores were seen; they share one tuning band.", "Claim C-10; Cohort A rule check.", "independence"),
+ ("P-19", 3, "Target Variable Configuration",
+  "to focus the model on the categorical distinction between standard weather and gale-force events",
+  "to focus the model on whether the next day meets the study's hazard label (wind ≥ 10.8 m/s or a 24-hour pressure fall ≥ 3 hPa); in the evaluation period every positive label was a pressure fall",
+  "The label is not gale-force wind.", "Group A label counts: {a_pos} positives, {a_press_only} pressure-only, {a_wind_only} wind-triggered.", "label"),
+ ("P-20", 3, "Algorithm / Dual-stream design",
+  "the Anomaly-Detection Attention-LSTM Stream is trained exclusively to isolate, extract, and recover the sparse sequential signals embedded within rare gale-positive observations",
+  "the Anomaly-Detection Attention-LSTM stream receives four pressure- and rainfall-anomaly features for every window and is trained jointly with the other stream on all training windows",
+  "Both streams see every window.", "`_train_w3.py` lines 737-780, 876-890.", "architecture"),
+ ("P-21", 4, "Model Architecture",
+  "The Anomaly-Detection Attention-LSTM stream is dedicated to the sparse, gale-positive sequences.",
+  "The Anomaly-Detection Attention-LSTM stream processes four anomaly features (pressure tendency, pressure drop, precipitation anomaly and a storm-signal flag) for every window; its attention layer weights the 32 time steps.",
+  "As P-20.", "Stage 1 layer list; `_train_w3.py` lines 737-780.", "architecture"),
+ ("P-22", 4, "Model Architecture",
+  "the ANN maps the non-linear relationships among the engineered features, and the LSTM, through its input, forget, and output gates, retains multi-day trends",
+  "the LSTM summarises the 32-day sequence through its input, forget and output gates, and a fully connected (ANN) layer then maps that summary before the streams are merged",
+  "The dense layer follows the LSTM in W1.", "Stage 1 layer list: `lstm_normal` (64) → `dense_normal` (32).", "architecture"),
+ ("P-23", 4, "Data Partitioning",
+  "The dataset of 83,569 observations was divided chronologically into three disjoint periods so that no information from the evaluation window could influence training or model selection.",
+  "The primary-station records were divided chronologically into training, tuning and evaluation periods. Information from the evaluation window did influence model selection, and Port Area and supplementary records dated within it were used in training; see the Data Partitioning corrections in Chapter 3.",
+  "Not disjoint in the sense stated.", "Claims C-07, C-10, C-17.", "independence"),
+ ("P-24", 4, "Data Partitioning",
+  "The training set covers January 1, 2015 to October 14, 2020 and contains 78,955 observations with 1,143 gale events.",
+  "Use the P-16 wording.", "As P-16.", "As P-16.", "provenance"),
+ ("P-25", 4, "Risk Tiering and Calibration",
+  "if none is triggered, the model probability is classified using the 0.33 and 0.66 cutoffs",
+  "the tier is Low when neither rule is triggered; the model score is not used to assign the tier",
+  "No probability fallback exists.", "Claim C-05.", "dashboard-risk"),
+ ("P-26", 4, "Table 4.3",
+  "Priority-ordered TCWS-aligned tiering (cutoffs 0.33 / 0.66), isotonic MOS calibration, persistence blending",
+  "Post-processing: same-date mean of the three station scores (X1); no fitted calibration. Tiering: rule-based on displayed wind speed and pressure drop (not on the model score).",
+  "Contradicts the chapter's own text and the code.", "Claims C-05, C-06.", "dashboard-risk"),
+ ("P-27", 4, "Model Evaluation",
+  "evaluated on the chronologically held-out test period using a 2x2 confusion matrix that compares the forecast hazard label (Gale / No Gale)",
+  "evaluated retrospectively on the later chronological period using a 2x2 confusion matrix that compares the forecast hazard label (study-label event / no event)",
+  "Not held out from selection; the label is not gale-force wind.", "Claims C-10, C-15, C-17.", "label"),
+ ("P-28", 4, "Model Evaluation",
+  "on a test period that was kept separate from both training and threshold selection",
+  "on a period withheld from primary-station training but used historically to compare model variants and to adopt the threshold rule",
+  "The threshold rule was adopted after test scores were seen.", "Claim C-10.", "independence"),
+ ("P-29", 4, "Model Evaluation",
+  "They therefore represent a conservative estimate of out-of-sample performance",
+  "These values are a retrospective, possibly optimistic, estimate: selection decisions were informed by the same period, and the score depends strongly on how inputs are scaled (training-consistent inputs on {b_cases} benchmark cases give {b_tp} of {b_events} events with {b_fp} false alarms). (Replace the whole sentence.)",
+  "Not conservative; not out-of-sample.", "Claims C-10, C-13, C-17; Group B benchmark run.", "independence"),
+ ("P-30", 4, "Selected case studies (new subsection after Table 4.4)",
+  "Table 4.4: Confusion Matrix Metrics Result",
+  "INSERT AFTER the paragraph following Table 4.4: \"Retrospectively selected illustrative case studies. To explain how the model behaved around correctly detected events, three-day windows (the day before, the event day and the day after) were selected from the 24 detected events using criteria fixed before the figures were drawn (complete observations, a confirmed pressure-fall event, and the most correct decisions in the window, then the largest pressure fall). Each date shows a separate next-day forecast; the windows are not three-day-ahead forecasts. These examples were chosen because they are successful; they illustrate behaviour and are not representative of all dates. Overall performance is given by Table 4.4 and the benchmark comparison.\"",
+  "The panel asked for illustrative examples; they must be labelled as selected.", "spec/CASE_SELECTION_v1.md; case-selection run.", "selected-cases"),
+ ("P-31", 4, "Table 4.5 / regression results",
+  "Table 4.5: Regression Head Error Metrics Compared with the Acceptable Thresholds",
+  "Replace Table 4.5 with the deployed model's neural-only next-day errors on the website's cases (raw observed truth, {a_wind_n} cases): wind speed MAE {a_w1_mae} m/s ({a_w1_mae_kmh} km/h), RMSE {a_w1_rmse} m/s; persistence {a_pe_mae} m/s; climatology {a_cl_mae} m/s. MSLP MAE {a_mslp_w1} hPa (persistence {a_mslp_pe}); humidity MAE {a_hum_w1}% (persistence {a_hum_pe}); rainfall MAE {a_rain_w1} mm (persistence {a_rain_pe}, climatology {a_rain_cl}; RMSE {a_rain_rmse_w1} vs climatology {a_rain_rmse_cl}). Add a note: \"The previously reported values (wind 2.04 km/h) belong to the model before W1 and included isotonic calibration and persistence blending fitted on the evaluation period; the wind-direction row came from a separate direction-only model.\"",
+  "The table's numbers are not W1's and include post-processing fitted on evaluation outcomes.",
+  "`git show 84d9ae3^:validation_cm3.json` (wind 0.5655 m/s = 2.04 km/h); regression-provenance run; Group A run.", "regression-identity"),
+ ("P-32", 4, "Regression results",
+  "every MASE value was below 1.00, so the model outperformed the seasonal naive baseline (lag-365)",
+  "every MASE value was below 1.00. MASE divides the error by the average error of a seasonal-naive rule measured in-sample on training data (Hyndman & Koehler, 2006), so a value below one does not show that the model beats a reference forecast on the same evaluation cases; on identical cases W1's neural wind forecast is less accurate than persistence and climatology",
+  "MASE < 1 against an in-sample denominator is not a same-case win.", "Hyndman & Koehler (2006) §3; Group A run.", "regression-identity"),
+ ("P-33", 5, "Summary of Findings 3",
+  "wind speed achieving an MAE of 2.04 km/h and an RMSE of 2.92 km/h, outperforming existing baseline studies",
+  "the deployed model's neural wind forecasts having an MAE of {a_w1_mae} m/s, larger than persistence ({a_pe_mae} m/s) and climatology ({a_cl_mae} m/s) on the same cases",
+  "Wrong model version; external studies are not same-case baselines.", "As P-31.", "regression-identity"),
+ ("P-34", 5, "Conclusions",
+  "all continuous regression targets met their acceptable error ceilings, led by wind speed (MAE of 2.04 km/h)",
+  "the deployed model's regression outputs were less accurate than persistence for wind, pressure and humidity; its rainfall MAE was lower than both references, though its RMSE was not lower than climatology's",
+  "As P-31.", "Group A run (PF-F3).", "regression-identity"),
+ ("P-35", 5, "Conclusions",
+  "demonstrated high diagnostic reliability and predictive strength for rare gale events",
+  "detected 24 of 28 study-label events (all pressure falls of at least 3 hPa) with 9 false alarms using the historical scoring procedure, and outperformed event persistence and event climatology on F1; the result is retrospective, depends on input scaling, and concerns pressure-fall events rather than gale-force winds",
+  "Overstates; label and independence.", "Group A and B runs.", "label"),
+ ("P-36", 5, "Summary of Findings 1",
+  "83,569 observations (2015 to 2024) across the Science Garden, NAIA, and Sangley Point stations",
+  "83,569 daily records (2015 to 2024), of which {primary_rows} are from Science Garden, NAIA and Sangley Point and the rest are supplementary PAGASA observations (owner-confirmed) from Port Area and 19 Luzon stations",
+  "The total is not primary-station data.", "Stage 2 and 2b runs.", "provenance"),
+]
+
+
+def page_index() -> dict[int, list[str]]:
+    out = {}
+    for n in range(1, 6):
+        f = PAGES / f"ch{n}.txt"
+        if f.exists():
+            out[n] = [re.sub(r"\s+", " ", p) for p in f.read_text(encoding="utf-8", errors="replace").split("\f")]
+    return out
+
+
+def norm(s: str) -> str:
+    return re.sub(r"\s+", " ", s).strip()
+
+
+def locate(idx, ch, find):
+    pages = idx.get(ch)
+    if pages is None:
+        return None, "not re-verified (private text unavailable)"
+    hits = [i + 1 for i, p in enumerate(pages) if norm(find) in p]
+    return (hits[0] if hits else None), ("found" if hits else "NOT FOUND")
+
+
+def build(ph: dict) -> list[dict]:
+    idx = page_index()
+    rows = []
+    for id_, ch, head, find, rep, why, ev, topic in LEDGER:
+        pg, status = locate(idx, ch, find)
+        rows.append({"id": id_, "chapter": ch, "heading": head, "pdf_page": pg, "find_text": find,
+                     "replacement": rep.format(**ph), "reason": why, "evidence": ev.format(**ph), "topic": topic,
+                     "find_check": status, "status": "proposed only (PDF source; not applied to any working copy)"})
+    return rows

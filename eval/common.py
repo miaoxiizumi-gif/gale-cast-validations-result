@@ -95,17 +95,16 @@ def private_dir(run_dir: Path) -> Path:
 
 
 def environment() -> dict:
-    import sklearn
-    import tensorflow as tf
-    import keras
+    # installed versions from package metadata, so figure-only runs need not import TensorFlow
+    from importlib.metadata import version
     return {
         "python": sys.version.split()[0],
         "platform": platform.platform(),
-        "tensorflow": tf.__version__,
-        "keras": keras.__version__,
+        "tensorflow": version("tensorflow-cpu"),
+        "keras": version("keras"),
         "numpy": np.__version__,
         "pandas": pd.__version__,
-        "scikit_learn": sklearn.__version__,
+        "scikit_learn": version("scikit-learn"),
     }
 
 
