@@ -49,8 +49,8 @@ CLAIMS = [
      "`git show 84d9ae3^:validation_cm3.json`; commit `24183d6` message."),
     ("C-19", "repo", "`validation_timeline.json` (generated 2026-07-02, threshold 0.5834, 'gale' = wind ≥ 17.2 m/s, 3,426 rows from 2021-11-15) predates W1 and uses a different label and threshold from `validation_cm3.json`; the two cannot be combined.",
      "File metadata and aggregate outcome counts (TN/FP only)."),
-    ("C-20", "hist", "`Training.csv` reproduces the supplementary counts exactly (69,388 rows; 1,057 positives under the study label; 1,057 + 86 = 1,143, the paper's figure). Whether its rows are observations, synthetic, or verified PAGASA data is not established.",
-     "Stage 2b run {s2b}; no construction script or source document found."),
+    ("C-20", "hist", "`Training.csv` reproduces the supplementary counts exactly (69,388 rows; 1,057 positives under the study label; 1,057 + 86 = 1,143, the paper's figure). The owner confirmed on 2026-10-24 that these rows are supplementary PAGASA observations (owner-confirmed; not independently verified against a PAGASA source document). The earlier reading of a SMOTE origin from a filename is withdrawn.",
+     "Stage 2b run {s2b}; owner confirmation recorded in the source project's `docs/data/DATA_SOURCES.md` (branch `docs/project-home`)."),
 ]
 
 # ------------------------------------------------------------------ chapter revision ledger
@@ -94,8 +94,8 @@ REV = [
   "Wrong", "C-05: the deployed tier uses wind and pressure thresholds only.", "The Low/Moderate/High tiers are rule-based categories computed from displayed wind speed and pressure drop; the model probability is not used to assign them."),
  # ---------------- Chapter 3
  ("R-3-01", 3, "Data Preprocessing", "83,569 high-fidelity observations from two tiers",
-  "Partly correct", "83,569 = 78,955 + 1,095 + 3,519 rows of three partitions, of which 69,388 are supplementary rows of unresolved provenance (C-20). It is not a count of primary-station observations.",
-  "The modelling data comprise 83,569 daily rows: 10,914 primary-station rows (6,342 training, 1,095 tuning, 3,519 test), 3,225 Port Area rows and 69,388 supplementary rows whose origin is not documented."),
+  "Partly correct", "83,569 = 78,955 + 1,095 + 3,519 rows of three partitions, of which 69,388 are supplementary PAGASA observations (owner-confirmed; C-20) and 3,225 are Port Area rows. It is not a count of primary-station observations. (Corrected 2026-10-25: the primary-station total is 10,956, not 10,914 as first written here.)",
+  "The modelling data comprise 83,569 daily rows: 10,956 primary-station rows (6,342 training, 1,095 tuning, 3,519 test), 3,225 Port Area rows and 69,388 rows from 19 additional Luzon stations; the Port Area and Luzon rows are supplementary PAGASA observations (owner-confirmed)."),
  ("R-3-02", 3, "Missing Value Imputation", "Gaps limited to 83 MSLP readings across three stations; wind speed and rainfall have no missing values",
   "Wrong", "Stage 2 raw inventory, primary stations: wind missing 73 (NAIA 68, Sangley 1, Science Garden 4), rainfall 103, MSLP 57. The figure 83 is MSLP across all four stations (Port Area 26).",
   "Before imputation, the three primary stations' records lacked 73 wind-speed, 103 rainfall and 57 mean sea-level pressure values (Port Area: 26 of each); rainfall also contained trace entries coded −1, which were set to 0.05 mm."),
@@ -212,7 +212,7 @@ REV = [
   "Partly correct", "The GWM arithmetic is correct. Usability ratings cannot establish forecast accuracy or deployment readiness.",
   "Evaluators rated the prototype's usability favourably (general weighted means 3.47-3.85 on a 4-point scale). These ratings describe perceived usability and do not establish forecast accuracy or operational readiness, which require prospective verification against observations."),
  ("R-5-05", 5, "Recommendation 1", "Compare with simpler baselines such as persistence and climatology",
-  "Correct", "This revision now performs that comparison (Section 4).", "Keep, and add: evaluate the frozen model prospectively on 2025+ observations before any operational claim."),
+  "Correct", "This evaluation now performs that comparison (benchmark sections A and B).", "Keep, and add: evaluate the frozen model prospectively on 2025+ observations before any operational claim."),
 ]
 
 OMISSIONS = [
@@ -221,7 +221,7 @@ OMISSIONS = [
     ("O-03", "The difference between the deployed system (24-step endpoint, simulated display values, rule-based tiers) and the evaluated model is not disclosed."),
     ("O-04", "Training on Port Area and supplementary rows dated inside the test period is not disclosed."),
     ("O-05", "No training history or seed exists; learning curves cannot be shown."),
-    ("O-06", "The provenance of the 69,388 supplementary rows is undocumented."),
+    ("O-06", "The 69,388 supplementary rows are described only as owner-confirmed PAGASA observations; no PAGASA delivery note or construction script for them is in the repository."),
     ("O-07", "PAGASA metadata for the wind statistic (mean/maximum, averaging period, height) is not given."),
 ]
 
@@ -232,7 +232,7 @@ LIMITS = [
     ("L-04", "CSV files are assumed, not proven, to equal the database tables W1 was trained and scored on."),
     ("L-05", "Next-day only; no valid two- or three-day procedure exists for W1."),
     ("L-06", "The block bootstrap (14-day blocks) captures short-range dependence only; seasonal dependence is not fully represented."),
-    ("L-07", "Supplementary data provenance is unresolved; its contribution to W1 cannot be separated."),
+    ("L-07", "Supplementary data are owner-confirmed PAGASA observations without an independent source document; their contribution to W1 cannot be separated."),
     ("L-08", "The running Hugging Face container was not inspected; deployment identity rests on the Space repository contents."),
     ("L-09", "Humidity, rainfall, pressure and direction outputs were not re-evaluated against baselines."),
 ]

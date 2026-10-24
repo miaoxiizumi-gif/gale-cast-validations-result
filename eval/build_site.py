@@ -13,6 +13,7 @@ import shutil
 import pandas as pd
 
 import common as C
+import build_docs
 from content import CLAIMS, LIMITS, OMISSIONS, REV
 
 DOCS = C.WORKSPACE / "docs"
@@ -58,7 +59,8 @@ def ci(c, d=3):
 def main():
     runs = {k: latest(p) for k, p in {"s1": "s1-identity", "s2": "s2-partitions", "s2b": "s2b-supplementary",
                                        "a": "a-legacy", "b": "b-benchmark", "d1": "diag-inputs", "d2": "diag-insample",
-                                       "v": "s7-variants", "fig": "fig"}.items()}
+                                       "v": "s7-variants", "fig": "fig", "w": "w-cohort", "rp": "reg-prov",
+                                       "sf": "split-facts", "case": "case", "pf": "pf"}.items()}
     s1 = J(runs["s1"] / "stage1_identity.json")
     s2 = J(runs["s2"] / "stage2_partitions.json")
     s2b = J(runs["s2b"] / "supplementary_counts.json")
@@ -101,6 +103,16 @@ def main():
         shutil.copy(p, DOCS / "figures" / p.name)
     for p in runs["fig"].glob("F*.csv"):
         shutil.copy(p, DOCS / "data" / p.name)
+    X = build_docs.main()  # writes documentation/*.md and README.md from the same runs
+    PH, LED, WA, RPv, CASE = X["ph"], X["ledger"], X["A"], X["RP"], X["case"]
+    (DOCS / "figures" / "paper").mkdir()
+    for p in (X["runs"]["pf"] / "figures").glob("PF-*"):
+        shutil.copy(p, DOCS / "figures" / "paper" / p.name)
+    (DOCS / "data" / "documentation").mkdir()
+    for p in (C.WORKSPACE / "documentation").glob("*"):
+        shutil.copy(p, DOCS / "data" / "documentation" / p.name)
+    for p in ("AMENDMENT_A2_website_cohort.md", "CASE_SELECTION_v1.md"):
+        shutil.copy(C.WORKSPACE / "spec" / p, DOCS / "data" / p)
     shutil.copy(runs["b"] / "wind_monthly_means_by_station.csv", DOCS / "data")
     shutil.copy(runs["b"] / "event_outcomes_monthly_by_station.csv", DOCS / "data")
 
@@ -163,35 +175,112 @@ def main():
     S = []
     nav = []
 
+    SECS = {}
+
     def sec(id_, title, body):
-        nav.append((id_, title))
-        S.append(f'<section id="{id_}"><h2>{e(title)}</h2>{body}</section>')
+        SECS[id_] = (title, body)
 
     tr = s2["w1_split_reconstructed"]
     spec_commit = C.git(["log", "--format=%h %ad", "--date=iso", "--reverse", "--", "spec/EVAL_SPEC_v1.json"], cwd=C.WORKSPACE).splitlines()[0]
 
+    ev = WA["events"]["pooled"]
+    cA = ev["classifiers"]
+    ckey = [k for k in cA if k.startswith("event_climatology")][0]
+    xa, pa, ca = cA["W1+X1@0.601"], cA["event_persistence"], cA[ckey]
     sec("overview", "Overview in plain English", f"""
-<p class="lead">GALE-CAST's deployed model, called <strong>W1</strong>, reads the last 32 days of weather at a Metro Manila
-station and gives (a) a score for whether tomorrow meets the study's hazard label and (b) six forecast weather values.
-We tested the frozen model, without changing it, on 2021-10-15 to 2024-12-31 at NAIA, Sangley Point and Science Garden,
-against two simple reference forecasts.</p>
+<p class="lead">GALE-CAST's deployed model, <strong>W1</strong>, reads the last 32 days of weather at a Metro Manila station and gives
+(a) a score for whether <em>tomorrow</em> meets the study's hazard label (wind ≥ 10.8 m/s or a 24-hour pressure fall ≥ 3 hPa) and
+(b) six next-day weather values. This site checks the frozen model, without changing it, against what was recorded and against two
+simple reference forecasts. The method is <b>retrospective forecast verification with persistence and climatology benchmarking</b>;
+it is not cross-validation.</p>
 <div class="cards">
- <div class="card"><div class="k">Wind forecast</div><div class="v">{ph['w1_mae']} m/s</div><div class="s">average error (MAE) of W1, vs
- <b>{ph['pe_mae']}</b> for "tomorrow = today" and <b>{ph['cl_mae']}</b> for the monthly average. W1 is worse than both.</div></div>
- <div class="card"><div class="k">Events in the test period</div><div class="v">{ph['ev_n']}</div><div class="s">all were pressure falls ≥ 3 hPa; no gale-force wind (≥ 17.2 m/s) was ever recorded.</div></div>
- <div class="card"><div class="k">W1+X1 at 0.601</div><div class="v">{ph['x1_tp']} / {ph['ev_n']}</div><div class="s">events caught, with {ph['x1_fp']} false alarms
- (training-consistent inputs). Better than repeating yesterday's label (F1 {ph['x1_f1']} vs {ph['pe_f1']}).</div></div>
- <div class="card"><div class="k">Historical scorecard</div><div class="v">24 / 28</div><div class="s">reproduced exactly, but its inputs were scaled
- differently from training, and its threshold rule was chosen after test results were seen.</div></div>
+ <div class="card"><div class="k">Website scorecard, traced</div><div class="v">24 / 28</div><div class="s">events caught with 9 false alarms on the
+ website's 3,423 cases. Every case was identified and matches the original saved record.</div></div>
+ <div class="card good"><div class="k">Strength: event detection</div><div class="v">F1 {xa['f1']:.2f}</div><div class="s">vs {pa['f1']:.2f} for
+ "tomorrow's label = today's" and {ca['f1']:.2f} for the monthly event rate, on the same cases (difference vs persistence established).
+ PR-AUC {ev['probabilistic']['W1+X1']['pr_auc']:.2f} vs no-skill {xa['prevalence']:.3f}.</div></div>
+ <div class="card bad"><div class="k">Weakness: weather values</div><div class="v">{PH['a_w1_mae']} m/s</div><div class="s">wind error (MAE) of W1 vs
+ <b>{PH['a_pe_mae']}</b> for "tomorrow = today". W1 is also worse than persistence for pressure and humidity.</div></div>
+ <div class="card"><div class="k">Training-consistent inputs</div><div class="v">{PH['b_tp']} / {PH['b_events']}</div><div class="s">events caught
+ ({PH['b_fp']} false alarms) when inputs are scaled as in training: the scorecard depends on input scaling.</div></div>
 </div>
-<p><b>What this means.</b> The headline 85.71% recall and 0.8302 PR-AUC can be reproduced but are not independent test results, and they
-depend strongly on how inputs are scaled. W1 does rank pressure-fall days above ordinary days better than simple rules, but its
-"gale" events are pressure falls, its probabilities are not calibrated, and its wind-speed forecasts are less useful than
-simply repeating today's wind. Nothing here shows that W1 forecasts gale-force winds.</p>
-<p class="note">Evaluation <code>{EVAL_ID}</code>. Specification committed before scoring: <code>{e(spec_commit)}</code>. Status: <b>provisional</b>
-(chapter review complete for Chapters 1-5 as supplied on 2026-10-24; update as revisions arrive).</p>
+<p><b>What this means.</b> W1 is genuinely better than simple rules at flagging the days on which station pressure falls sharply, and the
+website's matrix can be reproduced case by case. But every event in 2021-2024 was a pressure fall (no gale-force wind was recorded), the
+scores are not calibrated probabilities, the period was used to choose the scoring rule, and W1's own wind, pressure and humidity forecasts
+are less accurate than persistence. The website's regression numbers come from post-processing fitted on the evaluation period, not from W1 alone.</p>
+<div class="groups"><div><span class="tag new">A</span> <b>Website historical scorecard</b>: overall evidence on the website's own cases.</div>
+<div><span class="tag hist">B</span> <b>Training-consistent benchmark</b>: overall evidence, declared before scoring (the two B sections).</div>
+<div><span class="tag sel">C</span> <b>Selected case studies</b>: chosen retrospectively to explain behaviour; not representative.</div></div>
+<p class="note">Evaluation <code>{EVAL_ID}</code> with amendment A2. Specification committed before scoring: <code>{e(spec_commit)}</code>.
+Status: <b>provisional</b>; chapter corrections are proposals, not applied edits.</p>
 <p class="legend"><span class="tag repo">repository fact</span> <span class="tag hist">historical claim with saved record</span>
 <span class="tag new">new result (this evaluation)</span> <span class="tag interp">interpretation / limitation</span></p>
+""")
+
+    def fig(name, alt, cap):
+        return (f'<figure><img src="figures/paper/{name}.png" alt="{e(alt)}" loading="lazy"><figcaption>{cap} '
+                f'Download: <a href="figures/paper/{name}.png">PNG (300 DPI)</a> · <a href="figures/paper/{name}.svg">SVG</a> · '
+                f'<a href="figures/paper/{name}.csv">CSV</a>.</figcaption></figure>')
+
+    # Evidence A ----------------------------------------------------------------
+    lab, chk = WA["label"], WA["checks"]
+    erowsA = [[e(k), int(c["tp"]), int(c["fn"]), int(c["fp"]), int(c["tn"]), f(c["precision"]), f(c["recall"]), f(c["f1"]),
+               ci(ev["ci"].get(f"f1_{k}"))] for k, c in cA.items()]
+    dA = [[e(k), ci(v), e(v["verdict"])] for k, v in ev["ci"].items() if k.startswith("d")]
+    sec("scorecard", "A. The website's historical scorecard, case by case", f"""
+<p><span class="tag new">Evidence A</span> The website (<code>validation_cm3.json</code>) shows TN 3386, FP 9, FN 4, TP 24 at threshold 0.601.
+These are the 3,423 next-day windows of the historical scoring script (1,141 per primary station; target dates 2021-11-16 to 2024-12-30).
+No original per-case prediction file was saved, so the cases come from the reproduction run <code>a-legacy-20261023T162426Z-b5f446</code>,
+checked against the <b>original</b> W1-branch record of the 9 false alarms and 4 misses (identity match:
+{'✔' if chk['fp_identity_matches_original_record'] and chk['fn_identity_matches_original_record'] else '✘'}; re-run score differences ≤
+{max(chk['rerun_prob_max_abs_diff'], chk['rerun_x1_max_abs_diff']):.0e}). This is a different cohort from the 3,520-case benchmark (B).</p>
+<p><b>Label composition:</b> {lab['positives']} positives = {lab['pressure_only']} pressure-only, {lab['wind_only']} wind-only, {lab['both']} both.
+The label uses processed (forward-filled) values, as on the website; recomputed from raw observations it agrees on {lab['raw_label_agrees']:,} of
+{lab['raw_label_determinable']:,} determinable cases. These are study-label events, not observed gale-force winds.</p>
+{fig("PF-A_website_confusion_matrix", "Two-by-two matrix: 24 hits, 4 misses, 9 false alarms, 3386 correct negatives", "<b>PF-A.</b> The exact website matrix. Its 99.62% accuracy sits next to the 99.18% of always saying 'no event'.")}
+{fig("PF-B_station_outcomes", "Three small matrices, one per station", "<b>PF-B.</b> Hits, misses, false alarms and correct negatives by station. X1 averages the three stations, so a warning applies to all three on a date.")}
+<h3>Same cases, simple baselines</h3>
+{table(["Procedure", "Hits", "Misses", "False alarms", "Correct neg.", "Precision", "Recall", "F1", "F1 95% CI"], erowsA)}
+{table(["Paired difference (W1 − baseline)", "95% CI", "Verdict"], dA)}
+<p class="small">Event persistence = the issue day's label. Event climatology = station × month label frequency 2015-2020, warning if ≥
+{WA['event_climatology_threshold']['threshold']:.4f} (chosen on the tuning year only). df1 / dprauc positive = W1 better; dbrier positive = W1 worse
+(its scores are not calibrated: Brier skill {ev['probabilistic']['W1+X1']['brier_skill_vs_climatology']:.2f}).</p>
+{fig("PF-C_event_metrics_overall", "Precision, recall and F1 for W1+X1, persistence and climatology on two cohorts", "<b>PF-C.</b> Overall event metrics on the website cases (A) and on the training-consistent benchmark (B), each with its own baselines. W1+X1 leads on F1 in both; the level depends on input scaling.")}
+{fig("PF-D_event_metrics_by_station", "Event metrics per station", "<b>PF-D.</b> The same comparison per station; 8-10 events each, so intervals are wide.")}
+{fig("PF-E_precision_recall_curves", "Precision-recall curves with the 0.601 operating point", "<b>PF-E.</b> Precision-recall curves traced from the 3,423 saved scores, with the historical operating point and event persistence marked.")}
+""")
+
+    # Evidence C ----------------------------------------------------------------
+    crow = [[s_, v.get("trigger", "—"), ", ".join(v.get("outcomes", [])) or e(v.get("reason", "")),
+             v.get("event_persistence_on_event_day", "—"), v.get("eligible_candidates", 0)] for s_, v in CASE["per_station"].items()]
+    sec("cases", "C. Selected illustrative case studies", f"""
+<div class="selected"><p><span class="tag sel">Evidence C</span> <b>Selected successful cases; chosen retrospectively for illustration.</b>
+They explain how W1 behaved around correctly detected events. They are not representative of all dates and say nothing about overall
+performance, which sections A and B show.</p>
+<p><b>How they were chosen</b> (criteria committed before selection: <a href="data/CASE_SELECTION_v1.md">CASE_SELECTION_v1.md</a>): from the 24 hits,
+three consecutive target dates (day before, event day, day after) at one station, with complete raw wind and pressure observations and a
+raw-confirmed event; ranked by the number of correct W1 decisions in the window (a favourable criterion, disclosed), then the size of the
+pressure fall, then date. W1's error relative to the baselines was <b>not</b> used. {CASE['eligible']} of {CASE['candidates']} candidates passed.</p>
+<p><b>Timing:</b> each date shows its own next-day forecast. The three dates are not a +1/+2/+3-day forecast.</p>
+{table(["Station", "Event trigger", "W1+X1 outcomes (day before, event, day after)", "Event persistence on the event day", "Eligible candidates"], crow)}
+<p><b>Why the figures are not on this site:</b> they plot individual PAGASA station-day readings, which PAGASA's data terms (CADS-07 Rev.6,
+condition 4) do not allow online, and no permission was found. The per-station figures and the all-station common window are kept in a
+private thesis-export folder for the printed thesis. Exact dates are withheld here, as for every event date on this site.</p>
+<p><b>What they show</b> (described without readings): the pressure fall on the event day is what triggers the label; W1's score rises
+above 0.601 on those days, while W1's own next-day pressure value does not forecast the fall and its wind values stay in a narrow band.
+The detection comes from the classification head, not from the regression outputs.</p></div>
+""")
+
+    # regression ----------------------------------------------------------------
+    sec("regression", "Regression evidence: what the numbers really are", f"""
+<p><span class="tag new">Evidence A</span> The website's regression block (wind MAE 0.5365 m/s, RMSE 0.7723, MASE 0.6782) was traced to
+<code>validate_model_multioutput.py</code> at W1 commit <code>1fd1ef9</code> and reproduced <b>exactly</b> (run <code>{PH['run_rp']}</code>). It is not
+W1's own output: isotonic MOS and a persistence blend were fitted on the same evaluation period. Chapter 4's Table 4.5 (2.04 km/h) is the same
+pipeline on the model before W1, and its wind-direction row comes from a separate direction-only model.</p>
+{fig("PF-F2_website_regression_provenance", "Bars: neural 0.987, after MOS 0.576, after blend 0.5365, persistence 0.474", "<b>PF-F2.</b> From W1's neural wind error to the website's 0.5365 m/s, with issue-day persistence on the same cases and truth for reference.")}
+{fig("PF-F_wind_mae_rmse", "Wind MAE and RMSE by station for W1, persistence and climatology", f"<b>PF-F.</b> W1's neural next-day wind against both baselines on {PH['a_wind_n']} website cases with raw observations: W1 is worse everywhere.")}
+{fig("PF-F3_regression_variables_mae", "MAE of four regression outputs, one panel each", "<b>PF-F3.</b> Every supported regression output in its own unit. Rainfall is the one variable where W1's MAE is lower than both baselines; its RMSE is not lower than climatology's, and it under-forecasts.")}
+{fig("PF-G_observed_vs_predicted", "Binned observed versus forecast counts with a 1:1 line", "<b>PF-G.</b> Observed vs W1-forecast values as counts per cell (no individual readings), with the 1:1 line.")}
 """)
 
     # identity
@@ -206,7 +295,7 @@ simply repeating today's wind. Nothing here shows that W1 forecasts gale-force w
         ["Displayed values & tiers", "<code>predict_live.py:451</code>, <code>app.py:764</code>, PAGASA overwrite", "—", "—", "no", "wind ≥10.8/17.2 m/s or Δp ≥3/6 hPa", "tier ignores model probability"],
         ["This benchmark (S-TRAIN)", "<code>eval/cohort_b.py</code>", "32", "per-station W1 scalers", "reported both", "0.64 raw; 0.601/0.62 X1", "new retrospective procedure"],
     ]
-    sec("identity", "1. Verified identity of the deployed W1", f"""
+    sec("identity", "Verified identity of the deployed W1", f"""
 <p><span class="tag repo">repository fact</span> {md_inline(fill(CLAIMS[0][2]))} {md_inline(fill(CLAIMS[1][2]))}</p>
 {table(["File (" + "1f2d5dd" + ")", "SHA-256"], ident_rows)}
 <p>Saved by Keras {e(s1['keras_archive_metadata']['keras_version'])} on {e(s1['keras_archive_metadata']['date_saved'])}; {s1['model']['params_total']:,} parameters;
@@ -247,7 +336,7 @@ We did not change the inputs to make the live endpoint work; it is reported as f
         ["Cases with an imputed value in the window", bc["window_has_imputed_value"], "kept (causal fill); S-NOIMPUTE removes them"],
         ["Legacy (imputed) label disagreements", bc["event"]["legacy_imputed_label_disagreements"], "none on eligible cases"],
     ]
-    sec("data", "2. Data, splits and training history", f"""
+    sec("data", "Data, splits and training history", f"""
 <h3>Table D1. What W1 was actually trained, tuned and scored on</h3>
 {table(["Partition", "Rows", "First", "Last", "Positive labels", "Use"], prow)}
 <p class="small">Reconstructed from <code>_train_w3.py</code>'s rules on <code>data/processed_weather.csv</code> (run <code>{ph['s2']}</code>).
@@ -263,23 +352,24 @@ Every documented count reproduces: 9,567 real training rows, 1,095 tuning rows, 
 otherwise the model can "peek" at neighbouring days. GALE-CAST split the three primary stations' records into three blocks:
 about 5.8 years to learn (2015 to mid-October 2020), one full year to decide when to stop training and where to set the alarm
 threshold (mid-October 2020 to mid-October 2021), and about 3.2 years to grade (mid-October 2021 to end-2024). One full tuning year
-covers every season once, including one typhoon season. <b>Why these exact dates were chosen is not documented</b>: the code calls
-2021-10-15 the "v12 canonical split" but gives no reason.</p>
+covers every season once, including one typhoon season. <b>The exact calendar cutoff rationale was not preserved in the original
+experiment records</b>: the code calls 2021-10-15 the "v12 canonical split" and gives no reason. A labelled present-day assessment is in
+<a href="data/documentation/SPLIT_DESIGN_ASSESSMENT.md">SPLIT_DESIGN_ASSESSMENT.md</a>.</p>
 <p>The split was not clean, though: training also used Port Area records up to 2023 and 19 extra stations up to 2024, the test years were
 used to compare model versions and pick the scoring method, and nothing was saved from training (no learning curves, no seed).</p>
 <h3>Academic wording</h3>
 <p class="para">The primary-station records were partitioned chronologically to preserve temporal ordering and to approximate forecasting of
 future conditions: target dates from 1 January 2015 to 14 October 2020 were used for training, 15 October 2020 to 14 October 2021 for early
 stopping and threshold selection, and 15 October 2021 to 31 December 2024 for evaluation. The tuning block spans one complete annual cycle.
-The rationale for the specific boundary dates is not documented in the project records. Training additionally included all Port Area records
+The exact calendar cutoff rationale was not preserved in the original experiment records. Training additionally included all Port Area records
 (to 30 October 2023) and 69,388 supplementary rows (to 30 December 2024), so that records dated within the evaluation period contributed to
 training at stations other than those evaluated. Because the evaluation period was also used to compare model variants and to choose the
 scoring procedure, results on it are reported as retrospective rather than independent.</p>
 <h3>Supplementary data provenance</h3>
-<p><span class="tag hist">historical claim with saved record</span> {md_inline(fill(CLAIMS[19][2]))} <code>Training.csv</code> has whole-number winds and
-0.1 hPa pressures (as real station data do) but no PAGASA sentinel codes and 389 blank pressures, a different format from the primary raw file.
-The SMOTE script in the repository (<code>smote_generate_raw_gales.py</code>) targets ~32% positive rows; this file has about 1.5%. The table is
-therefore <b>not</b> evidently the SMOTE output, but it is also not verified PAGASA data.</p>
+<p><span class="tag hist">historical claim with saved record</span> {md_inline(fill(CLAIMS[19][2]))} Port Area belongs to the supplementary
+group; the primary (evaluated) stations are NAIA, Sangley Point and Science Garden. Split facts and a labelled present-day assessment are in
+<a href="data/documentation/SPLIT_DESIGN_ASSESSMENT.md">SPLIT_DESIGN_ASSESSMENT.md</a>. The exact calendar cutoff rationale was not preserved
+in the original experiment records.</p>
 """)
 
     # validation history
@@ -299,7 +389,7 @@ therefore <b>not</b> evidently the SMOTE output, but it is also not verified PAG
         ["Cases", "3,423 (binary); 3,487 (3×3, includes cross-station windows)", "3,426 (from 2021-11-15); outcomes only TN/FP"],
         ["Model", "W1", "an earlier model"],
     ]
-    sec("validation", "3. What validation already existed", f"""
+    sec("validation", "What validation already existed", f"""
 {table(["Question", "Configured in code", "Proof of execution", "Consequence"], vh)}
 <h3><code>validation_cm3.json</code> vs <code>validation_timeline.json</code></h3>
 {table(["", "validation_cm3.json", "validation_timeline.json"], cmp)}
@@ -311,7 +401,7 @@ post-processing fitted in the evaluation period. {md_inline(fill(CLAIMS[17][2]))
 """)
 
     # spec
-    sec("design", "4. Evaluation design (declared before scoring)", f"""
+    sec("design", "B. Benchmark design (declared before scoring)", f"""
 <p>The full specification is <a href="data/EVAL_SPEC_v1.md">EVAL_SPEC_v1.md</a> (<a href="data/EVAL_SPEC_v1.json">JSON</a>), committed at
 <code>{e(spec_commit)}</code> before any score. Amendment A1 (recorded before running it) added the legacy input construction to the variant comparison.</p>
 <ul>
@@ -356,7 +446,7 @@ post-processing fitted in the evaluation period. {md_inline(fill(CLAIMS[17][2]))
            for y, d in Bm["by_year"].items()]
     sn = Bm["S_NOIMPUTE"]
     dg = D1["configs"]
-    sec("results", "5. Results", f"""
+    sec("results", "B. Benchmark results (training-consistent inputs)", f"""
 <h3>5.1 Cohort A: can the historical scorecard be reproduced?</h3>
 <p><span class="tag new">new result</span> {md_inline(fill(CLAIMS[11][2]))} Neural-only next-day wind on those windows: MAE
 {f(A['neural_only_wind_legacy_windows']['mae'])} m/s (the scorecard's 0.5365 includes post-processing fitted on the test period and is not reproduced).</p>
@@ -384,11 +474,11 @@ post-processing fitted in the evaluation period. {md_inline(fill(CLAIMS[17][2]))
 <h4>By station (W1+X1 at 0.601; hits/false alarms/misses)</h4>
 {table(["Station", "Events", "W1+X1 H/FA/M", "W1+X1 F1", "Persistence H/FA/M", "W1+X1 PR-AUC"], stn)}
 <figure><img src="figures/F6_confusion_matrices.png" alt="Five binary confusion matrices including correct negatives">
-<figcaption><b>F6.</b> <b>Shows</b> 2×2 matrices (with correct negatives) for every procedure on the same {bc['event']['eligible']:,} cases. <b>Calculated</b> with the frozen thresholds listed in Section 4; each matrix sums to the case count (checked). <b>Matters</b> because accuracy alone hides the trade-off between misses and false alarms. <b>Supports</b> comparing burdens: W1+X1 at 0.601 has the fewest false alarms and the most hits here. <b>Does not prove</b> detection of strong wind: every event is a pressure fall. Source: <a href="data/F6_confusion_matrices.csv">CSV</a>.</figcaption></figure>
+<figcaption><b>F6.</b> <b>Shows</b> 2×2 matrices (with correct negatives) for every procedure on the same {bc['event']['eligible']:,} cases. <b>Calculated</b> with the frozen thresholds listed in the benchmark design section; each matrix sums to the case count (checked). <b>Matters</b> because accuracy alone hides the trade-off between misses and false alarms. <b>Supports</b> comparing burdens: W1+X1 at 0.601 has the fewest false alarms and the most hits here. <b>Does not prove</b> detection of strong wind: every event is a pressure fall. Source: <a href="data/F6_confusion_matrices.csv">CSV</a>.</figcaption></figure>
 <figure><img src="figures/F5_event_timeline_monthly.png" alt="Monthly hits, misses and false alarms per station; events cluster in typhoon seasons 2022-2024">
 <figcaption><b>F5.</b> <b>Shows</b> hits and misses (above the axis) and false alarms (below) per station per month for W1+X1 at 0.601. <b>Calculated</b> from the same cases as F6; monthly totals equal the matrix (checked: {'✔' if figchk['F5_timeline_equals_confusion'] else '✘'}). Exact dates are kept private. <b>Matters</b> because events are clustered in a few storm months, so cases are not independent. <b>Supports</b> that results rest on a handful of episodes. <b>Does not prove</b> seasonal generalisation. Source: <a href="data/F5_event_timeline_monthly.csv">CSV</a>.</figcaption></figure>
 <figure><img src="figures/F7_event_benchmarks.png" alt="F1 and PR-AUC with confidence intervals; W1+X1 above persistence and climatology, with wide intervals">
-<figcaption><b>F7.</b> <b>Shows</b> F1 and PR-AUC with 95% block-bootstrap intervals. <b>Calculated</b> from the paired bootstrap described in Section 4. <b>Matters</b> because 27 events give wide intervals. <b>Supports</b> that W1+X1 ranks pressure-fall days better than persistence and climatology (established). <b>Does not prove</b> a precise level of skill: the F1 interval for W1+X1 spans roughly 0.3 to 0.8. Source: <a href="data/F7_event_benchmarks.csv">CSV</a>.</figcaption></figure>
+<figcaption><b>F7.</b> <b>Shows</b> F1 and PR-AUC with 95% block-bootstrap intervals. <b>Calculated</b> from the paired bootstrap described in the benchmark design section. <b>Matters</b> because 27 events give wide intervals. <b>Supports</b> that W1+X1 ranks pressure-fall days better than persistence and climatology (established). <b>Does not prove</b> a precise level of skill: the F1 interval for W1+X1 spans roughly 0.3 to 0.8. Source: <a href="data/F7_event_benchmarks.csv">CSV</a>.</figcaption></figure>
 
 <h3>5.4 Declared sensitivities</h3>
 <ul>
@@ -423,7 +513,7 @@ on the tuning year the order reverses ({f(D2['results']['station|early_stop']['p
         ["v13, v14", "different splits (60/40, 65/35)", "own test periods; PR-AUC 0.518, 0.523", "partition-sensitivity references"],
         ["x1f, x2f", "extra input features (not recorded)", "TEST X1 PR-AUC 0.7976, 0.4734", "not re-scored here (feature list unavailable)"],
     ]
-    sec("selection", "6. Model selection: existing variants", f"""
+    sec("selection", "Model selection: existing variants", f"""
 <p>These are genuinely existing trained variants on <code>exp/precision-targeting</code>. All share W1's architecture (40,872 parameters); they differ in
 training recipe, split or class weights, so they are <b>training variants, not different architectures</b>. Three random seeds would not count as three models, and no seeds exist here anyway.</p>
 <h3>Historical record</h3>
@@ -431,7 +521,7 @@ training recipe, split or class weights, so they are <b>training variants, not d
 <h3>Re-scored on identical cases (inference only; own scalers; own documented threshold)</h3>
 {table(["Variant", "Thr", "X1 PR-AUC (S-TRAIN)", "X1 PR-AUC (S-LEGACY)", "Raw PR-AUC (S-TRAIN)", "Raw H/FA/M at thr", "Wind MAE"], vt)}
 <figure><img src="figures/F8_variants_and_inputs.png" alt="Dot plots: variants' X1 PR-AUC under two input constructions, and wind MAE all far above persistence">
-<figcaption><b>F8.</b> <b>Shows</b> each variant's X1 PR-AUC under both input constructions and its wind MAE. <b>Calculated</b> on the same cases as Section 5. <b>Matters</b> because a selection is only meaningful on identical cases. <b>Supports</b> three statements: no variant beats persistence or climatology on wind; W1 is not the top event ranker under either construction (v11, rejected for contamination, scores highest); and rankings change with the input construction.
+<figcaption><b>F8.</b> <b>Shows</b> each variant's X1 PR-AUC under both input constructions and its wind MAE. <b>Calculated</b> on the same cases as the benchmark results. <b>Matters</b> because a selection is only meaningful on identical cases. <b>Supports</b> three statements: no variant beats persistence or climatology on wind; W1 is not the top event ranker under either construction (v11, rejected for contamination, scores highest); and rankings change with the input construction.
 <b>Does not prove</b> that any variant would do better in future: this period informed all of them. Source: <a href="data/F8_variants_and_inputs.csv">CSV</a>.</figcaption></figure>
 <p><span class="tag interp">interpretation</span> The recorded reason for choosing W1 is its TEST-period scorecard after X1 and the recall-floor rule. W1 should not be described as
 superior because it is deployed. A defensible statement is: "W1 was selected from training variants using test-period scores; on a re-evaluation with identical cases, its ranking among variants depends on input scaling."</p>
@@ -463,7 +553,7 @@ superior because it is deployed. A defensible statement is: "W1 was selected fro
          "Skill is defined relative to a reference forecast evaluated on identical cases. Persistence and climatology are the standard minimal references in forecast verification; a model that does not outperform them provides no demonstrated forecast value for that quantity."),
     ]
     dhtml = "".join(f"<details open><summary>{e(q)}</summary><p><b>Simple:</b> {e(s)}</p><p class='para'><b>Academic:</b> {e(a)}</p></details>" for q, s, a in D)
-    sec("defense", "7. Defense explanations", dhtml)
+    sec("defense", "Defense explanations", dhtml)
 
     paras = [
         ("P-1 Methods: evaluation design", f"The frozen deployed model (W1; SHA-256 f2db5aa9…9d14b0) was evaluated retrospectively without retraining or recalibration. For each of the three primary stations and each target date from 15 October 2021 to 31 December 2024, a next-day forecast was issued from the 32 preceding daily records, scaled with the station-specific scalers used in training. Forecasts were compared with two reference forecasts on identical cases: persistence (the latest observation) and climatology (station-by-month means from 2015 to 14 October 2020). Wind speed was verified against unimputed observations using MAE, RMSE and bias; events under the study label (wind ≥ 10.8 m/s or a 24-hour pressure fall ≥ 3 hPa) were verified with contingency-table measures and PR-AUC. Uncertainty was estimated with a paired circular block bootstrap over dates (14-day blocks, 2,000 resamples). The evaluation specification was fixed before scoring."),
@@ -471,7 +561,7 @@ superior because it is deployed. A defensible statement is: "W1 was selected fro
         ("P-3 Results: events", f"The evaluation period contained {ph['ev_n']} hazard-label events, all defined by pressure falls. With cross-station averaging and the adopted threshold of 0.601, W1 detected {ph['x1_tp']} events with {ph['x1_fp']} false alarms (precision {ph['x1_p']}, recall {ph['x1_r']}, F1 {ph['x1_f1']}), outperforming event persistence (F1 {ph['pe_f1']}); its PR-AUC was {ph['prauc_x1_train']} against a prevalence of {f(x1['prevalence'], 4)}. Its scores were not calibrated (Brier skill relative to climatology {ph['bss_x1']}). When inputs were scaled as in the historical scorecard, the same procedure reproduced the previously reported PR-AUC of 0.830, showing that the reported performance depends strongly on input preprocessing."),
         ("P-4 Limitations", "The evaluation period was used historically to compare model variants and to choose the scoring procedure, and training included records from other stations dated within it; results are therefore retrospective rather than independent. The event sample is small and consists entirely of pressure falls, so no conclusion about gale-force wind detection is possible. No training history or random seed was preserved, so training cannot be reproduced. Only next-day forecasts were assessed. A prospective evaluation on observations from 2025 onward is required before any operational claim."),
     ]
-    sec("paragraphs", "8. Paper-ready paragraphs", "".join(f"<h3>{e(t)}</h3><p class='para'>{e(p)}</p>" for t, p in paras))
+    sec("paragraphs", "Paper-ready paragraphs", "".join(f"<h3>{e(t)}</h3><p class='para'>{e(p)}</p>" for t, p in paras))
 
     # ledger
     lh = []
@@ -480,20 +570,74 @@ superior because it is deployed. A defensible statement is: "W1 was selected fro
                  md_inline(fill(r[5])), md_inline(fill(r[6])) or "—"] for r in REV if r[1] == ch]
         lh.append(f"<h3>Chapter {ch}</h3>" + table(["#", "Section", "Short claim", "Verdict", "Evidence", "Full replacement text"], rows, "ledger"))
     om = "".join(f"<li><code>{i}</code> {e(t)}</li>" for i, t in OMISSIONS)
-    sec("ledger", "9. Chapters 1-5 revision ledger (provisional)", f"""
-<p>Reviewed from the PDFs supplied on 2026-10-24. Verdicts: Correct, Partly correct, Wrong, Not found in the code. Literature claims in Chapter 2 were not checked.
-Download: <a href="data/revision_ledger.csv">CSV</a>, <a href="data/revisions.json">JSON</a>.</p>{''.join(lh)}<h3>Important omissions</h3><ul>{om}</ul>""")
+    exact = [[e(r["id"]), f"Ch {r['chapter']}, {e(r['heading'])}, PDF p. {r['pdf_page']}", f"<q>{e(r['find_text'])}</q>", md_inline(r["replacement"]),
+              e(r["reason"]), md_inline(r["evidence"])] for r in LED]
+    nfound = sum(r["find_check"] == "found" for r in LED)
+    sec("ledger", "Paper revisions: exact find-and-replace ledger", f"""
+<p>Chapters 1-5 exist only as PDFs (2026-10-23; versions in <a href="data/documentation/SOURCE_DOCUMENTS.md">SOURCE_DOCUMENTS.md</a>), so every entry is
+<b>proposed only</b>; no chapter file was edited. Each find text was checked against the PDFs ({nfound} of {len(LED)} found); "PDF p." is the page
+index within that chapter's PDF. Only short excerpts are quoted. Download: <a href="data/documentation/PAPER_REVISION_LEDGER.md">Markdown</a>,
+<a href="data/documentation/paper_revision_ledger.csv">CSV</a>.</p>
+{table(["ID", "Location", "Find (exact)", "Replace with", "Reason", "Evidence"], exact, "ledger")}
+<details><summary>Earlier chapter review notes (2026-10-24; background; this ledger governs where they differ)</summary>
+<p>Verdicts: Correct, Partly correct, Wrong, Not found in the code. Literature claims in Chapter 2 were not checked.
+Download: <a href="data/revision_ledger.csv">CSV</a>, <a href="data/revisions.json">JSON</a>.</p>{''.join(lh)}<h3>Important omissions</h3><ul>{om}</ul></details>""")
+
+    figs = sorted((X["runs"]["pf"] / "figures").glob("PF-*.png"))
+    frows = [[e(p.stem), f'<a href="figures/paper/{p.name}">PNG</a> · <a href="figures/paper/{p.stem}.svg">SVG</a> · <a href="figures/paper/{p.stem}.csv">CSV</a>',
+              next((g["evidence_group"] for g in X["pf"]["figures"] if g["figure"] == p.stem), "")] for p in figs]
+    sec("figures", "Figures for the paper (downloads)", f"""
+<p>Individually downloadable figures, PNG at 300 DPI and SVG, with the CSV of the plotted numbers. Each figure states its model and processing,
+variable and units, stations, dates, sample size, forecast lead, baselines and evidence group. Captions, cohorts and source runs:
+<a href="data/documentation/FIGURE_GUIDE.md">FIGURE_GUIDE.md</a>. Figure run <code>{PH['run_pf']}</code>.</p>
+{table(["Figure", "Download", "Evidence group"], frows)}
+<p class="small">Selected case figures (PF-H per station, PF-I all stations) are private: they plot individual PAGASA readings. They are not available here.</p>
+""")
+
+    sec("method", 'What "validation" means in this paper', f"""
+<p>The evaluation is a <b>retrospective forecast verification with persistence and climatology benchmarking</b>. The three-day examples are
+<b>retrospectively selected illustrative case studies</b>.</p>
+<ul>
+<li><b>Chronological partitioning</b> describes how the data were divided (training, tuning, evaluation, in time order).</li>
+<li><b>Retrospective verification</b> means checking the frozen model's past next-day forecasts against what was recorded.</li>
+<li><b>Baseline benchmarking</b> compares the model with reference forecasts (persistence, climatology) on exactly the same cases.</li>
+<li><b>Selected case studies</b> explain behaviour on specific dates and are not performance estimates.</li>
+</ul>
+<p>None of these is cross-validation. No k-fold, rolling-origin or walk-forward cross-validation of the network was executed, and replaying a
+frozen model day by day over a past period is not cross-validation. Full method: <a href="data/documentation/EVALUATION_METHOD.md">EVALUATION_METHOD.md</a>;
+W1 identity, split and data status: <a href="data/documentation/MODEL_AND_DATA_SUMMARY.md">MODEL_AND_DATA_SUMMARY.md</a>.</p>
+<h3>Reading the numbers</h3>
+<ul>
+<li>Lower MAE/RMSE means smaller numerical error on the matching cases only.</li>
+<li>Mean signed error (bias) shows systematic over- or under-forecasting; positive and negative errors can cancel.</li>
+<li>Better average error does not establish better event detection, and vice versa.</li>
+<li>Three selected dates cannot establish general forecasting superiority.</li>
+<li>MASE below one compares with an in-sample naïve error from training data; it does not prove a win against a same-case test baseline.</li>
+</ul>
+<h3>References</h3>
+<ul>{''.join(f'<li>{md_inline(t.replace("*", ""))} <a href="{u}">{u}</a><br><span class="small">{e(n)}</span></li>' for t, u, n in build_docs.REFS)}</ul>
+""")
+
+    sec("credits", "Credits", f"""
+<table><thead><tr><th>Person / account</th><th>Role (from repository evidence)</th></tr></thead><tbody>
+<tr><td>Courtney (<a href="https://github.com/miaoxiizumi-gif">miaoxiizumi-gif</a>)</td><td>repository owner; author of every commit in this repository</td></tr>
+<tr><td>Christine Tamayo (<a href="https://github.com/Tinenen-cs">Tinenen-cs</a>)</td><td>front-end contributor to the GALE-CAST application repository (its commit history); not a contributor to this repository</td></tr>
+</tbody></table>
+<p class="small">Other thesis-team members and the thesis authorship list are not recorded in either repository and await confirmation.
+AI tool use is disclosed separately from authorship: commits here carry a <code>Co-Authored-By: Claude</code> trailer recording assistance
+by an AI coding tool, which is not a human author. PAGASA is the source of the station observations.</p>
+""")
 
     lim = "".join(f"<li><code>{i}</code> {e(t)}</li>" for i, t in LIMITS)
-    sec("limits", "10. Limitations and unresolved issues", f"<ul>{lim}</ul>")
+    sec("limits", "Limitations and unresolved issues", f"<ul>{lim}</ul>")
 
     cl = "".join(f'<tr><td><code>{i}</code></td><td><span class="tag {k}">{k}</span></td><td>{md_inline(fill(t))}</td><td>{md_inline(fill(ev))}</td></tr>'
                  for i, k, t, ev in CLAIMS)
-    sec("claims", "11. Claims register", f'<div class="tw"><table><thead><tr><th>ID</th><th>Class</th><th>Claim</th><th>Evidence</th></tr></thead><tbody>{cl}</tbody></table></div>')
+    sec("claims", "Claims register", f'<div class="tw"><table><thead><tr><th>ID</th><th>Class</th><th>Claim</th><th>Evidence</th></tr></thead><tbody>{cl}</tbody></table></div>')
 
     runlist = "".join(f"<li><code>{e(k)}</code>: <code>{e(v.name)}</code></li>" for k, v in runs.items())
-    sec("repro", "12. Reproducibility and sources", f"""
-<p>Source repository: <code>VS CODE LIVE SHARE</code> at <code>1f2d5dd</code> (private); W1 provenance on branch <code>exp/precision-targeting</code>
+    sec("repro", "Reproducibility and sources", f"""
+<p>Source repository: the GALE-CAST project at <code>1f2d5dd</code> (private); W1 provenance on branch <code>exp/precision-targeting</code>
 (<code>experiments/w1x1/_train_w3.py</code>, <code>_w1_recall_floor.py</code>, <code>THRESHOLD_CONFIG.md</code>). Evaluation code and aggregate run outputs:
 <a href="{REPO_URL}">{REPO_URL}</a> (folders <code>eval/</code>, <code>spec/</code>, <code>runs/</code>).</p>
 <pre>python -m venv (Python 3.11.9, tensorflow-cpu 2.16.1, keras 3.13.2, numpy 1.26.4, pandas 2.2.2, scikit-learn 1.7.2)
@@ -505,7 +649,11 @@ python cohort_a_legacy.py      # legacy reproduction
 python benchmark.py            # Cohort B
 python variants.py             # Stage 7
 python diag_inputs.py; python diag_insample.py   # post-hoc diagnostics
-python figures.py; python build_site.py</pre>
+python figures.py
+# amendment A2 (spec/AMENDMENT_A2_website_cohort.md, spec/CASE_SELECTION_v1.md)
+python website_cohort.py; python regression_provenance.py; python split_facts.py
+python case_studies.py         # private case figures -> _private/thesis_export/
+python paper_figures.py; python build_site.py</pre>
 <p>Requires the private raw file and the source checkout (paths in <code>eval/common.py</code>). Each run writes a manifest with code, data and artifact hashes. Runs used for this page:</p>
 <ul>{runlist}</ul>
 <p>Machine-readable files: <a href="data/claims.json">claims.json</a>, <a href="data/metrics.json">metrics.json</a>, <a href="data/revisions.json">revisions.json</a>,
@@ -513,26 +661,50 @@ python figures.py; python build_site.py</pre>
 No row-level observations or individual predictions are published.</p>
 """)
 
-    navh = "".join(f'<a href="#{i}">{e(t.split(". ", 1)[-1])}</a>' for i, t in nav)
+    ORDER = ["overview", "identity", "scorecard", "design", "results", "regression", "cases", "method", "data", "validation",
+             "selection", "figures", "ledger", "paragraphs", "defense", "limits", "claims", "credits", "repro"]
+    assert sorted(ORDER) == sorted(SECS), set(ORDER) ^ set(SECS)
+    for n, id_ in enumerate(ORDER):
+        title, body = SECS[id_]
+        nav.append((id_, title))
+        S.append(f'<section id="{id_}"><h2>{"" if n == 0 else f"{n}. "}{e(title)}</h2>{body}</section>')
+    navh = "".join(f'<a href="#{i}">{e(t)}</a>' for i, t in nav)
     built = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>GALE-CAST W1 Evaluation</title><meta name="description" content="Retrospective, reproducible evaluation of the frozen GALE-CAST W1 model: identity, data splits, baselines, model selection and thesis revision ledger.">
+<title>GALE-CAST W1 Evaluation</title><meta name="description" content="Retrospective forecast verification of the frozen GALE-CAST W1 model with persistence and climatology benchmarks: the website scorecard case by case, regression provenance, selected case studies, paper figures and revision ledger.">
 <link rel="stylesheet" href="style.css"></head><body>
-<header><div class="wrap"><h1>GALE-CAST W1: retrospective evaluation and thesis handoff</h1>
-<p class="sub">Evaluation <code>{EVAL_ID}</code> · built {built} · provisional</p></div></header>
+<header><div class="wrap"><h1>GALE-CAST W1: retrospective forecast verification</h1>
+<p class="sub">Evaluation <code>{EVAL_ID}</code> + amendment A2 · built {built} · provisional · <a href="{REPO_URL}">repository</a></p></div></header>
 <nav><div class="wrap">{navh}</div></nav><main class="wrap">{''.join(S)}</main>
-<footer><div class="wrap">Aggregate results only. PAGASA is the source of the station observations. Generated by <code>eval/build_site.py</code>.</div></footer>
+<footer><div class="wrap">Aggregate results only; no individual station-day readings are published. PAGASA is the source of the station observations. Maintained by Courtney (miaoxiizumi-gif); see Credits. Generated by <code>eval/build_site.py</code>.</div></footer>
 </body></html>"""
     (DOCS / "index.html").write_text(page, encoding="utf-8")
     (DOCS / "style.css").write_text(CSS, encoding="utf-8")
     (DOCS / ".nojekyll").write_text("", encoding="utf-8")
 
     # markdown report
-    md = [f"# GALE-CAST W1 evaluation `{EVAL_ID}` (provisional)\n", f"Site: {SITE_URL}\n", "## Claims\n"]
+    md = [f"# GALE-CAST W1 evaluation `{EVAL_ID}` + amendment A2 (provisional)\n", f"Site: {SITE_URL}\n",
+          "Method: retrospective forecast verification with persistence and climatology benchmarking (not cross-validation). "
+          "Evidence groups: A = website historical scorecard (3,423 cases); B = training-consistent benchmark; C = retrospectively "
+          "selected illustrative case studies (private figures). Documents: documentation/*.md in the repository.\n",
+          "## Evidence A: website scorecard with same-case baselines\n",
+          "| Procedure | TP | FN | FP | TN | Precision | Recall | F1 |", "|---|---|---|---|---|---|---|---|"]
+    md += [f"| {k} | {int(c['tp'])} | {int(c['fn'])} | {int(c['fp'])} | {int(c['tn'])} | {f(c['precision'])} | {f(c['recall'])} | {f(c['f1'])} |"
+           for k, c in WA["events"]["pooled"]["classifiers"].items()]
+    md += ["\n| Variable (raw truth) | n | W1 MAE | Persistence MAE | Climatology MAE |", "|---|---|---|---|---|"]
+    md += [f"| {v} ({r['unit']}) | {r['n_common']:,} | {f(r['scopes']['pooled']['point']['W1']['mae'])} | "
+           f"{f(r['scopes']['pooled']['point']['persistence']['mae'])} | {f(r['scopes']['pooled']['point']['climatology']['mae'])} |"
+           for v, r in WA["regression"].items()]
+    md += [f"\nWebsite regression block reproduced exactly from W1 + MOS + persistence blend fitted on the evaluation period "
+           f"(run {PH['run_rp']}); neural-only wind MAE {RPv['steps']['neural_only']['mae']:.3f} m/s.\n", "## Claims\n"]
     md += [f"- **{c['id']}** ({c['class']}): {c['claim']}  \n  Evidence: {c['evidence']}" for c in claims_j]
     md += ["\n## Limitations\n"] + [f"- **{i}** {t}" for i, t in LIMITS]
     md += ["\n## Paper-ready paragraphs\n"] + [f"### {t}\n\n{p}\n" for t, p in paras]
-    md += ["\n## Revision ledger\n", "| # | Ch | Section | Claim | Verdict | Evidence | Replacement |", "|---|---|---|---|---|---|---|"]
+    md += ["\n## Paper revision ledger (exact find and replace; proposed only)\n",
+           "| ID | Location | Find | Replace with | Reason |", "|---|---|---|---|---|"]
+    md += [f"| {r['id']} | Ch {r['chapter']}, {r['heading']}, PDF p. {r['pdf_page']} | \"{r['find_text']}\" | {r['replacement']} | {r['reason']} |"
+           for r in LED]
+    md += ["\n## Earlier chapter review notes (background)\n", "| # | Ch | Section | Claim | Verdict | Evidence | Replacement |", "|---|---|---|---|---|---|---|"]
     md += [f"| {r['id']} | {r['chapter']} | {r['section']} | {r['claim']} | {r['verdict']} | {r['evidence']} | {r['replacement'] or '—'} |" for r in rev_j]
     (DOCS / "data" / "REPORT.md").write_text("\n".join(md), encoding="utf-8")
 
@@ -570,6 +742,9 @@ details{margin:8px 0}summary{cursor:pointer;font-weight:600}ul.cols{columns:2}@m
 .tag.repo{color:var(--accent)}.tag.hist{color:var(--warn)}.tag.new{color:var(--ok)}.tag.interp{color:var(--nf)}
 .v{font-weight:600;white-space:nowrap}.vco{color:var(--ok)}.vpa{color:var(--warn)}.vwr{color:var(--bad)}.vno{color:var(--nf)}
 pre{background:var(--soft);padding:12px;border-radius:8px;overflow-x:auto;font-size:.85rem}footer{padding:24px 0;color:var(--ink2);font-size:.85rem}
+.card.good{border-left:4px solid var(--ok)}.card.bad{border-left:4px solid var(--bad)}.tag.sel{color:var(--warn);border-color:var(--warn);font-weight:600}
+.groups{display:grid;gap:6px;margin:12px 0;font-size:.92rem}.selected{border:2px dashed var(--warn);border-radius:10px;padding:4px 16px;background:var(--panel)}
+q{font-style:italic}q::before,q::after{content:'"'}
 """
 
 if __name__ == "__main__":

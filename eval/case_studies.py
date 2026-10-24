@@ -200,7 +200,12 @@ def main():
         figs += S.save(fig, exp, "PF-I_common_window_all_stations")
     summary["private_figures"] = figs
     (priv / "PRIVATE_selection_summary.json").write_text(json.dumps(summary, indent=2, default=str), encoding="utf-8")
-    public = {k: v for k, v in summary.items() if k not in ("private_figures",)}
+    # public copy: criteria outcomes only; exact dates stay private, as for every event date in this evaluation
+    public = {k: v for k, v in summary.items() if k not in ("private_figures", "per_station", "common")}
+    public["per_station"] = {s: {k: v for k, v in d.items() if k not in ("selected_event_date", "window")}
+                             for s, d in summary["per_station"].items()}
+    public["common"] = None if summary["common"] is None else {"selected": True, "sum_P1": summary["common"]["sum_P1"]}
+    public["dates"] = "withheld from public outputs; recorded in _private/runs/<run>/PRIVATE_selection_summary.json"
     (run / "case_selection_summary.json").write_text(json.dumps(public, indent=2, default=str), encoding="utf-8")
     C.write_manifest(run, {"stage": "Group C case studies (CASE_SELECTION_v1)", "spec": "GCV-W1-v1 + A2",
                            "private_outputs": "figures in _private/thesis_export/"})
