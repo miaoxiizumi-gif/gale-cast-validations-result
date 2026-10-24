@@ -185,11 +185,11 @@ def main():
     op = A["events"]["pooled"]["classifiers"]["W1+X1@0.601"]
     ax.plot(op["recall"], op["precision"], "o", ms=11, mfc=S.W1C, mec="white", mew=2, zorder=5)
     ax.annotate("historical operating point\nX1 ≥ 0.601: 24 hits, 9 false alarms", (op["recall"], op["precision"]),
-                xytext=(0.32, 0.52), fontsize=8.5, arrowprops=dict(arrowstyle="-", color=S.INK2))
+                xytext=(0.5, 0.2), fontsize=8.5, arrowprops=dict(arrowstyle="-", color=S.INK2))
     pe = A["events"]["pooled"]["classifiers"]["event_persistence"]
     ax.plot(pe["recall"], pe["precision"], "s", ms=9, color=S.PERC, label="Event persistence (single point; binary)")
     ax.axhline(op["prevalence"], color=S.INK2, lw=1, ls="--")
-    ax.text(0.45, op["prevalence"] + 0.015, f"no skill = prevalence {op['prevalence']:.4f}", ha="right", fontsize=7.5, color=S.INK2)
+    ax.text(0.7, op["prevalence"] + 0.035, f"no skill = prevalence {op['prevalence']:.4f}", ha="left", fontsize=7.5, color=S.INK2)
     ax.set_xlabel("Recall (share of events warned)"); ax.set_ylabel("Precision (share of warnings that were events)")
     ax.set_xlim(0, 1.02); ax.set_ylim(0, 1.05); ax.legend(loc="center left", bbox_to_anchor=(0.01, 0.42), fontsize=8, framealpha=0.9, frameon=True)
     S.title(fig, "PF-E. Precision-recall curves from the actual saved scores", S.EVIDENCE["A"])
