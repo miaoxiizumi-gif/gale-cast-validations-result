@@ -63,7 +63,7 @@ def main():
                          "pr_auc_x1": A["events"]["pooled"]["probabilistic"]["W1+X1"]["pr_auc"],
                          "all_negative_accuracy": cm["all_negative_accuracy"], "prevalence": cm["prevalence"]}])
     fig = plt.figure(figsize=(9, 6.4))
-    ax = fig.add_axes([0.08, 0.30, 0.42, 0.52])
+    ax = fig.add_axes([0.13, 0.30, 0.38, 0.52])
     mat = np.array([[cm["tp"], cm["fn"]], [cm["fp"], cm["tn"]]])
     lab = [["Hits (TP)", "Misses (FN)"], ["False alarms (FP)", "Correct negatives (TN)"]]
     shade = np.array([[S.W1C, "#c9ddf6"], ["#c9ddf6", "#eef4fc"]])
@@ -139,13 +139,15 @@ def main():
                              "tp": c["tp"], "fp": c["fp"], "fn": c["fn"], "tn": c["tn"]})
         ax.set_xticks([0, 1, 2], ["Precision", "Recall", "F1"]); ax.set_ylim(0, 1.05)
         ax.set_title(f"{grp}. {n_lab}", loc="left", fontsize=9.5)
-    axs[0].set_ylabel("Score (higher is better)"); axs[0].legend(loc="upper left", fontsize=8)
+    axs[0].set_ylabel("Score (higher is better)")
+    fig.legend(*axs[0].get_legend_handles_labels(), loc="lower center", bbox_to_anchor=(0.5, 0.235), ncol=3, fontsize=8.5)
     S.title(fig, "PF-C. Event detection: W1+X1 versus event persistence and event climatology",
             "Evidence A (website scorecard) and Evidence B (training-consistent benchmark), each on its own identical cases; overall evidence")
     add(fig, "PF-C_event_metrics_overall", pd.DataFrame(recs),
         "Precision, recall and F1 with 95% intervals. On both cohorts W1+X1 beats both event baselines on F1 (established). "
         "The level depends on the input construction: 24/28 hits with the website's procedure, fewer with training-consistent inputs.", "A+B",
-        [PROC_A + " Panel B: per-station scalers as in training (EVAL_SPEC_v1 Cohort B).", BASE_E, CI,
+        [PROC_A + " Panel B: per-station scalers as in training (EVAL_SPEC_v1 Cohort B).",
+         BASE_E + f" Panel B's event climatology threshold, chosen the same way on raw labels: {B['event_climatology_threshold']['threshold']:.4f}.", CI,
          "Cohorts differ (cases, input scaling, label truth: processed in A, raw unimputed in B); compare methods within a panel, not across panels."])
 
     # ---------------- PF-D by station (A)
@@ -164,7 +166,8 @@ def main():
                 recs.append({"station": s, "procedure": name, "metric": met, "value": v, "ci_lo": ci.get("lo"), "ci_hi": ci.get("hi")})
         ax.set_xticks([0, 1, 2], ["Precision", "Recall", "F1"]); ax.set_ylim(0, 1.05)
         ax.set_title(f"{s} ({int(E['classifiers']['W1+X1@0.601']['tp'] + E['classifiers']['W1+X1@0.601']['fn'])} events)", loc="left")
-    axs[0].set_ylabel("Score (higher is better)"); axs[0].legend(loc="upper left", fontsize=8)
+    axs[0].set_ylabel("Score (higher is better)")
+    fig.legend(*axs[0].get_legend_handles_labels(), loc="lower center", bbox_to_anchor=(0.5, 0.215), ncol=3, fontsize=8.5)
     S.title(fig, "PF-D. Event detection by station (website scorecard cases)", S.EVIDENCE["A"])
     add(fig, "PF-D_event_metrics_by_station", pd.DataFrame(recs),
         "The PF-C comparison for each primary station. With 8-10 events per station the intervals are wide.", "A", [PROC_A, COH_A, BASE_E, CI])
@@ -186,9 +189,9 @@ def main():
     pe = A["events"]["pooled"]["classifiers"]["event_persistence"]
     ax.plot(pe["recall"], pe["precision"], "s", ms=9, color=S.PERC, label="Event persistence (single point; binary)")
     ax.axhline(op["prevalence"], color=S.INK2, lw=1, ls="--")
-    ax.text(0.99, op["prevalence"] + 0.015, f"no skill = prevalence {op['prevalence']:.4f}", ha="right", fontsize=7.5, color=S.INK2)
+    ax.text(0.45, op["prevalence"] + 0.015, f"no skill = prevalence {op['prevalence']:.4f}", ha="right", fontsize=7.5, color=S.INK2)
     ax.set_xlabel("Recall (share of events warned)"); ax.set_ylabel("Precision (share of warnings that were events)")
-    ax.set_xlim(0, 1.02); ax.set_ylim(0, 1.05); ax.legend(loc="lower left", fontsize=8)
+    ax.set_xlim(0, 1.02); ax.set_ylim(0, 1.05); ax.legend(loc="center left", bbox_to_anchor=(0.01, 0.42), fontsize=8, framealpha=0.9, frameon=True)
     S.title(fig, "PF-E. Precision-recall curves from the actual saved scores", S.EVIDENCE["A"])
     recs.append({"score": "operating point X1>=0.601", "recall": op["recall"], "precision": op["precision"]})
     add(fig, "PF-E_precision_recall_curves", pd.DataFrame(recs),
@@ -210,8 +213,8 @@ def main():
             ax.bar(xs, vals, width=0.24, color=col, label=name)
             ax.errorbar(xs, vals, yerr=[[v - c["lo"] for v, c in zip(vals, ci)], [c["hi"] - v for v, c in zip(vals, ci)]],
                         fmt="none", ecolor=S.INK, lw=1, capsize=2)
-            for x_, v in zip(xs, vals):
-                ax.text(x_, v + 0.04, f"{v:.2f}", ha="center", fontsize=7.2, color=S.INK)
+            for x_, v, c in zip(xs, vals, ci):
+                ax.text(x_, c["hi"] + 0.03, f"{v:.2f}", ha="center", fontsize=7.2, color=S.INK)
             for sc, v, c in zip(SCOPES, vals, ci):
                 recs.append({"metric": met, "scope": sc, "method": name, "value_ms": v, "ci_lo": c["lo"], "ci_hi": c["hi"],
                              "n": Rw["scopes"][sc]["point"][mth]["n"]})
@@ -267,7 +270,7 @@ def main():
             val = R["point"][mth]["mae"]; c = R["ci"][f"mae_{mth}"]
             ax.bar(k, val, color=col, width=0.6)
             ax.errorbar(k, val, yerr=[[val - c["lo"]], [c["hi"] - val]], fmt="none", ecolor=S.INK, capsize=3, lw=1)
-            ax.text(k, val * 1.02 + 0.02, f"{val:.2f}", ha="center", fontsize=8)
+            ax.text(k, c["hi"] + 0.03 * ax.get_ylim()[1], f"{val:.2f}", ha="center", fontsize=8)
             recs.append({"variable": v, "unit": A["regression"][v]["unit"], "method": name, "mae": val, "ci_lo": c["lo"], "ci_hi": c["hi"],
                          "rmse": R["point"][mth]["rmse"], "bias": R["point"][mth]["bias"], "n": R["point"][mth]["n"]})
         ax.set_xticks([0, 1, 2], ["W1", "Persist.", "Clim."]); ax.set_title(names[v], loc="left", fontsize=9)
@@ -309,8 +312,9 @@ def main():
     fig.colorbar(im, ax=axs, shrink=0.75, pad=0.01, label="cases per cell (log scale)")
     S.title(fig, "PF-G. Observed versus W1-forecast values (counts of cases per cell, 1:1 line dashed)", S.EVIDENCE["A"])
     add(fig, "PF-G_observed_vs_predicted", bc,
-        "Binned counts replace a scatter so that no individual station-day reading is published. Wind forecasts sit in a narrow 2-3 m/s band "
-        "whatever was observed; pressure and humidity forecasts vary little; rainfall is mostly under-forecast on wet days.", "A",
+        "Binned counts replace a scatter so that no individual station-day reading is published. Most wind forecasts sit at 2-3 m/s whatever "
+        "was observed; humidity forecasts stay near 75-90%; pressure forecasts follow higher pressures but stay too high on low-pressure days; "
+        "rainfall forecasts sit at 1-5 mm almost regardless of the observed amount (too wet on dry days, too dry on wet days).", "A",
         [PROC_A, "Cases: website cases with a raw observation of the variable on the target date. Values beyond the plotted range are counted in the end "
          "cells. Rainfall cells are uneven (0, 0.1, 1, 2, 5, 10, 20, 50, 100 mm). Truth: raw, unimputed PAGASA observations.",
          "A useful forecast concentrates cases along the 1:1 line; this figure shows spread, not skill relative to baselines (see PF-F, PF-F3)."])

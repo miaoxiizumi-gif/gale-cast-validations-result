@@ -279,7 +279,7 @@ These examples illustrate behaviour; the overall comparisons (Sections A, B and 
 W1's own output: isotonic MOS and a persistence blend were fitted on the same evaluation period. Chapter 4's Table 4.5 (2.04 km/h) is the same
 pipeline on the model before W1, and its wind-direction row comes from a separate direction-only model.</p>
 {fig("PF-F2_website_regression_provenance", "Bars: neural 0.987, after MOS 0.576, after blend 0.5365, persistence 0.474", "<b>PF-F2.</b> From W1's neural wind error to the website's 0.5365 m/s, with issue-day persistence on the same cases and truth for reference.")}
-{fig("PF-F_wind_mae_rmse", "Wind MAE and RMSE by station for W1, persistence and climatology", f"<b>PF-F.</b> W1's neural next-day wind against both baselines on {PH['a_wind_n']} website cases with raw observations: W1 is worse everywhere.")}
+{fig("PF-F_wind_mae_rmse", "Wind MAE and RMSE by station for W1, persistence and climatology", f"<b>PF-F.</b> W1's neural next-day wind against both baselines on {PH['a_wind_n']} website cases with raw observations: W1's MAE and RMSE are higher at every station; the MAE difference is established against persistence at every station and against climatology everywhere except NAIA.")}
 {fig("PF-F3_regression_variables_mae", "MAE of four regression outputs, one panel each", "<b>PF-F3.</b> Every supported regression output in its own unit. Rainfall is the one variable where W1's MAE is lower than both baselines; its RMSE is not lower than climatology's, and it under-forecasts.")}
 {fig("PF-G_observed_vs_predicted", "Binned observed versus forecast counts with a 1:1 line", "<b>PF-G.</b> Observed vs W1-forecast values as counts per cell (no individual readings), with the 1:1 line.")}
 """)
