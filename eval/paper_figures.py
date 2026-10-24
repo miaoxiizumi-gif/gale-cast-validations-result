@@ -274,6 +274,7 @@ def main():
             recs.append({"variable": v, "unit": A["regression"][v]["unit"], "method": name, "mae": val, "ci_lo": c["lo"], "ci_hi": c["hi"],
                          "rmse": R["point"][mth]["rmse"], "bias": R["point"][mth]["bias"], "n": R["point"][mth]["n"]})
         ax.set_xticks([0, 1, 2], ["W1", "Persist.", "Clim."]); ax.set_title(names[v], loc="left", fontsize=9)
+        ax.set_ylim(0, ax.get_ylim()[1] * 1.15)
         ax.set_ylabel("MAE (lower is better)")
     S.title(fig, "PF-F3. Next-day error for each supported regression output, pooled over the three stations", S.EVIDENCE["A"])
     rf = A["regression"]["rainfall"]["scopes"]["pooled"]["point"]
