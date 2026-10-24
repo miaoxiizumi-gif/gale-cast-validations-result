@@ -40,11 +40,15 @@ in the git-ignored `_private/` folder.
 
 | Person / account | Role (from repository evidence) |
 |---|---|
-| Courtney ([miaoxiizumi-gif](https://github.com/miaoxiizumi-gif)) | repository owner; author of every commit in this repository |
-| Christine Tamayo ([Tinenen-cs](https://github.com/Tinenen-cs)) | front-end contributor to the GALE-CAST application repository (commit history of its `master` branch); not a contributor to this repository |
+| Courtney ([miaoxiizumi-gif](https://github.com/miaoxiizumi-gif)) | repository owner; original evaluation contributor |
+| Christine Tamayo ([Tinenen-cs](https://github.com/Tinenen-cs)) | front-end contributor to the GALE-CAST application; implementation-stack documentation contributor to this results repository |
 
 Other thesis-team members, and the thesis authorship list, are not recorded in either repository and need confirmation before they are
 added. AI tool use is disclosed separately: commits in this repository carry a
 `Co-Authored-By: Claude` trailer recording assistance by an AI coding tool, which is not a human author.
 
 PAGASA is the source of the station observations.
+
+## Implementation technology stack
+
+See [TECH_STACK.md](documentation/TECH_STACK.md) for the source-backed frontend, backend, database, ML, hosting, and report tooling inventory, including suggested Chapter 3 wording. Versions are configuration evidence, not a live runtime audit.

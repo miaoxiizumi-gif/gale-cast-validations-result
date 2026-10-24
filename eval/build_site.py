@@ -14,6 +14,7 @@ import pandas as pd
 
 import common as C
 import build_docs
+import tech_stack
 from content import CLAIMS, LIMITS, OMISSIONS, REV
 
 DOCS = C.WORKSPACE / "docs"
@@ -621,8 +622,8 @@ W1 identity, split and data status: <a href="data/documentation/MODEL_AND_DATA_S
 
     sec("credits", "Credits", f"""
 <table><thead><tr><th>Person / account</th><th>Role (from repository evidence)</th></tr></thead><tbody>
-<tr><td>Courtney (<a href="https://github.com/miaoxiizumi-gif">miaoxiizumi-gif</a>)</td><td>repository owner; author of every commit in this repository</td></tr>
-<tr><td>Christine Tamayo (<a href="https://github.com/Tinenen-cs">Tinenen-cs</a>)</td><td>front-end contributor to the GALE-CAST application repository (its commit history); not a contributor to this repository</td></tr>
+<tr><td>Courtney (<a href="https://github.com/miaoxiizumi-gif">miaoxiizumi-gif</a>)</td><td>repository owner; original evaluation contributor</td></tr>
+<tr><td>Christine Tamayo (<a href="https://github.com/Tinenen-cs">Tinenen-cs</a>)</td><td>front-end contributor to the GALE-CAST application; implementation-stack documentation contributor to this results repository</td></tr>
 </tbody></table>
 <p class="small">Other thesis-team members and the thesis authorship list are not recorded in either repository and await confirmation.
 AI tool use is disclosed separately from authorship: commits here carry a <code>Co-Authored-By: Claude</code> trailer recording assistance
@@ -662,8 +663,11 @@ python paper_figures.py; python build_site.py</pre>
 No row-level observations or individual predictions are published.</p>
 """)
 
+    sec("tech-stack", "Verified implementation technology stack", tech_stack.section_html())
+    tech_stack.write_documents(C.WORKSPACE)
+
     ORDER = ["overview", "identity", "scorecard", "design", "results", "regression", "cases", "method", "data", "validation",
-             "selection", "figures", "ledger", "paragraphs", "defense", "limits", "claims", "credits", "repro"]
+             "selection", "figures", "ledger", "paragraphs", "defense", "limits", "claims", "credits", "repro", "tech-stack"]
     assert sorted(ORDER) == sorted(SECS), set(ORDER) ^ set(SECS)
     for n, id_ in enumerate(ORDER):
         title, body = SECS[id_]

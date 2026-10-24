@@ -54,3 +54,7 @@ Each GCV-W1-v1 stage was run twice: first during development (~15:58-16:14 UTC o
 code `ed43f73` (~16:24-16:27 UTC). The two passes give identical results, and the site cites the second pass.
 Amendment A2 (2026-10-25): development and trial runs are kept and marked `FAILED.txt` with the reason (uncommitted code, out-of-memory
 failures caused by a concurrent experiment on this PC, or superseded trials). The site cites the latest unmarked run of each stage.
+
+## Implementation-stack supplement (2026-10-25)
+
+Added `eval/tech_stack.py`, mirrored `documentation/TECH_STACK.md` / `docs/data/documentation/TECH_STACK.md`, a public technology-stack section, and its build-site hook. Reviewed application source bb056a9; pinned dependencies are distinguished from unverified live versions. Historical experiment results, private case dates, and all run artifacts unchanged. Verified Python syntax, unique HTML IDs, local download links and document copies without executing evaluation code. Human role descriptions updated for the new Tinenen-cs documentation contribution.

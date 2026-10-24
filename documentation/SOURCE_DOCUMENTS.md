@@ -32,3 +32,7 @@ The hashes match those recorded in `docs/project/PRD.md` §0, so these are the s
 ## External references
 
 See `EVALUATION_METHOD.md` § References (each read from the primary source on 2026-10-25).
+
+## Implementation-stack supplement (2026-10-25)
+
+`TECH_STACK.md` additionally reviews `requirements.txt`, `Dockerfile`, `app.py`, `dashboard.html`, and the project deployment/structure documents at GALE-CAST commit `bb056a9`. This is a separate implementation inventory; it does not change or re-execute the earlier W1 evaluation. No live package inventory or private case values were inspected.
