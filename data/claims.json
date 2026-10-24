@@ -116,7 +116,7 @@
   {
     "id": "C-20",
     "class": "hist",
-    "claim": "`Training.csv` reproduces the supplementary counts exactly (69,388 rows; 1,057 positives under the study label; 1,057 + 86 = 1,143, the paper's figure). Whether its rows are observations, synthetic, or verified PAGASA data is not established.",
-    "evidence": "Stage 2b run s2b-supplementary-20261023T162419Z-8ba62b; no construction script or source document found."
+    "claim": "`Training.csv` reproduces the supplementary counts exactly (69,388 rows; 1,057 positives under the study label; 1,057 + 86 = 1,143, the paper's figure). The owner confirmed on 2026-10-24 that these rows are supplementary PAGASA observations (owner-confirmed; not independently verified against a PAGASA source document). The earlier reading of a SMOTE origin from a filename is withdrawn.",
+    "evidence": "Stage 2b run s2b-supplementary-20261023T162419Z-8ba62b; owner confirmation recorded in the source project's `docs/data/DATA_SOURCES.md` (branch `docs/project-home`)."
   }
 ]

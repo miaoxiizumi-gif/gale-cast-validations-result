@@ -116,8 +116,8 @@
       "section": "Data Preprocessing",
       "claim": "83,569 high-fidelity observations from two tiers",
       "verdict": "Partly correct",
-      "evidence": "83,569 = 78,955 + 1,095 + 3,519 rows of three partitions, of which 69,388 are supplementary rows of unresolved provenance (C-20). It is not a count of primary-station observations.",
-      "replacement": "The modelling data comprise 83,569 daily rows: 10,914 primary-station rows (6,342 training, 1,095 tuning, 3,519 test), 3,225 Port Area rows and 69,388 supplementary rows whose origin is not documented."
+      "evidence": "83,569 = 78,955 + 1,095 + 3,519 rows of three partitions, of which 69,388 are supplementary PAGASA observations (owner-confirmed; C-20) and 3,225 are Port Area rows. It is not a count of primary-station observations. (Corrected 2026-10-25: the primary-station total is 10,956, not 10,914 as first written here.)",
+      "replacement": "The modelling data comprise 83,569 daily rows: 10,956 primary-station rows (6,342 training, 1,095 tuning, 3,519 test), 3,225 Port Area rows and 69,388 rows from 19 additional Luzon stations; the Port Area and Luzon rows are supplementary PAGASA observations (owner-confirmed)."
     },
     {
       "id": "R-3-02",
@@ -494,7 +494,7 @@
       "section": "Recommendation 1",
       "claim": "Compare with simpler baselines such as persistence and climatology",
       "verdict": "Correct",
-      "evidence": "This revision now performs that comparison (Section 4).",
+      "evidence": "This evaluation now performs that comparison (benchmark sections A and B).",
       "replacement": "Keep, and add: evaluate the frozen model prospectively on 2025+ observations before any operational claim."
     }
   ],
@@ -521,7 +521,7 @@
     ],
     [
       "O-06",
-      "The provenance of the 69,388 supplementary rows is undocumented."
+      "The 69,388 supplementary rows are described only as owner-confirmed PAGASA observations; no PAGASA delivery note or construction script for them is in the repository."
     ],
     [
       "O-07",
@@ -555,7 +555,7 @@
     ],
     [
       "L-07",
-      "Supplementary data provenance is unresolved; its contribution to W1 cannot be separated."
+      "Supplementary data are owner-confirmed PAGASA observations without an independent source document; their contribution to W1 cannot be separated."
     ],
     [
       "L-08",
