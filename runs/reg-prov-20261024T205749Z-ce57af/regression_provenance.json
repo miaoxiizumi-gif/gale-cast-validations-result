@@ -1,0 +1,55 @@
+{
+  "run_id": "reg-prov-20261024T205749Z-ce57af",
+  "amendment": "A2 \u00a74",
+  "source_rows_run": "w-cohort-20261024T205646Z-6b7a96",
+  "n": 3423,
+  "truth": "processed_weather.wind_speed of the target day (forward-filled), as in the website script",
+  "steps": {
+    "neural_only": {
+      "mae": 0.9874551667543092,
+      "rmse": 1.1715888843339592,
+      "bias": 0.16639883242769504
+    },
+    "after_mos": {
+      "mae": 0.5764363797938159,
+      "rmse": 0.8386652561445055,
+      "bias": -0.08642906426666368
+    },
+    "after_blend": {
+      "mae": 0.5365441052838261,
+      "rmse": 0.7723157903309997,
+      "bias": -0.04727305808987274
+    },
+    "persistence_same_cases_same_truth": {
+      "mae": 0.47443762781186094,
+      "rmse": 0.7995032053729956,
+      "bias": 0.0005842827928717499
+    },
+    "script_blend_partner_two_day_old_obs": {
+      "mae": 0.5731814198071867,
+      "rmse": 0.9308551884309423,
+      "bias": 0.0005842827928717499
+    }
+  },
+  "blend_weight_on_model": 0.55,
+  "blend_cv_mae": 0.5175076466283282,
+  "blend_partner": "processed wind of day t-1 (two days before the target), as indexed by the script",
+  "mos_rows_from_fallback_fit_on_later_evaluation_rows": 399,
+  "mase_denominator_lag365_train": 0.7911542100283823,
+  "mase_after_blend": 0.6781789169327405,
+  "mase_neural_only": 1.2481197145103795,
+  "website_values": {
+    "mae": 0.5365,
+    "rmse": 0.7723,
+    "mase": 0.6782
+  },
+  "reproduces_website": {
+    "mae": true,
+    "rmse": true,
+    "mase": true
+  },
+  "fitted_on_evaluation_outcomes": {
+    "mos": true,
+    "blend_weight": true
+  }
+}

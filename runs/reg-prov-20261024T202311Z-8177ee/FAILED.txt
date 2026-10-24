@@ -1,0 +1,1 @@
+Development trial: blend used the true lag-1 instead of the script's index (t-1); superseded. Kept per run discipline.

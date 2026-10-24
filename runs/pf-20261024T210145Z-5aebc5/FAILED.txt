@@ -1,0 +1,1 @@
+Superseded: PF-F3 value labels touched panel titles. Numbers identical.

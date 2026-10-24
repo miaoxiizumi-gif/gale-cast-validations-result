@@ -1,0 +1,11 @@
+partition,season,events,rows
+training,Sep-Nov (late typhoon season),27,1497
+training,Jun-Aug (SW monsoon),18,1656
+training,Dec-Feb (NE monsoon),4,1533
+training,Mar-May (dry/hot),2,1656
+tuning,Sep-Nov (late typhoon season),18,273
+tuning,Mar-May (dry/hot),1,276
+evaluation,Sep-Nov (late typhoon season),18,960
+evaluation,Jun-Aug (SW monsoon),4,828
+evaluation,Dec-Feb (NE monsoon),3,903
+evaluation,Mar-May (dry/hot),3,828

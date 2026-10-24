@@ -1,0 +1,1 @@
+Development trial: PNG render failed (RendererAgg out of memory; system memory pressure from another session's experiment). Superseded.

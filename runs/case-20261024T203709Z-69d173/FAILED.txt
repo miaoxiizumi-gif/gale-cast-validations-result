@@ -1,0 +1,2 @@
+Development trial (manifest step failed on TensorFlow import under memory pressure; fixed in common.environment). Superseded.
+Moved case_selection_summary.json (contained exact event dates, written before dates were withheld from public outputs) to _private/runs/case-20261024T203709Z-69d173/ on 2026-10-25.

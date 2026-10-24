@@ -1,0 +1,1 @@
+Superseded: legends/labels overlapped data; PF-A tick label clipped; PF-C footer lacked panel B threshold. Numbers identical.

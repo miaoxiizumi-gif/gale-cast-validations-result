@@ -1,0 +1,1 @@
+Development trial interrupted before the manifest was written (session cut off); superseded by a run at committed code.

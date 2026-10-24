@@ -1,0 +1,94 @@
+{
+  "run_id": "split-facts-20261024T204556Z-25cb3e",
+  "label": "processed gale_flag >= 1",
+  "partitions": {
+    "training": {
+      "first": "2015-01-01",
+      "last": "2020-10-14",
+      "rows": 6342,
+      "years_covered": 5.79,
+      "events": 51,
+      "event_dates": 30,
+      "episodes_consecutive_dates": 27,
+      "pressure_only": 50,
+      "wind_only": 1,
+      "both": 0,
+      "calendar_months_present": 12,
+      "events_by_season": {
+        "Sep-Nov (late typhoon season)": 27,
+        "Jun-Aug (SW monsoon)": 18,
+        "Dec-Feb (NE monsoon)": 4,
+        "Mar-May (dry/hot)": 2
+      },
+      "rows_by_season": {
+        "Mar-May (dry/hot)": 1656,
+        "Jun-Aug (SW monsoon)": 1656,
+        "Dec-Feb (NE monsoon)": 1533,
+        "Sep-Nov (late typhoon season)": 1497
+      },
+      "events_by_station": {
+        "NAIA": 22,
+        "Sangley Point": 15,
+        "Science Garden": 14
+      }
+    },
+    "tuning": {
+      "first": "2020-10-15",
+      "last": "2021-10-14",
+      "rows": 1095,
+      "years_covered": 1.0,
+      "events": 19,
+      "event_dates": 7,
+      "episodes_consecutive_dates": 6,
+      "pressure_only": 19,
+      "wind_only": 0,
+      "both": 0,
+      "calendar_months_present": 12,
+      "events_by_season": {
+        "Sep-Nov (late typhoon season)": 18,
+        "Mar-May (dry/hot)": 1
+      },
+      "rows_by_season": {
+        "Mar-May (dry/hot)": 276,
+        "Jun-Aug (SW monsoon)": 276,
+        "Sep-Nov (late typhoon season)": 273,
+        "Dec-Feb (NE monsoon)": 270
+      },
+      "events_by_station": {
+        "Science Garden": 7,
+        "NAIA": 6,
+        "Sangley Point": 6
+      }
+    },
+    "evaluation": {
+      "first": "2021-10-15",
+      "last": "2024-12-30",
+      "rows": 3519,
+      "years_covered": 3.21,
+      "events": 28,
+      "event_dates": 12,
+      "episodes_consecutive_dates": 7,
+      "pressure_only": 28,
+      "wind_only": 0,
+      "both": 0,
+      "calendar_months_present": 12,
+      "events_by_season": {
+        "Sep-Nov (late typhoon season)": 18,
+        "Jun-Aug (SW monsoon)": 4,
+        "Dec-Feb (NE monsoon)": 3,
+        "Mar-May (dry/hot)": 3
+      },
+      "rows_by_season": {
+        "Sep-Nov (late typhoon season)": 960,
+        "Dec-Feb (NE monsoon)": 903,
+        "Mar-May (dry/hot)": 828,
+        "Jun-Aug (SW monsoon)": 828
+      },
+      "events_by_station": {
+        "NAIA": 10,
+        "Science Garden": 10,
+        "Sangley Point": 8
+      }
+    }
+  }
+}

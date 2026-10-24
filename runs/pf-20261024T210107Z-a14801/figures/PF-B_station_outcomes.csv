@@ -1,0 +1,4 @@
+station,hits,misses,false_alarms,correct_negatives,events,cases
+NAIA,9.0,1.0,2.0,1129.0,10.0,1141.0
+Sangley Point,7.0,1.0,4.0,1129.0,8.0,1141.0
+Science Garden,8.0,2.0,3.0,1128.0,10.0,1141.0

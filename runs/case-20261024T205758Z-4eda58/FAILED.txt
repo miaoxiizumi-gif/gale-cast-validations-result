@@ -1,0 +1,1 @@
+Superseded: figure layout overlaps (persistence labels, legend, threshold label) fixed in the next commit; selection identical.
