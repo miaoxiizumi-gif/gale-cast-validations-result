@@ -14,6 +14,7 @@ import pandas as pd
 
 import common as C
 import build_docs
+import figure_notes as FN
 import tech_stack
 from content import CLAIMS, LIMITS, OMISSIONS, REV
 
@@ -24,7 +25,7 @@ SITE_URL = "https://miaoxiizumi-gif.github.io/gale-cast-validations-result/"
 
 
 def latest(prefix):
-    c = [p for p in sorted(C.RUNS.glob(f"{prefix}-*")) if not (p / "FAILED.txt").exists()]
+    c = [p for p in sorted(C.RUNS.glob(f"{prefix}-2*")) if not (p / "FAILED.txt").exists()]
     return c[-1]
 
 
@@ -109,10 +110,10 @@ def main():
     (DOCS / "figures" / "paper").mkdir()
     for p in (X["runs"]["pf"] / "figures").glob("PF-*"):
         shutil.copy(p, DOCS / "figures" / "paper" / p.name)
-    (DOCS / "data" / "documentation").mkdir()
+    (DOCS / "data" / "documentation").mkdir(exist_ok=True)
     for p in (C.WORKSPACE / "documentation").glob("*"):
         shutil.copy(p, DOCS / "data" / "documentation" / p.name)
-    for p in ("AMENDMENT_A2_website_cohort.md", "CASE_SELECTION_v1.md"):
+    for p in ("AMENDMENT_A2_website_cohort.md", "CASE_SELECTION_v1.md", "CASE_SELECTION_v2_regression.md"):
         shutil.copy(C.WORKSPACE / "spec" / p, DOCS / "data" / p)
     shutil.copy(runs["b"] / "wind_monthly_means_by_station.csv", DOCS / "data")
     shutil.copy(runs["b"] / "event_outcomes_monthly_by_station.csv", DOCS / "data")
@@ -218,10 +219,16 @@ Status: <b>provisional</b>; chapter corrections are proposals, not applied edits
 <span class="tag new">new result (this evaluation)</span> <span class="tag interp">interpretation / limitation</span></p>
 """)
 
+    NOTES = X["NOTES"]
+
     def fig(name, alt, cap):
         return (f'<figure><img src="figures/paper/{name}.png" alt="{e(alt)}" loading="lazy"><figcaption>{cap} '
                 f'Download: <a href="figures/paper/{name}.png">PNG (300 DPI)</a> · <a href="figures/paper/{name}.svg">SVG</a> · '
-                f'<a href="figures/paper/{name}.csv">CSV</a>.</figcaption></figure>')
+                f'<a href="figures/paper/{name}.csv">CSV</a>.</figcaption>{FN.html(NOTES[name], e)}</figure>')
+
+    def figL(name, alt, data):
+        return (f'<figure><img src="figures/{name}.png" alt="{e(alt)}" loading="lazy"><figcaption><b>{e(name.split("_")[0])}.</b> '
+                f'Data: <a href="data/{data}">CSV</a>.</figcaption>{FN.html(NOTES[name], e)}</figure>')
 
     # Evidence A ----------------------------------------------------------------
     lab, chk = WA["label"], WA["checks"]
@@ -254,23 +261,41 @@ The label uses processed (forward-filled) values, as on the website; recomputed 
     # Evidence C ----------------------------------------------------------------
     crow = [[s_, v.get("trigger", "—"), ", ".join(v.get("outcomes", [])) or e(v.get("reason", "")),
              v.get("event_persistence_on_event_day", "—"), v.get("eligible_candidates", 0)] for s_, v in CASE["per_station"].items()]
+    C2 = X["case2"]
+    crow2 = [[s_, v.get("higher_wind_windows", 0), v.get("higher_wind_tier1_with_wind_win_ge1", 0),
+              f"Tier {v['tier']}" if v.get("selected") else "none qualified",
+              " · ".join(f"{k} {n}/3" for k, n in v.get("wins_by_variable_of_3", {}).items()) or "—",
+              ", ".join(v.get("outcomes", [])) or "—"] for s_, v in C2["per_station"].items()]
+
+    def privnote(fid):
+        return f'<div class="privfig"><p><b>{fid} (private figure; not available on this site)</b></p>{FN.html(NOTES[fid], e)}</div>'
     sec("cases", "C. Selected illustrative case studies", f"""
-<div class="selected"><p><span class="tag sel">Evidence C</span> <b>Selected successful cases; chosen retrospectively for illustration.</b>
-They explain how W1 behaved around correctly detected events. They are not representative of all dates and say nothing about overall
-performance, which sections A and B show.</p>
-<p><b>How they were chosen</b> (criteria committed before selection: <a href="data/CASE_SELECTION_v1.md">CASE_SELECTION_v1.md</a>): from the 24 hits,
-three consecutive target dates (day before, event day, day after) at one station, with complete raw wind and pressure observations and a
-raw-confirmed event; ranked by the number of correct W1 decisions in the window (a favourable criterion, disclosed), then the size of the
-pressure fall, then date. W1's error relative to the baselines was <b>not</b> used. {CASE['eligible']} of {CASE['candidates']} candidates passed.</p>
-<p><b>Timing:</b> each date shows its own next-day forecast. The three dates are not a +1/+2/+3-day forecast.</p>
-{table(["Station", "Event trigger", "W1+X1 outcomes (day before, event, day after)", "Event persistence on the event day", "Eligible candidates"], crow)}
+<div class="selected"><p class="selbanner"><span class="tag sel">Evidence C</span> <b>{e(FN.SELECTED)}</b></p>
+<p>Two separately recorded selections. Neither is a performance estimate; the overall comparisons (Sections A, B and the regression evidence)
+are the basis for any claim. Each date shows its own next-day forecast, issued after the previous day's observations; the three dates are
+<b>not</b> a +1/+2/+3-day forecast from one origin.</p>
 <p><b>Why the figures are not on this site:</b> they plot individual PAGASA station-day readings, which PAGASA's data terms (CADS-07 Rev.6,
-condition 4) do not allow online, and no permission was found. The per-station figures and the all-station common window are kept in a
-private thesis-export folder for the printed thesis. Exact dates are withheld here, as for every event date on this site.</p>
-<p><b>What they show</b> (described without readings): in every selected window the label is triggered by a same-station pressure fall of
-at least 3 hPa, and the W1+X1 score is above 0.601 on the event day and below it on the neighbouring non-event days. W1's own next-day
-pressure value showed a fall in some windows but not in others, and at Science Garden its wind value was well above the observed wind.
-These examples illustrate behaviour; the overall comparisons (Sections A, B and the regression evidence) are the basis for any claim.</p></div>
+condition 4) do not allow online, and no permission was found. High-resolution PNG and SVG files, with a local index of filenames and
+explanations, are kept in a private thesis-export folder for the printed thesis. There are no public download links for them, and exact
+dates are withheld here, as for every event date on this site.</p>
+<h3>Set 1: warning behaviour around detected events</h3>
+<p>Criteria committed before selection (<a href="data/CASE_SELECTION_v1.md">CASE_SELECTION_v1.md</a>): from the 24 hits, three consecutive
+target dates with complete raw wind and pressure observations and a raw-confirmed event; ranked by correct W1 decisions in the window
+(favourable, disclosed), then pressure fall, then date. W1's numerical error was <b>not</b> used. {CASE['eligible']} of {CASE['candidates']} candidates passed.</p>
+{table(["Station", "Event trigger", "W1+X1 outcomes (day before, event, day after)", "Event persistence on the event day", "Eligible candidates"], crow)}
+<p><b>A classification success is not a regression success.</b> In these windows W1+X1 warned correctly on every day, but W1's wind
+forecast was closer than both baselines on only 3 of the 9 station-days.</p>
+{privnote("PF-H")}{privnote("PF-I")}
+<h3>Set 2: favourable regression example (panel request)</h3>
+<p>Criteria recorded before the search (<a href="data/CASE_SELECTION_v2_regression.md">CASE_SELECTION_v2_regression.md</a>): complete raw
+wind, pressure, humidity and rainfall; observed wind at or above the station's 2015-2020 90th percentile on at least one day (NAIA
+{C2['station_wind_p90_training_ms']['NAIA']:.0f} m/s, Sangley Point {C2['station_wind_p90_training_ms']['Sangley Point']:.0f} m/s, Science Garden
+{C2['station_wind_p90_training_ms']['Science Garden']:.0f} m/s); windows with a detected event first; ranked by the number of days on which W1's
+wind error was smaller than both baselines. <b>This is a favourable-error selection.</b> Other variables were reported, not used to select.</p>
+{table(["Station", "Higher-wind windows", "…with a detected event and ≥1 W1 wind win", "Selected", "Days W1 closest (of 3) by variable", "W1+X1 outcomes"], crow2)}
+<p>Common window: W1's wind was closest on {C2['common']['station_dates_with_wind_win_of_9'] if C2.get('common') else 0} of 9 station-days.</p>
+{privnote("PF-J")}{privnote("PF-K")}
+</div>
 """)
 
     # regression ----------------------------------------------------------------
@@ -344,7 +369,7 @@ We did not change the inputs to make the live endpoint work; it is reported as f
 <p class="small">Reconstructed from <code>_train_w3.py</code>'s rules on <code>data/processed_weather.csv</code> (run <code>{ph['s2']}</code>).
 Every documented count reproduces: 9,567 real training rows, 1,095 tuning rows, 3,519 test rows, 3,423 test windows, 69,388 supplementary rows,
 78,955 total. Training windows built from real rows: {tr['windows_train_real_only']['windows']:,} ({tr['windows_train_real_only']['positive_windows']} positive).</p>
-<img src="figures/F1_partitions.png" alt="Timeline of W1 data allocation by source; Port Area and supplementary training rows extend into the test period">
+{figL("F1_partitions", "Timeline of W1 data allocation by source; Port Area and supplementary training rows extend into the test period", "F1_partitions.csv")}
 <h3>Table D2. Raw observations (unimputed)</h3>
 {table(["Station", "Days", "First", "Last", "Wind missing", "MSLP missing", "Rain missing", "Days ≥10.8 m/s", "Days ≥17.2 m/s"], rawrows)}
 <h3>Table D3. Benchmark cases and exclusions</h3>
@@ -457,14 +482,9 @@ post-processing fitted in the evaluation period. {md_inline(fill(CLAIMS[17][2]))
 <h3>5.2 Wind speed, next day (identical cases)</h3>
 {table(["Scope", "Method", "n", "MAE m/s", "MAE 95% CI", "RMSE m/s", "Bias m/s"], wtab)}
 {table(["Scope", "Difference in MAE", "Point", "95% CI", "Verdict"], wdiff)}
-<figure><img src="figures/F2_wind_mae_by_station.png" alt="Bar chart: W1 wind MAE is higher than persistence and climatology at every station">
-<figcaption><b>F2.</b> <b>Shows</b> mean absolute next-day wind error by station for W1, persistence and climatology. <b>Calculated</b> on {ph['wind_n']} identical cases; bars are block-bootstrap 95% intervals. <b>Matters</b> because a model must beat trivial forecasts to add value.
-<b>Supports</b> that W1's wind output is less accurate than both references at every station. <b>Does not prove</b> anything about strong winds (none ≥ 10.8 m/s occurred) or about other output variables. Source: <a href="data/F2_wind_mae_by_station.csv">CSV</a>.</figcaption></figure>
-<figure><img src="figures/F3_wind_monthly_means.png" alt="Monthly mean wind: W1 is almost flat near 2.5-2.7 m/s while observations vary; at Science Garden W1 is far above observations">
-<figcaption><b>F3.</b> <b>Shows</b> monthly means of the daily observed wind and of each forecast, for every eligible date (no dates selected). <b>Calculated</b> by averaging daily values within each calendar month. <b>Matters</b> because it reveals the error's structure: W1 forecasts sit near 2.5 m/s at every station (forecast SD {ph['w1_sd']} vs observed {ph['obs_sd']} m/s) and are far too high at Science Garden.
-<b>Supports</b> that W1 does not track seasonal or station differences in wind. <b>Does not prove</b> day-to-day skill or its absence (monthly averaging hides daily variation; the daily series is kept private). Source: <a href="data/wind_monthly_means_by_station.csv">CSV</a>.</figcaption></figure>
-<figure><img src="figures/F4_wind_obs_vs_pred_counts.png" alt="Count table: W1 never forecasts below 2.25 m/s while observed winds range from 0 to above 6 m/s">
-<figcaption><b>F4.</b> <b>Shows</b> how many cases fall in each observed-wind and W1-forecast bin. <b>Calculated</b> from all {ph['wind_n']} wind cases (total checked: {'✔' if figchk['F4_total_equals_wind_cases'] else '✘'}). <b>Matters</b> because a useful forecast puts most cases near the diagonal. <b>Supports</b> that W1's forecasts occupy a narrow band regardless of the observed wind. <b>Does not prove</b> why (the earlier audit points to the wind target's small share of the loss and per-station input scaling). Source: <a href="data/F4_wind_obs_vs_pred_counts.csv">CSV</a>.</figcaption></figure>
+{figL("F2_wind_mae_by_station", "Bar chart: W1 wind MAE is higher than persistence and climatology at every station", "F2_wind_mae_by_station.csv")}
+{figL("F3_wind_monthly_means", "Monthly mean wind: W1 is almost flat near 2.5-2.7 m/s while observations vary; at Science Garden W1 is far above observations", "wind_monthly_means_by_station.csv")}
+{figL("F4_wind_obs_vs_pred_counts", "Count table: W1 never forecasts below 2.25 m/s while observed winds range from 0 to above 6 m/s", "F4_wind_obs_vs_pred_counts.csv")}
 
 <h3>5.3 Events (study label: wind ≥ 10.8 m/s or pressure fall ≥ 3 hPa), identical cases</h3>
 <p>{bc['event']['eligible']:,} cases, {ph['ev_n']} events (prevalence {f(x1['prevalence'], 4)}); every event is a pressure fall; no wind event; no gale-force day.</p>
@@ -475,12 +495,9 @@ post-processing fitted in the evaluation period. {md_inline(fill(CLAIMS[17][2]))
 <p class="small">df1 = F1 difference (positive: W1 better); dprauc = PR-AUC difference (positive: W1 better); dbrier = Brier difference (positive: W1 <em>worse</em>).</p>
 <h4>By station (W1+X1 at 0.601; hits/false alarms/misses)</h4>
 {table(["Station", "Events", "W1+X1 H/FA/M", "W1+X1 F1", "Persistence H/FA/M", "W1+X1 PR-AUC"], stn)}
-<figure><img src="figures/F6_confusion_matrices.png" alt="Five binary confusion matrices including correct negatives">
-<figcaption><b>F6.</b> <b>Shows</b> 2×2 matrices (with correct negatives) for every procedure on the same {bc['event']['eligible']:,} cases. <b>Calculated</b> with the frozen thresholds listed in the benchmark design section; each matrix sums to the case count (checked). <b>Matters</b> because accuracy alone hides the trade-off between misses and false alarms. <b>Supports</b> comparing burdens: W1+X1 at 0.601 has the fewest false alarms and the most hits here. <b>Does not prove</b> detection of strong wind: every event is a pressure fall. Source: <a href="data/F6_confusion_matrices.csv">CSV</a>.</figcaption></figure>
-<figure><img src="figures/F5_event_timeline_monthly.png" alt="Monthly hits, misses and false alarms per station; events cluster in typhoon seasons 2022-2024">
-<figcaption><b>F5.</b> <b>Shows</b> hits and misses (above the axis) and false alarms (below) per station per month for W1+X1 at 0.601. <b>Calculated</b> from the same cases as F6; monthly totals equal the matrix (checked: {'✔' if figchk['F5_timeline_equals_confusion'] else '✘'}). Exact dates are kept private. <b>Matters</b> because events are clustered in a few storm months, so cases are not independent. <b>Supports</b> that results rest on a handful of episodes. <b>Does not prove</b> seasonal generalisation. Source: <a href="data/F5_event_timeline_monthly.csv">CSV</a>.</figcaption></figure>
-<figure><img src="figures/F7_event_benchmarks.png" alt="F1 and PR-AUC with confidence intervals; W1+X1 above persistence and climatology, with wide intervals">
-<figcaption><b>F7.</b> <b>Shows</b> F1 and PR-AUC with 95% block-bootstrap intervals. <b>Calculated</b> from the paired bootstrap described in the benchmark design section. <b>Matters</b> because 27 events give wide intervals. <b>Supports</b> that W1+X1 ranks pressure-fall days better than persistence and climatology (established). <b>Does not prove</b> a precise level of skill: the F1 interval for W1+X1 spans roughly 0.3 to 0.8. Source: <a href="data/F7_event_benchmarks.csv">CSV</a>.</figcaption></figure>
+{figL("F6_confusion_matrices", "Five binary confusion matrices including correct negatives", "F6_confusion_matrices.csv")}
+{figL("F5_event_timeline_monthly", "Monthly hits, misses and false alarms per station; events cluster in typhoon seasons 2022-2024", "F5_event_timeline_monthly.csv")}
+{figL("F7_event_benchmarks", "F1 and PR-AUC with confidence intervals; W1+X1 above persistence and climatology, with wide intervals", "F7_event_benchmarks.csv")}
 
 <h3>5.4 Declared sensitivities</h3>
 <ul>
@@ -522,9 +539,7 @@ training recipe, split or class weights, so they are <b>training variants, not d
 {table(["Variant", "What differs", "Saved evidence", "Selection status"], hist)}
 <h3>Re-scored on identical cases (inference only; own scalers; own documented threshold)</h3>
 {table(["Variant", "Thr", "X1 PR-AUC (S-TRAIN)", "X1 PR-AUC (S-LEGACY)", "Raw PR-AUC (S-TRAIN)", "Raw H/FA/M at thr", "Wind MAE"], vt)}
-<figure><img src="figures/F8_variants_and_inputs.png" alt="Dot plots: variants' X1 PR-AUC under two input constructions, and wind MAE all far above persistence">
-<figcaption><b>F8.</b> <b>Shows</b> each variant's X1 PR-AUC under both input constructions and its wind MAE. <b>Calculated</b> on the same cases as the benchmark results. <b>Matters</b> because a selection is only meaningful on identical cases. <b>Supports</b> three statements: no variant beats persistence or climatology on wind; W1 is not the top event ranker under either construction (v11, rejected for contamination, scores highest); and rankings change with the input construction.
-<b>Does not prove</b> that any variant would do better in future: this period informed all of them. Source: <a href="data/F8_variants_and_inputs.csv">CSV</a>.</figcaption></figure>
+{figL("F8_variants_and_inputs", "Dot plots: variants' X1 PR-AUC under two input constructions, and wind MAE all far above persistence", "F8_variants_and_inputs.csv")}
 <p><span class="tag interp">interpretation</span> The recorded reason for choosing W1 is its TEST-period scorecard after X1 and the recall-floor rule. W1 should not be described as
 superior because it is deployed. A defensible statement is: "W1 was selected from training variants using test-period scores; on a re-evaluation with identical cases, its ranking among variants depends on input scaling."</p>
 """)
@@ -667,7 +682,7 @@ No row-level observations or individual predictions are published.</p>
     tech_stack.write_documents(C.WORKSPACE)
 
     ORDER = ["overview", "identity", "scorecard", "design", "results", "regression", "cases", "method", "data", "validation",
-             "selection", "figures", "ledger", "paragraphs", "defense", "limits", "claims", "credits", "repro", "tech-stack"]
+             "selection", "figures", "ledger", "tech-stack", "paragraphs", "defense", "limits", "claims", "credits", "repro"]
     assert sorted(ORDER) == sorted(SECS), set(ORDER) ^ set(SECS)
     for n, id_ in enumerate(ORDER):
         title, body = SECS[id_]
@@ -718,8 +733,10 @@ No row-level observations or individual predictions are published.</p>
     for p in DOCS.rglob("*"):
         if p.is_file() and p.suffix in (".html", ".md", ".json", ".csv", ".css"):
             t = p.read_text(encoding="utf-8")
-            for pat in ("GALECAST@", "postgresql://", "C:\\Users", "VAPID", "ADMIN_API_KEY="):
-                if pat in t:
+            # credentials and private paths: connection strings carrying user@host, key variables, PEM keys, local paths
+            for pat in (r"GALECAST@", r"postgres(?:ql)?://[^\s\"'<>]+@", r"C:\\Users", r"VAPID_PRIVATE", r"ADMIN_API_KEY=",
+                        r"-----BEGIN [A-Z ]*PRIVATE KEY-----"):
+                if re.search(pat, t):
                     bad.append((p.name, pat))
     assert not bad, f"publication scan failed: {bad}"
     print("site built:", DOCS, "| sections:", len(nav), "| revisions:", len(rev_j))
@@ -750,6 +767,7 @@ pre{background:var(--soft);padding:12px;border-radius:8px;overflow-x:auto;font-s
 .card.good{border-left:4px solid var(--ok)}.card.bad{border-left:4px solid var(--bad)}.tag.sel{color:var(--warn);border-color:var(--warn);font-weight:600}
 .groups{display:grid;gap:6px;margin:12px 0;font-size:.92rem}.selected{border:2px dashed var(--warn);border-radius:10px;padding:4px 16px;background:var(--panel)}
 q{font-style:italic}q::before,q::after{content:'"'}
+.fignotes{margin-top:10px;border-top:1px solid var(--line);padding-top:8px;font-size:.88rem;color:var(--ink)}.fignotes p{margin:4px 0}.privfig{border:1px solid var(--line);border-radius:8px;padding:6px 14px;margin:12px 0;background:var(--soft)}.selbanner{font-size:1.02rem;border-left:4px solid var(--warn);padding:6px 10px;background:var(--soft)}
 """
 
 if __name__ == "__main__":

@@ -9,7 +9,9 @@ import json
 import pandas as pd
 
 import common as C
+import figure_notes as FN
 import paper_ledger as PL
+import tech_stack
 
 DOC = C.WORKSPACE / "documentation"
 SITE = "https://miaoxiizumi-gif.github.io/gale-cast-validations-result/"
@@ -31,7 +33,7 @@ REFS = [
 
 
 def latest(prefix):
-    return sorted(p for p in C.RUNS.glob(f"{prefix}-*") if not (p / "FAILED.txt").exists())[-1]
+    return sorted(p for p in C.RUNS.glob(f"{prefix}-2*") if not (p / "FAILED.txt").exists())[-1]
 
 
 def J(p):
@@ -41,7 +43,7 @@ def J(p):
 def placeholders() -> tuple[dict, dict]:
     r = {k: latest(p) for k, p in {"w": "w-cohort", "rp": "reg-prov", "b": "b-benchmark", "case": "case", "pf": "pf",
                                    "sf": "split-facts", "s2": "s2-partitions", "s2b": "s2b-supplementary", "s1": "s1-identity",
-                                   "a": "a-legacy"}.items()}
+                                   "a": "a-legacy", "case2": "case-v2", "v": "s7-variants", "fig": "fig"}.items()}
     A, RP, B, SF, S2 = (J(r["w"] / "website_cohort_results.json"), J(r["rp"] / "regression_provenance.json"),
                         J(r["b"] / "benchmark_results.json"), J(r["sf"] / "split_facts.json"), J(r["s2"] / "stage2_partitions.json"))
     reg = A["regression"]
@@ -65,8 +67,13 @@ def placeholders() -> tuple[dict, dict]:
         "a_rain_w1": f"{pt('rainfall', 'W1'):.2f}", "a_rain_pe": f"{pt('rainfall', 'persistence'):.2f}", "a_rain_cl": f"{pt('rainfall', 'climatology'):.2f}",
         "a_rain_rmse_w1": f"{pt('rainfall', 'W1', 'rmse'):.1f}", "a_rain_rmse_cl": f"{pt('rainfall', 'climatology', 'rmse'):.1f}",
     }
-    return ph, {"runs": r, "A": A, "RP": RP, "B": B, "SF": SF, "S2": S2, "case": J(r["case"] / "case_selection_summary.json"),
-                "pf": J(r["pf"] / "figure_guide.json")}
+    case1, case2 = J(r["case"] / "case_selection_summary.json"), J(r["case2"] / "case_selection_v2_summary.json")
+    V = J(r["v"] / "variants_results.json")
+    ctx = {"A": A, "B": B, "RP": RP, "V": V, "case1": case1, "case2": case2, "run_w": r["w"].name, "run_rp": r["rp"].name,
+           "run_pf": r["pf"].name, "run_b": r["b"].name, "run_fig": r["fig"].name, "run_v": r["v"].name,
+           "run_case1": r["case"].name, "run_case2": r["case2"].name}
+    return ph, {"runs": r, "A": A, "RP": RP, "B": B, "SF": SF, "S2": S2, "case": case1, "case2": case2,
+                "pf": J(r["pf"] / "figure_guide.json"), "NOTES": FN.notes(ctx), "ctx": ctx}
 
 
 def md_table(headers, rows):
@@ -78,6 +85,49 @@ def md_table(headers, rows):
 def write(name, text):
     DOC.mkdir(exist_ok=True)
     (DOC / name).write_text(text.strip() + "\n", encoding="utf-8")
+
+
+def write_private_index(X) -> None:
+    """_private/thesis_export/INDEX.md: files, explanations and day-by-day values of the selected cases (never published)."""
+    ctx, NOTES = X["ctx"], X["NOTES"]
+    exp = C.PRIVATE / "thesis_export"
+    rows = pd.read_csv(C.private_dir(X["runs"]["w"]) / "website_cohort_rows.csv", parse_dates=["date"])
+    s1 = J(C.private_dir(X["runs"]["case"]) / "PRIVATE_selection_summary.json")
+    s2 = J(C.private_dir(X["runs"]["case2"]) / "PRIVATE_selection_summary_v2.json")
+
+    def table(station, dates):
+        out = ["| Target date (issued after the previous day) | Variable | Observed | W1 | Persistence | Climatology | abs err W1 / P / C | Closest |",
+               "|---|---|---|---|---|---|---|---|"]
+        for d in dates:
+            r = rows[(rows["station"] == station) & (rows["date"] == pd.Timestamp(d))].iloc[0]
+            dec = int(r["x1"] >= 0.601)
+            oc = {(1, 1): "Hit", (0, 0): "Correct negative", (1, 0): "Miss", (0, 1): "False alarm"}[(int(r["y"]), dec)]
+            for v, u in (("wind", "m/s"), ("mslp", "hPa"), ("humidity", "%"), ("rainfall", "mm")):
+                o = r[f"obs_{v}"]; e = {k: abs(r[c] - o) for k, c in (("W1", f"W1_{v}"), ("P", f"pers_{v}"), ("C", f"clim_{v}"))}
+                best = "/".join(k for k, x in e.items() if x == min(e.values()))
+                out.append(f"| {d} | {v} ({u}) | {o:.1f} | {r[f'W1_{v}']:.1f} | {r[f'pers_{v}']:.1f} | {r[f'clim_{v}']:.1f} | "
+                           f"{e['W1']:.2f} / {e['P']:.2f} / {e['C']:.2f} | {best} |")
+            out.append(f"| {d} | warning | X1 = {r['x1']:.2f} | {'warning' if dec else 'no warning'} | "
+                       f"{'warning' if r['E_persist'] == 1 else 'no warning'} | — | label: {'pressure fall' if r['L_press'] else ('wind' if r['L_wind'] else 'no event')} | {oc} |")
+        return "\n".join(out)
+
+    parts = ["# Private thesis-export index (NOT for publication)", "",
+             "Contains exact dates and individual PAGASA readings. PAGASA CADS-07 Rev.6 condition 4: do not post online. For the printed thesis only.",
+             f"Every figure: {FN.SELECTED}", "", f"Source rows: `_private/runs/{X['runs']['w'].name}/website_cohort_rows.csv`.", ""]
+    for key, run, summ, figs in (("v1", ctx["run_case1"], s1, ("PF-H", "PF-I")), ("v2", ctx["run_case2"], s2, ("PF-J", "PF-K"))):
+        parts += [f"## Selection {key}: folder `{run}/`", ""]
+        for fid in figs:
+            parts.append(FN.markdown(fid, NOTES[fid]))
+        for s, v in summ["per_station"].items():
+            if v.get("window"):
+                fn = (f"PF-H_case_{s.replace(' ', '_')}" if key == "v1" else f"PF-J_regression_case_{s.replace(' ', '_')}")
+                parts += [f"### {s}: {', '.join(v['window'])}  (files `{fn}.png`, `{fn}.svg`)", "", table(s, v["window"]), ""]
+        if summ.get("common"):
+            fn = "PF-I_common_window_all_stations" if key == "v1" else "PF-K_regression_common_window"
+            parts += [f"### Common window: {', '.join(summ['common']['window'])}  (files `{fn}.png`, `{fn}.svg`)", ""]
+            for s in C.PRIMARY:
+                parts += [f"#### {s}", "", table(s, summ["common"]["window"]), ""]
+    (exp / "INDEX.md").write_text("\n".join(parts) + "\n", encoding="utf-8")
 
 
 def main() -> dict:
@@ -114,7 +164,17 @@ on evaluation-period outcomes (see `MODEL_AND_DATA_SUMMARY.md`, regression prove
 |---|---|---|---|---|
 | **A. Website historical scorecard** | the website's 3,423 next-day windows (1,141 per primary station; target dates 2021-11-16 to 2024-12-30) | historical scoring procedure: pooled `scaled_weather` inputs, 32-day windows | processed (forward-filled) label, as on the website; raw observations for regression | reproduce and explain what the website shows; add same-case baselines |
 | **B. Training-consistent benchmark** | {ph['b_cases']} event cases / {B['counts']['wind']['eligible']:,} wind cases, target dates 2021-10-15 to 2024-12-31 | per-station scalers as in training | raw, unimputed observations | the declared benchmark of `spec/EVAL_SPEC_v1.md` |
-| **C. Selected case studies** | 3 station windows + 1 common window (3 days each) | as A | raw observations | explanation only |
+| **C. Selected illustrative case studies** | set 1 (`CASE_SELECTION_v1.md`): 3 station windows + 1 common window around detected events; set 2 (`CASE_SELECTION_v2_regression.md`): 3 station windows + 1 common window with relatively high wind and favourable W1 wind error (favourable-error selection, disclosed) | as A (saved rows; no model run) | raw observations | explanation only; not representative |
+
+### Selected illustrative case studies: what the two sets show
+
+- **Set 1 (classification behaviour):** W1+X1 warned correctly on every day of the selected windows, and every event was a pressure fall.
+  This is a classification success, not a regression success: W1's wind error was smaller than both baselines on only 3 of the 9
+  station-days.
+- **Set 2 (favourable regression example, requested by the panel):** chosen *because* W1's wind error was smaller than both baselines.
+  Its rule was recorded before the search (relatively higher wind = observed wind ≥ the station's 2015-2020 90th percentile on at least one
+  day). Results by station are in `FIGURE_GUIDE.md` (PF-J, PF-K). The pressure forecast was the closest on few of these days.
+- Neither set establishes general superiority; the overall comparisons (Evidence A and B) do.
 
 Group A's case identity was recovered without regenerating predictions: the saved reproduction rows (`a-legacy-20261023T162426Z-b5f446`)
 match the original W1-branch record `nine_fp_report.json` for all 9 false alarms and 4 misses (station, date and score), and the matrix is
@@ -182,6 +242,9 @@ them to show added value (Rasp et al., 2020). They are computed here on the iden
 | Training | one `model.fit` on primary rows before 2020-10-15 + all Port Area rows + all supplementary rows; early stopping on the tuning year (`val_gale_prob_loss`, patience 12); no saved history or seed; no pre-training stage |
 | Scoring procedure behind the website | `_w1_recall_floor.py`: pooled `scaled_weather` inputs, X1 = same-date mean over the three stations, threshold 0.601 |
 | Live system | the dashboard tier uses wind/pressure rules, not the model score; the 24-step live endpoint fails on this 32-step model; displayed 2025+ values are simulated or imported PAGASA forecasts |
+
+Implementation technologies around the model (web, API, database, hosting) are listed separately in `TECH_STACK.md`; they are not
+evidence of forecast accuracy.
 
 ## Station groups
 
@@ -271,37 +334,39 @@ evaluation on observations from 2025 onward.
 """)
 
     # ------------------------------------------------------------ FIGURE_GUIDE.md
-    rows = [[f"`{g['png']}` / `{g['svg']}` / `{g['csv']}`", g["evidence_group"], g["caption"], ", ".join(f"`{s}`" for s in g["source_runs"])]
-            for g in pf["figures"]]
-    cs = case["per_station"]
-    priv = [[f"PF-H ({s})", "C (selected)", (f"3-day window around a {v['trigger']}-triggered event; outcomes: {', '.join(v['outcomes'])}; "
-                                              f"event persistence on the event day: {v['event_persistence_on_event_day']}; {v['eligible_candidates']} eligible candidates"
-                                              if v.get("outcomes") else v.get("reason", "")), "private only"] for s, v in cs.items()]
-    if case.get("common"):
-        priv.append(["PF-I (all three stations)", "C (selected)", "3-day window around a date detected at all three stations", "private only"])
+    NOTES = X["NOTES"]
+    pub_ids = [g["figure"] for g in pf["figures"]]
+    legacy = ["F1_partitions", "F2_wind_mae_by_station", "F3_wind_monthly_means", "F4_wind_obs_vs_pred_counts",
+              "F5_event_timeline_monthly", "F6_confusion_matrices", "F7_event_benchmarks", "F8_variants_and_inputs"]
     write("FIGURE_GUIDE.md", f"""
 # Figure guide
 
-Public figures are aggregates. Each is downloadable as PNG (300 DPI), SVG and the CSV of the plotted numbers, from
-[`docs/figures/paper/`](../docs/figures/paper/) (site: {SITE}#figures). Figure run: `{ph['run_pf']}`.
+Every figure has the same nine-part explanation (what it shows, purpose, how it was produced, how to read it, actual finding, what it
+supports, what it does not establish, use in the paper, source). The text is generated from `eval/figure_notes.py`, the single source used
+by the website too. Numbers are filled from the saved runs.
 
-## Public paper figures
+How to read numerical errors: {FN.ERRORS}
 
-{md_table(["Files", "Evidence", "Caption and interpretation", "Source runs"], rows)}
+## Public paper figures (download PNG 300 DPI, SVG, CSV)
 
-Earlier evaluation figures F1-F8 (Group B benchmark and model variants) remain on the site and in `docs/figures/`.
+Files are in [`docs/figures/paper/`](../docs/figures/paper/) (site: {SITE}#figures). Figure run: `{ph['run_pf']}`.
 
-## Selected case figures (private)
+""" + "\n".join(FN.markdown(f"{i} — `{i}.png` / `.svg` / `.csv`", NOTES[i]) for i in pub_ids) + f"""
 
-These plot individual PAGASA station-day readings. PAGASA's data terms (CADS-07 Rev.6, condition 4, as recorded in the source project)
-forbid publishing station readings online and no permission was found, so they exist only in the private thesis-export folder and are
-**not** publicly available. Selection run: `{ph['run_case']}`; criteria: `spec/CASE_SELECTION_v1.md`.
+## Earlier benchmark figures (Evidence B unless stated; PNG on the site, data in `docs/data/`)
 
-{md_table(["Figure", "Evidence", "Content", "Availability"], priv)}
+""" + "\n".join(FN.markdown(f"{i} — `docs/figures/{i}.png`", NOTES[i]) for i in legacy) + f"""
 
-Every case figure carries the label: "Selected successful case; chosen retrospectively for illustration; not representative of all dates."
-Each date shows a separate next-day forecast; the windows are not three-day-ahead forecasts.
-""")
+## Selected illustrative case studies (private figures)
+
+These figures plot individual PAGASA station-day readings. PAGASA's data terms (CADS-07 Rev.6, condition 4, as recorded in the source project)
+forbid publishing station readings online and no permission was found, so they exist **only** in the private thesis-export folder
+(`_private/thesis_export/`, with a local `INDEX.md`). They are not available for download here. Exact dates are withheld from public files.
+
+Every case figure states: "{FN.SELECTED}" Each date shows a separate next-day forecast, not a +1/+2/+3-day forecast from one origin.
+
+""" + "\n".join(FN.markdown(f"{i} (private)", NOTES[i]) for i in ("PF-H", "PF-I", "PF-J", "PF-K")))
+    write_private_index(X)
 
     # ------------------------------------------------------------ PAPER_REVISION_LEDGER.md
     lrows = [[r["id"], f"Ch {r['chapter']}, {r['heading']}, PDF p. {r['pdf_page']}", f"\"{r['find_text']}\"", r["replacement"], r["reason"],
@@ -355,7 +420,21 @@ The hashes match those recorded in `docs/project/PRD.md` §0, so these are the s
 ## External references
 
 See `EVALUATION_METHOD.md` § References (each read from the primary source on 2026-10-25).
+
+## Implementation-stack supplement (2026-10-25)
+
+`TECH_STACK.md` reviews the application at GALE-CAST commit `bb056a9` (`requirements.txt`, `requirements-dev.txt`, `Dockerfile`, `app.py`,
+`dashboard.html`, `static/sw.js`, `hosting/vercel.json`, `docker/db-init/schema.sql`, `.github/workflows/tests.yml`) together with
+`docs/PROJECT_STRUCTURE.md` and `docs/handoff/DEPLOYMENT_AND_GITHUB.md`. It was first compiled by Tinenen-cs (commit `8b32465`) and verified
+line by line on the same date. It is a separate implementation inventory; it does not change or re-execute the W1 evaluation, and no live
+package inventory or private case values were used for it.
+
+## Selection amendments
+
+`spec/CASE_SELECTION_v1.md` (classification case studies) and `spec/CASE_SELECTION_v2_regression.md` (favourable regression case), each
+committed before its search.
 """)
+    tech_stack.write_documents(C.WORKSPACE)
 
     # ------------------------------------------------------------ README.md (root)
     x1 = ev["W1+X1@0.601"]; pe = ev["event_persistence"]; cl = ev[clim_key]
@@ -373,7 +452,7 @@ Evidence for the thesis *GALE-CAST*, about the frozen, deployed model **W1** (`g
 |---|---|---|
 | **A. Website historical scorecard** | the 3,423 cases behind the website matrix, identified case by case | TN 3386, FP 9, FN 4, TP 24 at X1 ≥ 0.601; F1 {x1['f1']:.3f} vs event persistence {pe['f1']:.3f} and event climatology {cl['f1']:.3f} (difference vs persistence established) |
 | **B. Training-consistent benchmark** | {ph['b_cases']} cases, inputs scaled as in training | {ph['b_tp']} of {ph['b_events']} events, {ph['b_fp']} false alarms |
-| **C. Selected case studies** | three-day windows chosen retrospectively for illustration | private figures only (PAGASA terms) |
+| **C. Selected illustrative case studies** | three-day windows chosen retrospectively for illustration: set 1 around detected events; set 2 with relatively high wind and favourable W1 wind error (disclosed) | private figures only (PAGASA terms); not representative |
 
 W1 ranks pressure-fall days well, but its neural wind, pressure and humidity forecasts are less accurate than persistence on the same
 cases, its scores are not calibrated probabilities, and every evaluation-period event is a pressure fall rather than gale-force wind.
@@ -388,6 +467,7 @@ cases, its scores are not calibrated probabilities, and every evaluation-period 
 | [`documentation/PAPER_REVISION_LEDGER.md`](documentation/PAPER_REVISION_LEDGER.md) | exact find/replace corrections for Chapters 1-5 |
 | [`documentation/SPLIT_DESIGN_ASSESSMENT.md`](documentation/SPLIT_DESIGN_ASSESSMENT.md) | documented split facts and a labelled present-day assessment |
 | [`documentation/SOURCE_DOCUMENTS.md`](documentation/SOURCE_DOCUMENTS.md) | source documents, branches, commits and chapter versions |
+| [`documentation/TECH_STACK.md`](documentation/TECH_STACK.md) | verified implementation stack with source and version evidence, and a Chapter 3 paragraph |
 | [`spec/`](spec/) | specification and amendments, each committed before its analysis |
 | [`HANDOFF.md`](HANDOFF.md) | run order and open items |
 
@@ -401,14 +481,19 @@ in the git-ignored `_private/` folder.
 
 | Person / account | Role (from repository evidence) |
 |---|---|
-| Courtney ([miaoxiizumi-gif](https://github.com/miaoxiizumi-gif)) | repository owner; author of every commit in this repository |
-| Christine Tamayo ([Tinenen-cs](https://github.com/Tinenen-cs)) | front-end contributor to the GALE-CAST application repository (commit history of its `master` branch); not a contributor to this repository |
+| Courtney ([miaoxiizumi-gif](https://github.com/miaoxiizumi-gif)) | repository owner; original evaluation contributor |
+| Christine Tamayo ([Tinenen-cs](https://github.com/Tinenen-cs)) | front-end contributor to the GALE-CAST application; implementation-stack documentation contributor to this results repository |
 
 Other thesis-team members, and the thesis authorship list, are not recorded in either repository and need confirmation before they are
 added. AI tool use is disclosed separately: commits in this repository carry a
 `Co-Authored-By: Claude` trailer recording assistance by an AI coding tool, which is not a human author.
 
 PAGASA is the source of the station observations.
+
+## Implementation technology stack
+
+See [TECH_STACK.md](documentation/TECH_STACK.md) for the source-backed frontend, backend, database, ML, hosting, and report tooling inventory,
+including a proposed Chapter 3 paragraph. Versions are configuration or environment evidence, not a live runtime audit.
 """, encoding="utf-8")
     return {"ph": ph, "ledger": ledger, **X}
 
