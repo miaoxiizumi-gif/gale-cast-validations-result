@@ -266,9 +266,10 @@ pressure fall, then date. W1's error relative to the baselines was <b>not</b> us
 <p><b>Why the figures are not on this site:</b> they plot individual PAGASA station-day readings, which PAGASA's data terms (CADS-07 Rev.6,
 condition 4) do not allow online, and no permission was found. The per-station figures and the all-station common window are kept in a
 private thesis-export folder for the printed thesis. Exact dates are withheld here, as for every event date on this site.</p>
-<p><b>What they show</b> (described without readings): the pressure fall on the event day is what triggers the label; W1's score rises
-above 0.601 on those days, while W1's own next-day pressure value does not forecast the fall and its wind values stay in a narrow band.
-The detection comes from the classification head, not from the regression outputs.</p></div>
+<p><b>What they show</b> (described without readings): in every selected window the label is triggered by a same-station pressure fall of
+at least 3 hPa, and the W1+X1 score is above 0.601 on the event day and below it on the neighbouring non-event days. W1's own next-day
+pressure value showed a fall in some windows but not in others, and at Science Garden its wind value was well above the observed wind.
+These examples illustrate behaviour; the overall comparisons (Sections A, B and the regression evidence) are the basis for any claim.</p></div>
 """)
 
     # regression ----------------------------------------------------------------

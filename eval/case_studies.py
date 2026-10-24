@@ -73,7 +73,7 @@ def case_axes(axs: dict, win, show_legend=True):
     hi = float(np.nanmax(win[["obs_wind", "W1_wind", "pers_wind", "clim_wind"]].values))
     ax.set_ylim(max(0, lo - 1), hi + 1.2)
     if show_legend:
-        ax.legend(loc="upper left", ncol=4, fontsize=8)
+        ax.legend(loc="upper left", ncol=2, fontsize=7.5)
 
     ax = axs.get("mslp")
     if ax is None:
@@ -97,7 +97,7 @@ def case_axes(axs: dict, win, show_legend=True):
     ax.bar(x - 0.18, obs_ch, width=0.34, color=S.OBS, label="Observed 24-h change")
     ax.bar(x + 0.18, w1_ch, width=0.34, color=S.W1C, label="W1 forecast MSLP minus last observed")
     ax.axhline(-3, color=S.INK2, lw=1, ls="--")
-    ax.text(-0.55, -3, "−3 hPa: label threshold", va="top", ha="left", fontsize=7.5, color=S.INK2)
+    ax.text(2.58, -3.2, "−3 hPa: label threshold", va="top", ha="right", fontsize=7.5, color=S.INK2)
     ax.axhline(0, color=S.INK2, lw=0.6)
     ax.set_ylabel("24-hour MSLP change, hPa"); ax.set_title("Pressure tendency (the label's trigger)", loc="left")
     lim = np.nanmax(np.abs(np.concatenate([obs_ch, w1_ch, [3.5]])))
@@ -113,8 +113,8 @@ def case_axes(axs: dict, win, show_legend=True):
         part = "pressure fall" if r["L_press"] == 1 else ("wind" if r["L_wind"] == 1 else "no event")
         ax.text(i, min(r["x1"] + 0.09, 1.04), f"{r['x1']:.2f}", ha="center", fontsize=8.5, color=S.INK, fontweight="semibold")
         ax.text(i, -0.30, f"W1: {'warning' if dec else 'no warning'}\nLabel: {part}\n{outcome(r['y'], dec)}\n"
-                f"Persistence: {'warning' if r['E_persist'] == 1 else 'no warning'}",
-                ha="center", va="top", fontsize=7.8, color=S.INK)
+                f"Persistence:\n{'warning' if r['E_persist'] == 1 else 'no warning'}",
+                ha="center", va="top", fontsize=7.5, color=S.INK)
     ax.set_ylim(0, 1.1); ax.set_ylabel("W1+X1 score (not a calibrated probability)")
     ax.set_title("W1+X1 score, decision and study-label outcome", loc="left")
     for k, a in axs.items():
@@ -162,7 +162,7 @@ def main():
                                      "outcomes": [outcome(r.y, r.x1 >= THR) for r in win.itertuples()],
                                      "event_persistence_on_event_day": "warning" if win.iloc[1]["E_persist"] == 1 else "no warning"}
         fig, axs = plt.subplots(2, 2, figsize=(12, 9.6))
-        fig.subplots_adjust(left=0.07, right=0.98, top=0.88, bottom=0.25, hspace=0.62, wspace=0.22)
+        fig.subplots_adjust(left=0.07, right=0.98, top=0.88, bottom=0.27, hspace=0.72, wspace=0.22)
         a = axs.ravel()
         case_axes({"wind": a[0], "mslp": a[1], "tend": a[2], "score": a[3]}, win)
         S.title(fig, f"PF-H. {s}: selected successful case around {top['date']:%d %B %Y}",
@@ -184,8 +184,8 @@ def main():
         summary["common"] = {"selected_event_date": f"{d:%Y-%m-%d}",
                              "window": [f"{t:%Y-%m-%d}" for t in (d - ONE, d, d + ONE)],
                              "sum_P1": int(by_date.iloc[0]["p1"])}
-        fig, axs = plt.subplots(3, 3, figsize=(14, 11.5))
-        fig.subplots_adjust(left=0.06, right=0.985, top=0.9, bottom=0.17, hspace=0.75, wspace=0.25)
+        fig, axs = plt.subplots(3, 3, figsize=(14, 12.5))
+        fig.subplots_adjust(left=0.06, right=0.985, top=0.9, bottom=0.18, hspace=0.92, wspace=0.3)
         for i, s in enumerate(C.PRIMARY):
             win = window(W, s, d)
             row = axs[i]
