@@ -258,6 +258,59 @@ def notes(ctx: dict) -> dict:
         paper="Chapter 4, selected case studies. Caption: 'Figure 4.x. Selected favourable regression window across the three primary stations. " + SELECTED + "'",
         source=f"private: _private/thesis_export/{ctx['run_case2']}/.")
     N.update(panel_notes(ctx))
+    N.update(persistence_notes(ctx))
+    return N
+
+
+PERSIST = PANEL + " Dates selected because persistence's wind and MSLP errors were both larger than W1's."
+
+
+def persistence_notes(ctx: dict) -> dict:
+    """Evidence E (spec/CASE_SELECTION_v4_persistence_override.md): public PF-Q, private PF-R."""
+    D, run = ctx["case4"], ctx["run_case4"]
+    q, a, sh, cp = D["qualifying"], D["all_complete"], D["share"], D["complete"]
+    st = ("NAIA", "Sangley Point", "Science Garden")
+    w = D["windows"]["per_station"]
+    N = {}
+    N["PF-Q_persistence_worse_dates"] = dict(
+        shows="How many station-dates had persistence errors larger than W1's for both wind and MSLP, and the wind and MSLP MAE of W1, "
+              "persistence and climatology on those dates, per station and pooled.",
+        purpose="The panel directed a search for dates on which persistence, the reference that beats W1 on average for wind and MSLP, was "
+                "worse than W1 for both. " + PERSIST,
+        produced="Selection v4 (spec/CASE_SELECTION_v4_persistence_override.md, committed before the search): strict |persistence error| > "
+                 "|W1 error| for wind AND MSLP on the same station-date, complete records only. Saved Evidence A rows; no model run.",
+        read="Left: number (and share) of qualifying dates. Middle and right: shorter bars are better. W1 below persistence is guaranteed by "
+             "the selection; the climatology bars are the only comparison the rule does not fix.",
+        finding=f"{q['pooled']['n']} of {cp['pooled']:,} station-dates qualify ({sh['pooled'] * 100:.1f}%): "
+                + ", ".join(f"{s} {q[s]['n']} ({sh[s] * 100:.1f}%)" for s in st) +
+                f". On them, wind MAE W1 {q['pooled']['wind']['W1']:.2f} vs persistence {q['pooled']['wind']['persistence']:.2f}, climatology "
+                f"{q['pooled']['wind']['climatology']:.2f} m/s; MSLP W1 {q['pooled']['mslp']['W1']:.2f} vs {q['pooled']['mslp']['persistence']:.2f} / "
+                f"{q['pooled']['mslp']['climatology']:.2f} hPa. W1 was also closer than climatology for both variables on "
+                f"{q['pooled']['both_beat_climatology_too']} of them.",
+        supports="Dates exist, about one in thirteen, on which W1 beat persistence for both wind and MSLP; on them it was usually also closer "
+                 "than climatology for MSLP.",
+        limits=f"Selected for W1's success against persistence, so W1 < persistence here proves nothing about general skill. On all dates "
+               f"persistence is better: wind {a['pooled']['wind']['persistence']:.2f} vs W1 {a['pooled']['wind']['W1']:.2f} m/s, MSLP "
+               f"{a['pooled']['mslp']['persistence']:.2f} vs {a['pooled']['mslp']['W1']:.2f} hPa (n = {cp['pooled']:,}). Only "
+               f"{q['pooled']['events']} qualifying dates are study-label events. Science Garden has few qualifying dates.",
+        paper="Chapter 4, same subsection as PF-L (panel request). Caption: 'Figure 4.x. Station-dates on which persistence's next-day wind "
+              "and MSLP errors were both larger than the model's, and errors on those dates. " + PERSIST + "'",
+        source=f"figures/paper/PF-Q_persistence_worse_dates.csv; run {run}; spec/CASE_SELECTION_v4_persistence_override.md.")
+    N["PF-R"] = dict(
+        shows="Per station, three consecutive target dates that all qualify under selection v4: observed and forecast wind and MSLP with "
+              "absolute errors, humidity and rainfall (not used to select), and the W1+X1 score and outcome.",
+        purpose="Concrete dates for the panel where persistence was worse than W1 for wind and MSLP. " + PERSIST,
+        produced="Selection v4 windows: three consecutive qualifying dates, ranked by cells (of 6) where W1 also beat climatology, then the "
+                 "normalised persistence margin, then date; two-date windows only if a station has no three-date window.",
+        read="Shaded = qualifying date; ★ = W1 also closer than climatology. Each date is a separate next-day forecast.",
+        finding="; ".join(f"{s}: " + (f"{v['length']}-date window, W1 also beat climatology on {v['W1_beats_climatology_cells']} of {v['of_cells']} cells"
+                                      if v.get("selected") else "no window (no two consecutive qualifying dates)") for s, v in w.items())
+                + ". No common window qualifies at all three stations.",
+        supports="On these dates W1's wind and MSLP were closer than persistence's, and mostly closer than climatology's.",
+        limits="Chosen for W1's success; Science Garden has no qualifying window; not a performance estimate (see PF-Q, PF-F).",
+        paper="Chapter 4, same subsection (printed thesis only). Caption: 'Figure 4.x. Selected window where persistence was worse than the "
+              "model for wind and MSLP. " + PERSIST + "'",
+        source=f"private: _private/thesis_export/{run}/; public counts: runs/{run}/persistence_v4_results.json.")
     return N
 
 
@@ -289,13 +342,17 @@ def panel_notes(ctx: dict) -> dict:
     N = {}
     N["PF-L_baseline_failure_mae"] = dict(
         shows="For each next-day output (wind, MSLP, humidity, rainfall), the MAE of W1, persistence, climatology and a no-model control "
-              "(average of the two baselines) on all complete dates and on the dates where both baselines failed; pooled over the three primary stations.",
-        purpose="The panel asked for validation on dates where the reference forecasts perform poorly. " + PANEL,
+              "(average of the two baselines) on all complete dates and on the dates where both baselines failed; pooled over the three primary stations. "
+              f"The rainfall panel shows all complete dates only (n = {al('rainfall')['n']:,}), by panel directive; its baseline-failure result is "
+              "printed inside the panel and plotted in PF-M.",
+        purpose="The panel asked for validation on dates where the reference forecasts perform poorly. " + PANEL +
+                " Panel directive (2026-10-25): rainfall shown for all complete dates only; this panel is locked against spec/FROZEN_PF-L_rainfall.json.",
         produced=f"Selection v3 Part 1 (spec/CASE_SELECTION_v3_panel_validation.md, committed before the analysis): {BF_RULE}. W1 is scored on every "
                  "such date, whether it did well or not. Saved Evidence A rows (W1 neural-only output; no model run); raw PAGASA truth.",
         read="Shorter bars are better. Compare the four bars within a group; units differ between panels. The left group is the ordinary "
-             "picture, the right group the baseline-failure dates only.",
-        finding="On baseline-failure dates: " + "; ".join(
+             "picture, the right group the baseline-failure dates only. Rainfall has one group (all complete dates).",
+        finding=f"Rainfall, all complete dates (n = {al('rainfall')['n']:,}): W1 {mae(al('rainfall'), 'W1'):.2f} vs persistence "
+                f"{mae(al('rainfall'), 'persistence'):.2f}, climatology {mae(al('rainfall'), 'climatology'):.2f} mm. On baseline-failure dates: " + "; ".join(
             f"{VNAME[v][0]} n = {bf(v)['n']}, W1 {mae(bf(v), 'W1'):.2f} vs persistence {mae(bf(v), 'persistence'):.2f}, climatology "
             f"{mae(bf(v), 'climatology'):.2f}, control {mae(bf(v), 'control'):.2f} {VNAME[v][1]}" for v in P) +
             ". On all dates W1's MAE is larger than persistence's for wind, MSLP and humidity and smaller for rainfall.",

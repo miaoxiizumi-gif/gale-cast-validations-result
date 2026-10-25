@@ -177,13 +177,26 @@ MCOL = {"W1": S.W1C, "persistence": S.PERC, "climatology": S.CLIMC, "control": "
 MNAME = {"W1": "W1", "persistence": "Persistence", "climatology": "Climatology", "control": "Control: mean of the two baselines"}
 
 
+# Panel directive (2026-10-25): PF-L's rainfall panel shows 'All complete dates' only. Locked: build_site.py checks the plotted values
+# against spec/FROZEN_PF-L_rainfall.json. The baseline-failure rainfall result is still computed and reported (PF-M, CSV, notes).
+PFL_GROUPS = {"wind": ("all_complete", "baseline_failure"), "mslp": ("all_complete", "baseline_failure"),
+              "humidity": ("all_complete", "baseline_failure"), "rainfall": ("all_complete",)}
+GROUP_LABEL = {"all_complete": "All complete\ndates", "baseline_failure": "Baseline-failure\ndates"}
+
+
 def fig_L(P1: dict, T: dict, out, run) -> list[str]:
     fig, axs = plt.subplots(1, 4, figsize=(15, 6.2))
     fig.subplots_adjust(left=0.05, right=0.99, top=0.84, bottom=0.25, wspace=0.32)
     for ax, (v, (_, unit)) in zip(axs, VARS.items()):
         r = P1[v]["pooled"]
-        groups = [("All complete\ndates", r["all_complete"]), ("Baseline-failure\ndates", r["baseline_failure"])]
-        x = np.arange(2)
+        groups = [(GROUP_LABEL[g], r[g]) for g in PFL_GROUPS[v]]
+        x = np.arange(len(groups))
+        if len(groups) == 1:
+            ax.set_xlim(-0.75, 0.75)
+            b = r["baseline_failure"]
+            ax.text(0.02, 0.97, f"Shown: all complete dates only\n(panel directive). Baseline-failure\nrainfall dates (n = {b['n']}): W1 "
+                    f"{b['point']['W1']['mae']:.1f} vs\npersistence {b['point']['persistence']['mae']:.1f}, climatology "
+                    f"{b['point']['climatology']['mae']:.1f} mm\n(see PF-M).", transform=ax.transAxes, ha="left", va="top", fontsize=6.8, color=S.INK2)
         for k, m in enumerate(METHODS):
             vals = [g["point"][m]["mae"] if g["n"] else np.nan for _, g in groups]
             xs = x + (k - 1.5) * 0.2
@@ -193,7 +206,7 @@ def fig_L(P1: dict, T: dict, out, run) -> list[str]:
                 ax.text(xi, val, f"{val:.2f}" if val < 10 else f"{val:.1f}", ha="center", va="bottom", fontsize=6.6, rotation=90)
         ax.set_xticks(x, [f"{lab}\n(n = {g['n']:,})" for lab, g in groups], fontsize=8)
         ax.set_ylabel(f"MAE, {unit}")
-        ax.set_ylim(0, ax.get_ylim()[1] * 1.28)
+        ax.set_ylim(0, ax.get_ylim()[1] * (1.28 if len(groups) > 1 else 2.1))
         ax.set_title(v.replace("mslp", "MSLP").capitalize() if v != "mslp" else "MSLP", loc="left")
     axs[0].legend(loc="upper left", fontsize=7.2, ncol=1)
     S.title(fig, "PF-L. Next-day error on dates where both baselines failed, compared with all dates (pooled, three primary stations)",
@@ -201,7 +214,8 @@ def fig_L(P1: dict, T: dict, out, run) -> list[str]:
     S.footer(fig, ["Baseline-failure date (per station and variable): |persistence error| ≥ the station's 2015-2020 90th percentile of day-to-day change AND "
                    "|climatology error| ≥ the 90th percentile of deviation from the station × month mean. Persistence = issue-day observation; climatology = "
                    "station × month mean 2015-01-01 to 2020-10-14; control = their average (no model). W1 = saved neural-only next-day output (website scorecard cohort, "
-                   f"target dates 2021-11-16 to 2024-12-30). Truth: raw PAGASA observations. Lower is better. Spec: spec/CASE_SELECTION_v3_panel_validation.md. Run {run.name}."],
+                   f"target dates 2021-11-16 to 2024-12-30). Truth: raw PAGASA observations. Lower is better. Rainfall panel: all complete dates only, by panel "
+                   f"directive (locked; spec/FROZEN_PF-L_rainfall.json). Spec: spec/CASE_SELECTION_v3_panel_validation.md. Run {run.name}."],
              width=200)
     return S.save(fig, out, "PF-L_baseline_failure_mae")
 
@@ -446,7 +460,7 @@ def main():
             for grp in ("all_complete", "baseline_failure", "non_failure"):
                 r = P1[v][s][grp]
                 if r["n"]:
-                    rows.append({"variable": v, "scope": s, "group": grp, "n": r["n"], **{f"mae_{m}": r["point"][m]["mae"] for m in METHODS},
+                    rows.append({"variable": v, "scope": s, "group": grp, "shown_in_PF-L": s == "pooled" and grp in PFL_GROUPS[v], "n": r["n"], **{f"mae_{m}": r["point"][m]["mae"] for m in METHODS},
                                  **{f"rmse_{m}": r["point"][m]["rmse"] for m in METHODS}, "w1_beats_both_share": r["w1_beats_both_share"]})
     pd.DataFrame(rows).to_csv(figdir / "PF-L_baseline_failure_mae.csv", index=False)
     pd.DataFrame([{"variable": v, "scope": s, "n": P1[v][s]["baseline_failure"]["n"], "comparison": b,

@@ -108,12 +108,14 @@ def main():
     X = build_docs.main()  # writes documentation/*.md and README.md from the same runs
     PH, LED, WA, RPv, CASE = X["ph"], X["ledger"], X["A"], X["RP"], X["case"]
     (DOCS / "figures" / "paper").mkdir()
-    for p in [*(X["runs"]["pf"] / "figures").glob("PF-*"), *(X["runs"]["case3"] / "figures").glob("PF-*")]:
+    for p in [*(X["runs"]["pf"] / "figures").glob("PF-*"), *(X["runs"]["case3"] / "figures").glob("PF-*"),
+              *(X["runs"]["case4"] / "figures").glob("PF-*")]:
         shutil.copy(p, DOCS / "figures" / "paper" / p.name)
     (DOCS / "data" / "documentation").mkdir(exist_ok=True)
     for p in (C.WORKSPACE / "documentation").glob("*"):
         shutil.copy(p, DOCS / "data" / "documentation" / p.name)
-    for p in ("AMENDMENT_A2_website_cohort.md", "CASE_SELECTION_v1.md", "CASE_SELECTION_v2_regression.md", "CASE_SELECTION_v3_panel_validation.md"):
+    for p in ("AMENDMENT_A2_website_cohort.md", "CASE_SELECTION_v1.md", "CASE_SELECTION_v2_regression.md", "CASE_SELECTION_v3_panel_validation.md",
+              "CASE_SELECTION_v4_persistence_override.md", "FROZEN_PF-L_rainfall.json"):
         shutil.copy(C.WORKSPACE / "spec" / p, DOCS / "data" / p)
     shutil.copy(runs["b"] / "wind_monthly_means_by_station.csv", DOCS / "data")
     shutil.copy(runs["b"] / "event_outcomes_monthly_by_station.csv", DOCS / "data")
@@ -349,6 +351,36 @@ closer than both. Every variable is shown in the private figures, including wher
 <p>Common window (all three stations): {p2['common']['success_cells_of_36'] if p2.get('common') else 0} W1 successes among
 {p2['common']['baseline_failure_cells_of_36'] if p2.get('common') else 0} baseline-failure cells of 36.</p>
 {privnote("PF-O")}{privnote("PF-P")}
+<h3>Panel directive on PF-L (2026-10-25)</h3>
+<p>PF-L's rainfall panel shows <b>all complete dates only</b> (n = {PH['v4_rain_all_n']}; MAE W1 {PH['v4_rain_all_w1']}, persistence
+{PH['v4_rain_all_pe']}, climatology {PH['v4_rain_all_cl']} mm). It is locked: the site build fails if the plotted values differ from
+<a href="data/FROZEN_PF-L_rainfall.json">FROZEN_PF-L_rainfall.json</a>. The baseline-failure rainfall result is still reported inside the
+panel, in PF-M and in the table above. The humidity panel keeps its baseline-failure values under their correct label and sample size
+(n = {PH['v3_humidity_n']}).</p>
+</div>
+""")
+
+    # panel directive: persistence worse than W1 for wind and MSLP (Evidence E) ---------
+    D4 = X["case4"]
+    q4 = D4["qualifying"]
+    w4rows = [[s_, f"{q4[s_]['n']} of {D4['complete'][s_]:,} ({D4['share'][s_] * 100:.1f}%)",
+               f"{q4[s_]['wind']['W1']:.2f} / {q4[s_]['wind']['persistence']:.2f} / {q4[s_]['wind']['climatology']:.2f}",
+               f"{q4[s_]['mslp']['W1']:.2f} / {q4[s_]['mslp']['persistence']:.2f} / {q4[s_]['mslp']['climatology']:.2f}",
+               q4[s_]["both_beat_climatology_too"],
+               (lambda w: "—" if s_ == "pooled" else (f"{w['length']} dates; W1 also beat climatology on {w['W1_beats_climatology_cells']} of {w['of_cells']}"
+                                                     if w.get("selected") else "none (no two consecutive qualifying dates)"))(D4["windows"]["per_station"].get(s_, {}))]
+              for s_ in ["pooled", *C.PRIMARY]]
+    sec("persist", "E. Dates where persistence was worse than W1 for wind and MSLP (panel directive)", f"""
+<div class="selected"><p class="selbanner"><span class="tag sel">Evidence E</span> <b>{e(FN.PERSIST)}</b></p>
+<p>The panel noted that persistence is the reference that beats W1 on average for wind and MSLP, and directed a search for dates on which
+persistence's error was larger than W1's for <b>both</b> variables (climatology not part of the filter). Rule committed before the search:
+<a href="data/CASE_SELECTION_v4_persistence_override.md">CASE_SELECTION_v4_persistence_override.md</a>. <b>W1 beats persistence on these
+dates by construction</b>; the table shows how often such dates occur and how climatology, which the rule does not fix, compares.</p>
+{table(["Scope", "Qualifying station-dates", "Wind MAE W1 / persistence / climatology (m/s)", "MSLP MAE W1 / persistence / climatology (hPa)", "Also beat climatology for both", "Window (private)"], w4rows)}
+<p>On all {PH['v4_total']} dates persistence remains more accurate: wind {PH['v4_wind_pe_all']} vs W1 {PH['v4_wind_w1_all']} m/s; MSLP
+{PH['v4_mslp_pe_all']} vs {PH['v4_mslp_w1_all']} hPa. No common window qualifies at all three stations. Exact dates are private (PAGASA terms).</p>
+{fig("PF-Q_persistence_worse_dates", "Bars: qualifying dates per station and wind and MSLP MAE on them", "<b>PF-Q.</b> How many dates had persistence worse than W1 for both wind and MSLP, and errors on them.")}
+{privnote("PF-R")}
 </div>
 """)
 
@@ -654,16 +686,18 @@ index within that chapter's PDF. Only short excerpts are quoted. Download: <a hr
 <p>Verdicts: Correct, Partly correct, Wrong, Not found in the code. Literature claims in Chapter 2 were not checked.
 Download: <a href="data/revision_ledger.csv">CSV</a>, <a href="data/revisions.json">JSON</a>.</p>{''.join(lh)}<h3>Important omissions</h3><ul>{om}</ul></details>""")
 
-    figs = sorted([*(X["runs"]["pf"] / "figures").glob("PF-*.png"), *(X["runs"]["case3"] / "figures").glob("PF-*.png")], key=lambda p: p.name)
+    figs = sorted([*(X["runs"]["pf"] / "figures").glob("PF-*.png"), *(X["runs"]["case3"] / "figures").glob("PF-*.png"),
+                   *(X["runs"]["case4"] / "figures").glob("PF-*.png")], key=lambda p: p.name)
     frows = [[e(p.stem), f'<a href="figures/paper/{p.name}">PNG</a> · <a href="figures/paper/{p.stem}.svg">SVG</a> · <a href="figures/paper/{p.stem}.csv">CSV</a>',
               next((g["evidence_group"] for g in X["pf"]["figures"] if g["figure"] == p.stem),
-                   "D: baseline-failure validation (panel request; not representative of all dates)")] for p in figs]
+                   "E: persistence-worse dates (panel directive; favourable selection)" if p.stem.startswith("PF-Q")
+                   else "D: baseline-failure validation (panel request; not representative of all dates)")] for p in figs]
     sec("figures", "Figures for the paper (downloads)", f"""
 <p>Individually downloadable figures, PNG at 300 DPI and SVG, with the CSV of the plotted numbers. Each figure states its model and processing,
 variable and units, stations, dates, sample size, forecast lead, baselines and evidence group. Captions, cohorts and source runs:
 <a href="data/documentation/FIGURE_GUIDE.md">FIGURE_GUIDE.md</a>. Figure run <code>{PH['run_pf']}</code>.</p>
 {table(["Figure", "Download", "Evidence group"], frows)}
-<p class="small">Selected case figures (PF-H to PF-K, PF-O, PF-P) are private: they plot individual PAGASA readings. They are not available here.</p>
+<p class="small">Selected case figures (PF-H to PF-K, PF-O, PF-P, PF-R) are private: they plot individual PAGASA readings. They are not available here.</p>
 """)
 
     sec("method", 'What "validation" means in this paper', f"""
@@ -736,7 +770,7 @@ No row-level observations or individual predictions are published.</p>
     sec("tech-stack", "Verified implementation technology stack", tech_stack.section_html())
     tech_stack.write_documents(C.WORKSPACE)
 
-    ORDER = ["overview", "identity", "scorecard", "design", "results", "regression", "cases", "panel", "method", "data", "validation",
+    ORDER = ["overview", "identity", "scorecard", "design", "results", "regression", "cases", "panel", "persist", "method", "data", "validation",
              "selection", "figures", "ledger", "tech-stack", "paragraphs", "defense", "limits", "claims", "credits", "repro"]
     assert sorted(ORDER) == sorted(SECS), set(ORDER) ^ set(SECS)
     for n, id_ in enumerate(ORDER):
@@ -788,11 +822,20 @@ No row-level observations or individual predictions are published.</p>
     # publication safety scan
     private_dates = set()
     for run_key, fname in (("case", "PRIVATE_selection_summary.json"), ("case2", "PRIVATE_selection_summary_v2.json"),
-                           ("case3", "PRIVATE_selection_summary_v3.json")):
+                           ("case3", "PRIVATE_selection_summary_v3.json"), ("case4", "PRIVATE_selection_summary_v4.json")):
         ps = J(C.private_dir(X["runs"][run_key]) / fname)
         for w in [*ps.get("per_station", {}).values(), ps.get("common") or {}]:
             private_dates.update(w.get("window", []))
     assert private_dates, "no private case dates loaded for the scan"
+
+    # panel directive: PF-L's rainfall panel is locked to its frozen 'All complete dates' values
+    frozen = J(C.WORKSPACE / "spec" / "FROZEN_PF-L_rainfall.json")
+    rf = X["case3"]["part1_A_q90"]["rainfall"]["pooled"]["all_complete"]
+    assert rf["n"] == frozen["n"] and all(abs(rf["point"][m]["mae"] - frozen["mae"][m]) < 1e-9 for m in frozen["mae"]), \
+        "PF-L rainfall panel differs from spec/FROZEN_PF-L_rainfall.json"
+    shown = pd.read_csv(DOCS / "figures" / "paper" / "PF-L_baseline_failure_mae.csv")
+    shown = shown[(shown["variable"] == "rainfall") & shown["shown_in_PF-L"]]
+    assert list(shown["group"]) == ["all_complete"], "PF-L rainfall panel must show 'all_complete' only"
     bad = []
     for p in DOCS.rglob("*"):
         if p.is_file() and p.suffix in (".html", ".md", ".json", ".csv", ".css"):
