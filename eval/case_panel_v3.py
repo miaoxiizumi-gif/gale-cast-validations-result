@@ -250,8 +250,8 @@ def fig_N(OA: dict, OB: dict, out, run) -> list[str]:
             for xi, val in zip(xs, vals):
                 ax.text(xi, val, str(val), ha="center", va="bottom", fontsize=7.5)
         ax.plot(x, [O[s]["onsets"] for s in SCOPES], ls="none", marker="_", ms=26, mew=1.6, color=S.INK, label="Event onsets (all)")
-        ax.set_xticks(x, [f"{s}\n{O[s]['onsets']} onsets; W1+X1 false\nalarms {O[s]['false_alarms_on_non_events']['W1+X1@0.601']}\n"
-                          f"climatology false alarms {O[s]['false_alarms_on_non_events']['event_climatology']}" for s in SCOPES], fontsize=7.4)
+        ax.set_xticks(x, [f"{s}\n{O[s]['onsets']} onsets\nfalse alarms:\nW1+X1 {O[s]['false_alarms_on_non_events']['W1+X1@0.601']}, "
+                          f"clim. {O[s]['false_alarms_on_non_events']['event_climatology']}" for s in SCOPES], fontsize=7.4)
         ax.set_ylabel("Onsets warned (hits)")
         ax.set_ylim(0, max(O["pooled"]["onsets"], 1) * 1.25)
         ax.set_title(lab, loc="left")
