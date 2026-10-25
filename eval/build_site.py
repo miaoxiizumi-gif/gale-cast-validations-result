@@ -108,12 +108,12 @@ def main():
     X = build_docs.main()  # writes documentation/*.md and README.md from the same runs
     PH, LED, WA, RPv, CASE = X["ph"], X["ledger"], X["A"], X["RP"], X["case"]
     (DOCS / "figures" / "paper").mkdir()
-    for p in (X["runs"]["pf"] / "figures").glob("PF-*"):
+    for p in [*(X["runs"]["pf"] / "figures").glob("PF-*"), *(X["runs"]["case3"] / "figures").glob("PF-*")]:
         shutil.copy(p, DOCS / "figures" / "paper" / p.name)
     (DOCS / "data" / "documentation").mkdir(exist_ok=True)
     for p in (C.WORKSPACE / "documentation").glob("*"):
         shutil.copy(p, DOCS / "data" / "documentation" / p.name)
-    for p in ("AMENDMENT_A2_website_cohort.md", "CASE_SELECTION_v1.md", "CASE_SELECTION_v2_regression.md"):
+    for p in ("AMENDMENT_A2_website_cohort.md", "CASE_SELECTION_v1.md", "CASE_SELECTION_v2_regression.md", "CASE_SELECTION_v3_panel_validation.md"):
         shutil.copy(C.WORKSPACE / "spec" / p, DOCS / "data" / p)
     shutil.copy(runs["b"] / "wind_monthly_means_by_station.csv", DOCS / "data")
     shutil.copy(runs["b"] / "event_outcomes_monthly_by_station.csv", DOCS / "data")
@@ -212,7 +212,8 @@ scores are not calibrated probabilities, the period was used to choose the scori
 are less accurate than persistence. The website's regression numbers come from post-processing fitted on the evaluation period, not from W1 alone.</p>
 <div class="groups"><div><span class="tag new">A</span> <b>Website historical scorecard</b>: overall evidence on the website's own cases.</div>
 <div><span class="tag hist">B</span> <b>Training-consistent benchmark</b>: overall evidence, declared before scoring (the two B sections).</div>
-<div><span class="tag sel">C</span> <b>Selected case studies</b>: chosen retrospectively to explain behaviour; not representative.</div></div>
+<div><span class="tag sel">C</span> <b>Selected case studies</b>: chosen retrospectively to explain behaviour; not representative.</div>
+<div><span class="tag sel">D</span> <b>Baseline-failure validation</b> (panel request): every date where persistence and climatology both failed, then selected examples; not representative of all dates.</div></div>
 <p class="note">Evaluation <code>{EVAL_ID}</code> with amendment A2. Specification committed before scoring: <code>{e(spec_commit)}</code>.
 Status: <b>provisional</b>; chapter corrections are proposals, not applied edits.</p>
 <p class="legend"><span class="tag repo">repository fact</span> <span class="tag hist">historical claim with saved record</span>
@@ -295,6 +296,59 @@ wind error was smaller than both baselines. <b>This is a favourable-error select
 {table(["Station", "Higher-wind windows", "…with a detected event and ≥1 W1 wind win", "Selected", "Days W1 closest (of 3) by variable", "W1+X1 outcomes"], crow2)}
 <p>Common window: W1's wind was closest on {C2['common']['station_dates_with_wind_win_of_9'] if C2.get('common') else 0} of 9 station-days.</p>
 {privnote("PF-J")}{privnote("PF-K")}
+</div>
+""")
+
+    # panel request: baseline-failure validation (Evidence D) ----------------------
+    D3 = X["case3"]
+    P3 = D3["part1_A_q90"]
+    unit = {"wind": "m/s", "mslp": "hPa", "humidity": "%", "rainfall": "mm"}
+    vrd = lambda r, b: e(r["ci"][f"dmae_W1_{b}"]["verdict"].replace("established: negative", "W1 smaller (established)")
+                         .replace("established: positive", "W1 larger (established)"))
+    d3rows = [[("MSLP" if v == "mslp" else v.capitalize()) + f" ({unit[v]})", P3[v]["pooled"]["baseline_failure"]["n"],
+               " / ".join(f"{P3[v]['pooled']['baseline_failure']['point'][m]['mae']:.2f}" for m in ("W1", "persistence", "climatology", "control")),
+               vrd(P3[v]["pooled"]["baseline_failure"], "persistence"), vrd(P3[v]["pooled"]["baseline_failure"], "climatology"),
+               vrd(P3[v]["pooled"]["baseline_failure"], "control")] for v in P3]
+    O3 = D3["onsets"]
+    orows = [[ev, O3[ev]["pooled"]["onsets"], O3[ev]["pooled"]["onset_hits"]["W1+X1@0.601"], O3[ev]["pooled"]["onset_hits"]["event_persistence"],
+              O3[ev]["pooled"]["onset_hits"]["event_climatology"],
+              f"{O3[ev]['pooled']['false_alarms_on_non_events']['W1+X1@0.601']} / {O3[ev]['pooled']['false_alarms_on_non_events']['event_climatology']}"]
+             for ev in ("A", "B")]
+    p2 = D3["part2"]
+    prow = [[s_, v.get("windows_with_success_cell", 0), f"{v.get('success_cells_of_12', 0)} of {v.get('baseline_failure_cells_of_12', 0)}",
+             " · ".join(f"{k} {t['w1_success']}/{t['baseline_failure_dates']}" for k, t in v.get("by_variable", {}).items()),
+             ", ".join(v.get("outcomes", []))] for s_, v in p2["per_station"].items()]
+    thr = D3["thresholds_training_2015_2020"]["0.9"]
+    sec("panel", "D. Validation on dates where persistence and climatology failed (panel request)", f"""
+<div class="selected"><p class="selbanner"><span class="tag sel">Evidence D</span> <b>{e(FN.PANEL)}</b></p>
+<p>The panel asked us to identify historical station dates on which the simple reference forecasts perform poorly, and to show how W1 does
+there. The rule was committed before the analysis (<a href="data/CASE_SELECTION_v3_panel_validation.md">CASE_SELECTION_v3_panel_validation.md</a>)
+and <b>does not use W1</b>: a station-date is a <i>baseline-failure date</i> for a variable when the persistence error is at least the station's
+2015-2020 90th percentile of day-to-day change <b>and</b> the climatology error is at least the 90th percentile of deviation from the
+station's month mean (for example wind at NAIA: {thr['NAIA']['wind']['T_pers']:.0f} m/s and {thr['NAIA']['wind']['T_clim']:.2f} m/s; MSLP:
+{thr['NAIA']['mslp']['T_pers']:.1f} hPa and {thr['NAIA']['mslp']['T_clim']:.1f} hPa). W1 is scored on <b>every</b> such date, and only then are
+example windows picked. A no-model <b>control</b> (the average of the two baselines) shows how much of any advantage a simple hedge also gets,
+because choosing dates by baseline error favours any forecast that does not copy a baseline.</p>
+<h3>Part 1: every baseline-failure date (pooled; 95% block-bootstrap verdicts)</h3>
+{table(["Variable", "Dates", "MAE W1 / persistence / climatology / control", "W1 vs persistence", "W1 vs climatology", "W1 vs control"], d3rows)}
+<h3>Event onsets: the change persistence cannot foresee</h3>
+{table(["Evidence", "Onsets", "W1+X1 warned", "Event persistence warned", "Event climatology warned", "False alarms W1+X1 / climatology (all non-event days)"], orows)}
+<p><b>What this shows.</b> Where the references fail, W1's clear advantage is <b>warning of pressure-fall onsets</b>, which persistence cannot
+do by construction. For numerical forecasts the picture is mixed: W1's humidity error is smaller than both baselines (helped by its tendency to
+forecast high humidity on dates that are mostly humidity rises); its pressure error is smaller than climatology's but not persistence's; its wind
+error (except at Science Garden, again a level effect) and rainfall error are not smaller. These dates do not change the overall comparison
+in the regression section.</p>
+{fig("PF-L_baseline_failure_mae", "Four panels of MAE bars for W1, persistence, climatology and control on all dates and on baseline-failure dates", "<b>PF-L.</b> MAE on all dates versus dates where both baselines failed.")}
+{fig("PF-M_baseline_failure_differences", "Interval plot of W1 minus baseline MAE per station and variable", "<b>PF-M.</b> Which differences on baseline-failure dates are established.")}
+{fig("PF-N_event_onsets", "Bars of onsets warned by W1+X1, persistence and climatology, by station, on two cohorts", "<b>PF-N.</b> Warnings of event onsets.")}
+<h3>Part 2: selected example windows (favourable by design; private figures)</h3>
+<p>From Part 1's dates, the three-day window per station with the most (variable, date) cells where both baselines failed and W1 was strictly
+closer than both. Every variable is shown in the private figures, including where W1 was worse. Exact dates and readings are withheld here
+(PAGASA CADS-07 Rev.6, condition 4).</p>
+{table(["Station", "Windows with ≥1 W1 success", "Selected: W1 successes of baseline-failure cells", "By variable (W1 successes / failure dates)", "W1+X1 outcomes"], prow)}
+<p>Common window (all three stations): {p2['common']['success_cells_of_36'] if p2.get('common') else 0} W1 successes among
+{p2['common']['baseline_failure_cells_of_36'] if p2.get('common') else 0} baseline-failure cells of 36.</p>
+{privnote("PF-O")}{privnote("PF-P")}
 </div>
 """)
 
@@ -600,15 +654,16 @@ index within that chapter's PDF. Only short excerpts are quoted. Download: <a hr
 <p>Verdicts: Correct, Partly correct, Wrong, Not found in the code. Literature claims in Chapter 2 were not checked.
 Download: <a href="data/revision_ledger.csv">CSV</a>, <a href="data/revisions.json">JSON</a>.</p>{''.join(lh)}<h3>Important omissions</h3><ul>{om}</ul></details>""")
 
-    figs = sorted((X["runs"]["pf"] / "figures").glob("PF-*.png"))
+    figs = sorted([*(X["runs"]["pf"] / "figures").glob("PF-*.png"), *(X["runs"]["case3"] / "figures").glob("PF-*.png")], key=lambda p: p.name)
     frows = [[e(p.stem), f'<a href="figures/paper/{p.name}">PNG</a> · <a href="figures/paper/{p.stem}.svg">SVG</a> · <a href="figures/paper/{p.stem}.csv">CSV</a>',
-              next((g["evidence_group"] for g in X["pf"]["figures"] if g["figure"] == p.stem), "")] for p in figs]
+              next((g["evidence_group"] for g in X["pf"]["figures"] if g["figure"] == p.stem),
+                   "D: baseline-failure validation (panel request; not representative of all dates)")] for p in figs]
     sec("figures", "Figures for the paper (downloads)", f"""
 <p>Individually downloadable figures, PNG at 300 DPI and SVG, with the CSV of the plotted numbers. Each figure states its model and processing,
 variable and units, stations, dates, sample size, forecast lead, baselines and evidence group. Captions, cohorts and source runs:
 <a href="data/documentation/FIGURE_GUIDE.md">FIGURE_GUIDE.md</a>. Figure run <code>{PH['run_pf']}</code>.</p>
 {table(["Figure", "Download", "Evidence group"], frows)}
-<p class="small">Selected case figures (PF-H per station, PF-I all stations) are private: they plot individual PAGASA readings. They are not available here.</p>
+<p class="small">Selected case figures (PF-H to PF-K, PF-O, PF-P) are private: they plot individual PAGASA readings. They are not available here.</p>
 """)
 
     sec("method", 'What "validation" means in this paper', f"""
@@ -681,7 +736,7 @@ No row-level observations or individual predictions are published.</p>
     sec("tech-stack", "Verified implementation technology stack", tech_stack.section_html())
     tech_stack.write_documents(C.WORKSPACE)
 
-    ORDER = ["overview", "identity", "scorecard", "design", "results", "regression", "cases", "method", "data", "validation",
+    ORDER = ["overview", "identity", "scorecard", "design", "results", "regression", "cases", "panel", "method", "data", "validation",
              "selection", "figures", "ledger", "tech-stack", "paragraphs", "defense", "limits", "claims", "credits", "repro"]
     assert sorted(ORDER) == sorted(SECS), set(ORDER) ^ set(SECS)
     for n, id_ in enumerate(ORDER):
@@ -706,7 +761,9 @@ No row-level observations or individual predictions are published.</p>
     md = [f"# GALE-CAST W1 evaluation `{EVAL_ID}` + amendment A2 (provisional)\n", f"Site: {SITE_URL}\n",
           "Method: retrospective forecast verification with persistence and climatology benchmarking (not cross-validation). "
           "Evidence groups: A = website historical scorecard (3,423 cases); B = training-consistent benchmark; C = retrospectively "
-          "selected illustrative case studies (private figures). Documents: documentation/*.md in the repository.\n",
+          "selected illustrative case studies (private figures); D = baseline-failure validation requested by the panel "
+          "(every date where persistence and climatology both failed, then selected examples; not representative of all dates). "
+          "Documents: documentation/*.md in the repository.\n",
           "## Evidence A: website scorecard with same-case baselines\n",
           "| Procedure | TP | FN | FP | TN | Precision | Recall | F1 |", "|---|---|---|---|---|---|---|---|"]
     md += [f"| {k} | {int(c['tp'])} | {int(c['fn'])} | {int(c['fp'])} | {int(c['tn'])} | {f(c['precision'])} | {f(c['recall'])} | {f(c['f1'])} |"
@@ -729,6 +786,13 @@ No row-level observations or individual predictions are published.</p>
     (DOCS / "data" / "REPORT.md").write_text("\n".join(md), encoding="utf-8")
 
     # publication safety scan
+    private_dates = set()
+    for run_key, fname in (("case", "PRIVATE_selection_summary.json"), ("case2", "PRIVATE_selection_summary_v2.json"),
+                           ("case3", "PRIVATE_selection_summary_v3.json")):
+        ps = J(C.private_dir(X["runs"][run_key]) / fname)
+        for w in [*ps.get("per_station", {}).values(), ps.get("common") or {}]:
+            private_dates.update(w.get("window", []))
+    assert private_dates, "no private case dates loaded for the scan"
     bad = []
     for p in DOCS.rglob("*"):
         if p.is_file() and p.suffix in (".html", ".md", ".json", ".csv", ".css"):
@@ -738,6 +802,9 @@ No row-level observations or individual predictions are published.</p>
                         r"-----BEGIN [A-Z ]*PRIVATE KEY-----"):
                 if re.search(pat, t):
                     bad.append((p.name, pat))
+            for d in private_dates:  # selected case dates stay private (PAGASA terms)
+                if d in t:
+                    bad.append((p.name, "private case date"))
     assert not bad, f"publication scan failed: {bad}"
     print("site built:", DOCS, "| sections:", len(nav), "| revisions:", len(rev_j))
 

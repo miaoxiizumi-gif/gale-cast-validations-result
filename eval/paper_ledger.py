@@ -173,6 +173,16 @@ LEDGER = [
   "the database was moved to a hosted PostgreSQL service (Supabase, according to the project team; the hosting provider is not recorded in the reviewed source files)",
   "Supabase appears only in the chapter and in code comments; the connection string is a deployment secret, so the provider could not be verified from the repository.",
   "docs/handoff/DEPLOYMENT_AND_GITHUB.md (database row: 'Not verified'); app.py:477.", "tech-stack"),
+ ("P-39", 4, "Model Evaluation (regression results; insertion)",
+  "which forecasts each day using the value observed on the same calendar day one year earlier",
+  "(Keep the sentence; this entry adds a subsection after its paragraph.) New subsection 'Validation on dates where the reference forecasts failed (panel request)': As requested by the panel, the model was also examined on the historical dates where both simple references failed: a station-date counts when the persistence error and the climatology error are both at least the station's 2015-2020 90th percentile (the model was not used to choose the dates, and it was scored on every such date). On these dates the model's next-day humidity error was smaller than both references (MAE {v3_humidity_w1}% vs persistence {v3_humidity_pe}% and climatology {v3_humidity_cl}%, n = {v3_humidity_n}) and its pressure error was smaller than climatology's ({v3_mslp_w1} vs {v3_mslp_cl} hPa) but not persistence's ({v3_mslp_pe} hPa); its wind ({v3_wind_w1} vs {v3_wind_pe} m/s) and rainfall ({v3_rainfall_w1} vs {v3_rainfall_pe} mm) errors were not smaller. Of {v3_on_A} event onsets (no event the day before), the model warned of {v3_on_A_x1}, whereas persistence and climatology warned of none. These dates were selected to demonstrate baseline limitations as requested by the thesis panel and are not representative of all historical dates; the humidity advantage partly reflects the model's tendency to forecast high humidity.",
+  "The panel asked for validation on dates where the reference forecasts perform poorly; the result must be reported for every such date, with its selection rule.",
+  "spec/CASE_SELECTION_v3_panel_validation.md; run {run_case3} (PF-L, PF-M, PF-N).", "panel-validation"),
+ ("P-40", 5, "Recommendations",
+  "the researchers' recommendation is to significantly refine the model's data ingestion and temporal resolution capabilities",
+  "the researchers' recommendation is to significantly refine the model's data ingestion and temporal resolution capabilities, and to repeat the baseline-failure validation (dates on which persistence and climatology both fail) prospectively on observations from 2025 onward, where the model's numerical forecasts, not only its pressure-fall warnings, would need to beat the references",
+  "Evidence D shows an advantage mainly in onset warnings; a prospective repeat is the only clean test.",
+  "spec/CASE_SELECTION_v3_panel_validation.md; run {run_case3}.", "panel-validation"),
 ]
 
 

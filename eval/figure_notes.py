@@ -257,6 +257,121 @@ def notes(ctx: dict) -> dict:
         limits="At Science Garden W1's wind was the worst forecast on every date of this window; selected for favourable error.",
         paper="Chapter 4, selected case studies. Caption: 'Figure 4.x. Selected favourable regression window across the three primary stations. " + SELECTED + "'",
         source=f"private: _private/thesis_export/{ctx['run_case2']}/.")
+    N.update(panel_notes(ctx))
+    return N
+
+
+PANEL = ("Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; "
+         "not representative of all historical dates.")
+VNAME = {"wind": ("wind", "m/s"), "mslp": ("MSLP", "hPa"), "humidity": ("humidity", "%"), "rainfall": ("rainfall", "mm")}
+BF_RULE = ("baseline-failure date = |persistence error| ≥ the station's 2015-2020 90th percentile of day-to-day change AND |climatology error| ≥ "
+           "the station's 2015-2020 90th percentile of deviation from its month mean (W1 not used)")
+
+
+def panel_notes(ctx: dict) -> dict:
+    """Evidence D (spec/CASE_SELECTION_v3_panel_validation.md): public PF-L, PF-M, PF-N and private PF-O, PF-P."""
+    D, run = ctx["case3"], ctx["run_case3"]
+    P = D["part1_A_q90"]
+    bf = lambda v, s="pooled": P[v][s]["baseline_failure"]
+    al = lambda v, s="pooled": P[v][s]["all_complete"]
+    mae = lambda r, m: r["point"][m]["mae"]
+    verdict = lambda r, b: r["ci"][f"dmae_W1_{b}"]["verdict"].replace("established: negative", "W1 smaller (established)").replace(
+        "established: positive", "W1 larger (established)")
+    OA, OB = D["onsets"]["A"]["pooled"], D["onsets"]["B"]["pooled"]
+    wins = [f"{VNAME[v][0]} at {s}" for v in P for s in ("NAIA", "Sangley Point", "Science Garden")
+            if bf(v, s)["n"] and all(bf(v, s)["ci"][f"dmae_W1_{b}"]["verdict"] == "established: negative" for b in ("persistence", "climatology"))]
+    hum_bias = al("humidity")["point"]["W1"]["bias"]
+    sg_bias = al("wind", "Science Garden")["point"]["W1"]["bias"]
+    hum_fall = P["humidity"]["pooled"]["baseline_failure_fall"]
+    pf_fall = P["mslp"]["pooled"]["baseline_failure_fall"]
+    B = D["part1_B_wind_q90"]["pooled"]["baseline_failure"]
+    p2 = D["part2"]
+    N = {}
+    N["PF-L_baseline_failure_mae"] = dict(
+        shows="For each next-day output (wind, MSLP, humidity, rainfall), the MAE of W1, persistence, climatology and a no-model control "
+              "(average of the two baselines) on all complete dates and on the dates where both baselines failed; pooled over the three primary stations.",
+        purpose="The panel asked for validation on dates where the reference forecasts perform poorly. " + PANEL,
+        produced=f"Selection v3 Part 1 (spec/CASE_SELECTION_v3_panel_validation.md, committed before the analysis): {BF_RULE}. W1 is scored on every "
+                 "such date, whether it did well or not. Saved Evidence A rows (W1 neural-only output; no model run); raw PAGASA truth.",
+        read="Shorter bars are better. Compare the four bars within a group; units differ between panels. The left group is the ordinary "
+             "picture, the right group the baseline-failure dates only.",
+        finding="On baseline-failure dates: " + "; ".join(
+            f"{VNAME[v][0]} n = {bf(v)['n']}, W1 {mae(bf(v), 'W1'):.2f} vs persistence {mae(bf(v), 'persistence'):.2f}, climatology "
+            f"{mae(bf(v), 'climatology'):.2f}, control {mae(bf(v), 'control'):.2f} {VNAME[v][1]}" for v in P) +
+            ". On all dates W1's MAE is larger than persistence's for wind, MSLP and humidity and smaller for rainfall.",
+        supports="Where both baselines failed, W1's humidity error was smaller than both baselines and the control, and its MSLP error was "
+                 "smaller than climatology's (not persistence's).",
+        limits=f"Choosing dates by baseline error favours any forecast that does not follow persistence or climatology; the control shows how much "
+               f"of that a no-model hedge also gets. W1's humidity forecasts run {hum_bias:+.1f} percentage points high on average, so dates with "
+               f"sudden humidity rises favour it; on humidity falls (n = {hum_fall['n']}) W1 is worse ({mae(hum_fall, 'W1'):.1f} vs persistence "
+               f"{mae(hum_fall, 'persistence'):.1f} %). On heavy-rain baseline-failure dates W1 under-forecasts and has the largest error. These "
+               f"dates are {bf('wind')['n']} of {al('wind')['n']} wind cases; they do not change the overall result.",
+        paper="Chapter 4, new subsection 'Validation on dates where the reference forecasts failed (panel request)'. Caption: 'Figure 4.x. Next-day "
+              "MAE on all dates and on dates where both persistence and climatology failed (training-period 90th-percentile rule), three primary "
+              "stations, 2021-11-16 to 2024-12-30. " + PANEL + "'",
+        source=f"figures/paper/PF-L_baseline_failure_mae.csv; run {run}; spec/CASE_SELECTION_v3_panel_validation.md.")
+    N["PF-M_baseline_failure_differences"] = dict(
+        shows="On baseline-failure dates only: W1's MAE minus persistence's, climatology's and the control's, per station and pooled, with 95% intervals.",
+        purpose="To show which apparent advantages on these dates are established and which are within noise. " + PANEL,
+        produced="Paired circular block bootstrap over target dates (14-day blocks, 2,000 resamples, seed 20261025) on the PF-L dates.",
+        read="Left of the zero line = W1's error smaller. A difference is established only if its whole interval is on one side of zero. "
+             "n is the number of baseline-failure station-dates.",
+        finding="Pooled: " + "; ".join(f"{VNAME[v][0]}: vs persistence {verdict(bf(v), 'persistence')}, vs climatology "
+                                       f"{verdict(bf(v), 'climatology')}, vs control {verdict(bf(v), 'control')}" for v in P) +
+                ". Established smaller than both baselines at: " + (", ".join(wins) or "none") + ".",
+        supports="W1 adds value over both baselines for humidity on dates when humidity jumped, and over climatology for pressure on dates "
+                 "with large pressure changes; Science Garden is the one station where W1's wind is better on these dates.",
+        limits=f"Science Garden's wind advantage comes from W1's high wind level there (bias {sg_bias:+.2f} m/s on all dates): almost all of its "
+               f"baseline-failure dates are wind rises. On large MSLP falls (n = {pf_fall['n']}) W1 is not established better than persistence. "
+               f"Training-consistent inputs (Evidence B) give the same wind picture: n = {B['n']}, W1 {mae(B, 'W1'):.2f} vs persistence "
+               f"{mae(B, 'persistence'):.2f}, climatology {mae(B, 'climatology'):.2f} m/s.",
+        paper="Chapter 4, same subsection. Caption: 'Figure 4.x. Paired MAE differences on baseline-failure dates with 95% block-bootstrap "
+              "intervals. " + PANEL + "'",
+        source=f"figures/paper/PF-M_baseline_failure_differences.csv; run {run}.")
+    N["PF-N_event_onsets"] = dict(
+        shows="Event onsets (no study-label event on the issue day, an event on the target day): how many each forecast warned of, on the "
+              "website cases (A) and the training-consistent benchmark (B), with false alarms.",
+        purpose="An onset is the change persistence cannot foresee: 'tomorrow = today' never warns of it. " + PANEL,
+        produced="Every onset in each cohort (no date chosen by hand). W1+X1 warns at ≥ 0.601; event climatology uses its tuning-year threshold.",
+        read="Bars = onsets each forecast warned of; the black dash is the number of onsets. False alarms are listed under each station.",
+        finding=f"Evidence A: {OA['onsets']} onsets; W1+X1 warned of {OA['onset_hits']['W1+X1@0.601']} with {OA['false_alarms_on_non_events']['W1+X1@0.601']} "
+                f"false alarms; event persistence {OA['onset_hits']['event_persistence']}; event climatology {OA['onset_hits']['event_climatology']}. "
+                f"Evidence B: {OB['onsets']} onsets; W1+X1 {OB['onset_hits']['W1+X1@0.601']} ({OB['false_alarms_on_non_events']['W1+X1@0.601']} false "
+                f"alarms); persistence {OB['onset_hits']['event_persistence']}; climatology {OB['onset_hits']['event_climatology']} "
+                f"({OB['false_alarms_on_non_events']['event_climatology']} false alarms).",
+        supports="W1+X1 warns of most sudden pressure-fall onsets that both simple references miss, with few false alarms.",
+        limits="Every onset is a pressure fall, not gale-force wind; the 0.601 threshold was adopted after the website results were seen, so "
+               "Evidence A is not an independent test; fewer onsets are caught with training-consistent inputs (B).",
+        paper="Chapter 4, same subsection. Caption: 'Figure 4.x. Warnings of event onsets by W1+X1, event persistence and event climatology. " + PANEL + "'",
+        source=f"figures/paper/PF-N_event_onsets.csv; run {run}.")
+    N["PF-O"] = dict(
+        shows="Per station, three consecutive target dates: observed and forecast wind, MSLP, humidity and rainfall with baseline-failure dates "
+              "shaded and W1 successes starred; a closest-forecast grid; the W1+X1 score and outcome.",
+        purpose="The panel's request for concrete dates where the baselines failed and W1 did better. " + PANEL,
+        produced="Selection v3 Part 2: windows ranked by the number of (variable, date) cells that are baseline-failure dates on which W1 was "
+                 "strictly closer than both baselines, then normalised margin, then baseline-failure cells, then date. Favourable by design.",
+        read="Shaded = both baselines failed for that variable; ★ = W1 closest there. Every variable and date is shown, including those where W1 "
+             "was worse. Each date is a separate next-day forecast; a gap in a line is a missing observation.",
+        finding="W1 success cells (of 12): " + "; ".join(f"{s} {v.get('success_cells_of_12', 0)} of {v.get('baseline_failure_cells_of_12', 0)} "
+                                                       f"baseline-failure cells, W1+X1 outcomes {', '.join(v.get('outcomes', []))}"
+                                                       for s, v in p2["per_station"].items()) + ".",
+        supports="On specific dates when both baselines failed, W1 was the closest forecast for some variables.",
+        limits="Chosen for W1's success; at two of the three stations W1 badly under-forecast the heaviest-rain day of the window; not a "
+               "performance estimate (see PF-L, PF-M).",
+        paper="Chapter 4, same subsection (printed thesis only). Caption: 'Figure 4.x. Selected validation window. " + PANEL + "'",
+        source=f"private: _private/thesis_export/{run}/; public counts: runs/{run}/panel_v3_results.json.")
+    N["PF-P"] = dict(
+        shows="The Part 2 common window: all four variables at all three primary stations on the same three dates.",
+        purpose="A network-wide view of a period when both baselines failed. " + PANEL,
+        produced="Common-window rule of Part 2: dates in the cohort at all three stations, ranked by total W1 success cells (of 36).",
+        read="One row per station, one column per variable; shading and stars as in PF-O.",
+        finding=(f"W1 success cells {p2['common']['success_cells_of_36']} of 36; baseline-failure cells {p2['common']['baseline_failure_cells_of_36']} "
+                 "of 36 (success cells by station: " + ", ".join(f"{s} {n}" for s, n in p2["common"]["by_station_success"].items()) + ")."
+                 ) if p2.get("common") else "No common window qualified.",
+        supports="During a multi-station disturbance, W1 was closer than both failed baselines on a minority of the variable-station-dates.",
+        limits="Favourable selection; W1 missed the heavy rainfall of the window at every station.",
+        paper="Chapter 4, same subsection (printed thesis only). Caption: 'Figure 4.x. Selected common validation window. " + PANEL + "'",
+        source=f"private: _private/thesis_export/{run}/.")
     return N
 
 

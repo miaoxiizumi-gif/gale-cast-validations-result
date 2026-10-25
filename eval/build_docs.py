@@ -13,6 +13,8 @@ import figure_notes as FN
 import paper_ledger as PL
 import tech_stack
 
+PANEL_PUB = ["PF-L_baseline_failure_mae", "PF-M_baseline_failure_differences", "PF-N_event_onsets"]
+
 DOC = C.WORKSPACE / "documentation"
 SITE = "https://miaoxiizumi-gif.github.io/gale-cast-validations-result/"
 
@@ -43,7 +45,7 @@ def J(p):
 def placeholders() -> tuple[dict, dict]:
     r = {k: latest(p) for k, p in {"w": "w-cohort", "rp": "reg-prov", "b": "b-benchmark", "case": "case", "pf": "pf",
                                    "sf": "split-facts", "s2": "s2-partitions", "s2b": "s2b-supplementary", "s1": "s1-identity",
-                                   "a": "a-legacy", "case2": "case-v2", "v": "s7-variants", "fig": "fig"}.items()}
+                                   "a": "a-legacy", "case2": "case-v2", "case3": "panel-v3", "v": "s7-variants", "fig": "fig"}.items()}
     A, RP, B, SF, S2 = (J(r["w"] / "website_cohort_results.json"), J(r["rp"] / "regression_provenance.json"),
                         J(r["b"] / "benchmark_results.json"), J(r["sf"] / "split_facts.json"), J(r["s2"] / "stage2_partitions.json"))
     reg = A["regression"]
@@ -68,12 +70,43 @@ def placeholders() -> tuple[dict, dict]:
         "a_rain_rmse_w1": f"{pt('rainfall', 'W1', 'rmse'):.1f}", "a_rain_rmse_cl": f"{pt('rainfall', 'climatology', 'rmse'):.1f}",
     }
     case1, case2 = J(r["case"] / "case_selection_summary.json"), J(r["case2"] / "case_selection_v2_summary.json")
+    case3 = J(r["case3"] / "panel_v3_results.json")
+    ph.update(panel_placeholders(case3))
     V = J(r["v"] / "variants_results.json")
     ctx = {"A": A, "B": B, "RP": RP, "V": V, "case1": case1, "case2": case2, "run_w": r["w"].name, "run_rp": r["rp"].name,
            "run_pf": r["pf"].name, "run_b": r["b"].name, "run_fig": r["fig"].name, "run_v": r["v"].name,
-           "run_case1": r["case"].name, "run_case2": r["case2"].name}
-    return ph, {"runs": r, "A": A, "RP": RP, "B": B, "SF": SF, "S2": S2, "case": case1, "case2": case2,
+           "run_case1": r["case"].name, "run_case2": r["case2"].name, "case3": case3, "run_case3": r["case3"].name}
+    return ph, {"runs": r, "A": A, "RP": RP, "B": B, "SF": SF, "S2": S2, "case": case1, "case2": case2, "case3": case3,
                 "pf": J(r["pf"] / "figure_guide.json"), "NOTES": FN.notes(ctx), "ctx": ctx}
+
+
+def panel_placeholders(D: dict) -> dict:
+    """Numbers of selection v3 (baseline-failure validation) used by the ledger and documents."""
+    P = D["part1_A_q90"]
+    out = {}
+    for v in P:
+        r = P[v]["pooled"]["baseline_failure"]
+        out[f"v3_{v}_n"] = r["n"]
+        for m, k in (("W1", "w1"), ("persistence", "pe"), ("climatology", "cl"), ("control", "ctl")):
+            out[f"v3_{v}_{k}"] = f"{r['point'][m]['mae']:.2f}"
+        for b, k in (("persistence", "pe"), ("climatology", "cl"), ("control", "ctl")):
+            out[f"v3_{v}_vs_{k}"] = r["ci"][f"dmae_W1_{b}"]["verdict"]
+    for ev in ("A", "B"):
+        o = D["onsets"][ev]["pooled"]
+        out[f"v3_on_{ev}"] = o["onsets"]
+        out[f"v3_on_{ev}_x1"] = o["onset_hits"]["W1+X1@0.601"]
+        out[f"v3_on_{ev}_pe"] = o["onset_hits"]["event_persistence"]
+        out[f"v3_on_{ev}_cl"] = o["onset_hits"]["event_climatology"]
+        out[f"v3_fa_{ev}_x1"] = o["false_alarms_on_non_events"]["W1+X1@0.601"]
+        out[f"v3_fa_{ev}_cl"] = o["false_alarms_on_non_events"]["event_climatology"]
+    return out
+
+
+def v3_table(ph: dict) -> str:
+    return md_table(["Variable (pooled)", "Baseline-failure dates", "MAE W1 / persistence / climatology / control", "W1 − persistence",
+                     "W1 − climatology", "W1 − control"],
+                    [[v, ph[f"v3_{v}_n"], f"{ph[f'v3_{v}_w1']} / {ph[f'v3_{v}_pe']} / {ph[f'v3_{v}_cl']} / {ph[f'v3_{v}_ctl']}",
+                      ph[f"v3_{v}_vs_pe"], ph[f"v3_{v}_vs_cl"], ph[f"v3_{v}_vs_ctl"]] for v in ("wind", "mslp", "humidity", "rainfall")])
 
 
 def md_table(headers, rows):
@@ -94,6 +127,9 @@ def write_private_index(X) -> None:
     rows = pd.read_csv(C.private_dir(X["runs"]["w"]) / "website_cohort_rows.csv", parse_dates=["date"])
     s1 = J(C.private_dir(X["runs"]["case"]) / "PRIVATE_selection_summary.json")
     s2 = J(C.private_dir(X["runs"]["case2"]) / "PRIVATE_selection_summary_v2.json")
+    s3 = J(C.private_dir(X["runs"]["case3"]) / "PRIVATE_selection_summary_v3.json")
+    FIGN = {"v1": ("PF-H_case_{}", "PF-I_common_window_all_stations"), "v2": ("PF-J_regression_case_{}", "PF-K_regression_common_window"),
+            "v3": ("PF-O_panel_window_{}", "PF-P_panel_common_window")}
 
     def table(station, dates):
         out = ["| Target date (issued after the previous day) | Variable | Observed | W1 | Persistence | Climatology | abs err W1 / P / C | Closest |",
@@ -114,16 +150,19 @@ def write_private_index(X) -> None:
     parts = ["# Private thesis-export index (NOT for publication)", "",
              "Contains exact dates and individual PAGASA readings. PAGASA CADS-07 Rev.6 condition 4: do not post online. For the printed thesis only.",
              f"Every figure: {FN.SELECTED}", "", f"Source rows: `_private/runs/{X['runs']['w'].name}/website_cohort_rows.csv`.", ""]
-    for key, run, summ, figs in (("v1", ctx["run_case1"], s1, ("PF-H", "PF-I")), ("v2", ctx["run_case2"], s2, ("PF-J", "PF-K"))):
+    for key, run, summ, figs in (("v1", ctx["run_case1"], s1, ("PF-H", "PF-I")), ("v2", ctx["run_case2"], s2, ("PF-J", "PF-K")),
+                                 ("v3", ctx["run_case3"], s3, ("PF-O", "PF-P"))):
         parts += [f"## Selection {key}: folder `{run}/`", ""]
+        if key == "v3":
+            parts += [f"Every v3 figure: {FN.PANEL}", ""]
         for fid in figs:
             parts.append(FN.markdown(fid, NOTES[fid]))
         for s, v in summ["per_station"].items():
             if v.get("window"):
-                fn = (f"PF-H_case_{s.replace(' ', '_')}" if key == "v1" else f"PF-J_regression_case_{s.replace(' ', '_')}")
+                fn = FIGN[key][0].format(s.replace(" ", "_"))
                 parts += [f"### {s}: {', '.join(v['window'])}  (files `{fn}.png`, `{fn}.svg`)", "", table(s, v["window"]), ""]
         if summ.get("common"):
-            fn = "PF-I_common_window_all_stations" if key == "v1" else "PF-K_regression_common_window"
+            fn = FIGN[key][1]
             parts += [f"### Common window: {', '.join(summ['common']['window'])}  (files `{fn}.png`, `{fn}.svg`)", ""]
             for s in C.PRIMARY:
                 parts += [f"#### {s}", "", table(s, summ["common"]["window"]), ""]
@@ -164,6 +203,7 @@ on evaluation-period outcomes (see `MODEL_AND_DATA_SUMMARY.md`, regression prove
 |---|---|---|---|---|
 | **A. Website historical scorecard** | the website's 3,423 next-day windows (1,141 per primary station; target dates 2021-11-16 to 2024-12-30) | historical scoring procedure: pooled `scaled_weather` inputs, 32-day windows | processed (forward-filled) label, as on the website; raw observations for regression | reproduce and explain what the website shows; add same-case baselines |
 | **B. Training-consistent benchmark** | {ph['b_cases']} event cases / {B['counts']['wind']['eligible']:,} wind cases, target dates 2021-10-15 to 2024-12-31 | per-station scalers as in training | raw, unimputed observations | the declared benchmark of `spec/EVAL_SPEC_v1.md` |
+| **D. Baseline-failure validation (panel request)** | every Group A station-date on which both persistence and climatology failed (training-period 90th-percentile rule, `CASE_SELECTION_v3_panel_validation.md`) and every event onset; then favourable example windows | as A (saved rows; no model run); wind and onsets also on B | raw observations | show where the reference forecasts fail and how W1 does there; examples not representative |
 | **C. Selected illustrative case studies** | set 1 (`CASE_SELECTION_v1.md`): 3 station windows + 1 common window around detected events; set 2 (`CASE_SELECTION_v2_regression.md`): 3 station windows + 1 common window with relatively high wind and favourable W1 wind error (favourable-error selection, disclosed) | as A (saved rows; no model run) | raw observations | explanation only; not representative |
 
 ### Selected illustrative case studies: what the two sets show
@@ -175,6 +215,30 @@ on evaluation-period outcomes (see `MODEL_AND_DATA_SUMMARY.md`, regression prove
   Its rule was recorded before the search (relatively higher wind = observed wind ≥ the station's 2015-2020 90th percentile on at least one
   day). Results by station are in `FIGURE_GUIDE.md` (PF-J, PF-K). The pressure forecast was the closest on few of these days.
 - Neither set establishes general superiority; the overall comparisons (Evidence A and B) do.
+
+### Baseline-failure validation (Evidence D, panel request)
+
+*{FN.PANEL}*
+
+The panel asked for historical dates on which persistence and climatology perform poorly. `spec/CASE_SELECTION_v3_panel_validation.md`
+(committed before the analysis) defines them **without using W1**: a station-date is a *baseline-failure date* for a variable when the
+persistence error is at least the station's 2015-2020 90th percentile of day-to-day change **and** the climatology error is at least the
+90th percentile of deviation from the station × month mean. W1 is then scored on **every** such date (Part 1); favourable example windows
+are picked only afterwards (Part 2, private figures). A no-model control (the average of the two baselines) shows how much of any advantage
+on these dates a simple hedge also gets, because choosing dates by baseline error favours any forecast that does not copy a baseline.
+
+{v3_table(ph)}
+
+"established: negative" = W1's error is smaller and the 95% interval excludes zero; "positive" = W1's error is larger. Event onsets (no
+event on the issue day, an event on the target day): Evidence A {ph['v3_on_A']} onsets, W1+X1 warned of {ph['v3_on_A_x1']}
+({ph['v3_fa_A_x1']} false alarms on all non-event days), event persistence {ph['v3_on_A_pe']}, event climatology {ph['v3_on_A_cl']};
+Evidence B {ph['v3_on_B']} onsets, W1+X1 {ph['v3_on_B_x1']} ({ph['v3_fa_B_x1']} false alarms), event climatology {ph['v3_on_B_cl']}
+({ph['v3_fa_B_cl']} false alarms).
+
+Reading: where the references fail, W1's clearest advantage is **warning of pressure-fall onsets**. For numerical forecasts the advantage
+is limited to humidity (helped by W1's high humidity bias, since these dates are mostly humidity rises) and to MSLP against climatology
+only; for wind (except Science Garden, again a bias effect) and rainfall W1 is not better on these dates. Per-station detail:
+`FIGURE_GUIDE.md` (PF-L to PF-P).
 
 Group A's case identity was recovered without regenerating predictions: the saved reproduction rows (`a-legacy-20261023T162426Z-b5f446`)
 match the original W1-branch record `nine_fp_report.json` for all 9 false alarms and 4 misses (station, date and score), and the matrix is
@@ -216,7 +280,8 @@ W1's thresholds are unchanged: X1 ≥ 0.601 (website) and raw ≥ 0.64 (document
 - **Precision, recall, F1, PR-AUC:** reported with all four confusion-matrix cells. Accuracy is shown with the all-negative reference.
 - **Uncertainty:** paired circular block bootstrap over target dates (14-day blocks, 2,000 resamples). "Established" means the 95% interval
   excludes zero.
-- **Selected dates cannot establish general forecasting superiority.**
+- **Selected dates cannot establish general forecasting superiority.** Conditioning on baseline failure (Evidence D) is a stratified
+  view of the same cases, not a new test, and it favours forecasts that do not copy a baseline.
 
 ## Why persistence and climatology
 
@@ -353,6 +418,13 @@ Files are in [`docs/figures/paper/`](../docs/figures/paper/) (site: {SITE}#figur
 
 """ + "\n".join(FN.markdown(f"{i} — `{i}.png` / `.svg` / `.csv`", NOTES[i]) for i in pub_ids) + f"""
 
+## Baseline-failure validation figures (Evidence D, panel request; public aggregates)
+
+Every figure in this group states: "{FN.PANEL}" Rule: `spec/CASE_SELECTION_v3_panel_validation.md`. Run `{ph['run_case3']}`; files in
+[`docs/figures/paper/`](../docs/figures/paper/). PF-L to PF-N are aggregates over every qualifying date (no dates or readings).
+
+""" + "\n".join(FN.markdown(f"{i} — `{i}.png` / `.svg` / `.csv`", NOTES[i]) for i in PANEL_PUB) + f"""
+
 ## Earlier benchmark figures (Evidence B unless stated; PNG on the site, data in `docs/data/`)
 
 """ + "\n".join(FN.markdown(f"{i} — `docs/figures/{i}.png`", NOTES[i]) for i in legacy) + f"""
@@ -365,7 +437,7 @@ forbid publishing station readings online and no permission was found, so they e
 
 Every case figure states: "{FN.SELECTED}" Each date shows a separate next-day forecast, not a +1/+2/+3-day forecast from one origin.
 
-""" + "\n".join(FN.markdown(f"{i} (private)", NOTES[i]) for i in ("PF-H", "PF-I", "PF-J", "PF-K")))
+""" + "\n".join(FN.markdown(f"{i} (private)", NOTES[i]) for i in ("PF-H", "PF-I", "PF-J", "PF-K", "PF-O", "PF-P")))
     write_private_index(X)
 
     # ------------------------------------------------------------ PAPER_REVISION_LEDGER.md
@@ -431,8 +503,8 @@ package inventory or private case values were used for it.
 
 ## Selection amendments
 
-`spec/CASE_SELECTION_v1.md` (classification case studies) and `spec/CASE_SELECTION_v2_regression.md` (favourable regression case), each
-committed before its search.
+`spec/CASE_SELECTION_v1.md` (classification case studies), `spec/CASE_SELECTION_v2_regression.md` (favourable regression case) and
+`spec/CASE_SELECTION_v3_panel_validation.md` (baseline-failure validation, panel request), each committed before its search.
 """)
     tech_stack.write_documents(C.WORKSPACE)
 
@@ -452,6 +524,7 @@ Evidence for the thesis *GALE-CAST*, about the frozen, deployed model **W1** (`g
 |---|---|---|
 | **A. Website historical scorecard** | the 3,423 cases behind the website matrix, identified case by case | TN 3386, FP 9, FN 4, TP 24 at X1 ≥ 0.601; F1 {x1['f1']:.3f} vs event persistence {pe['f1']:.3f} and event climatology {cl['f1']:.3f} (difference vs persistence established) |
 | **B. Training-consistent benchmark** | {ph['b_cases']} cases, inputs scaled as in training | {ph['b_tp']} of {ph['b_events']} events, {ph['b_fp']} false alarms |
+| **D. Baseline-failure validation (panel request)** | every date on which both persistence and climatology failed (W1 not used to choose), every event onset, then favourable example windows | onsets: W1+X1 warned of {ph['v3_on_A_x1']} of {ph['v3_on_A']} (persistence and climatology {ph['v3_on_A_pe']} and {ph['v3_on_A_cl']}); humidity MAE {ph['v3_humidity_w1']} vs {ph['v3_humidity_pe']} / {ph['v3_humidity_cl']} %; wind and rainfall not better; not representative of all dates |
 | **C. Selected illustrative case studies** | three-day windows chosen retrospectively for illustration: set 1 around detected events; set 2 with relatively high wind and favourable W1 wind error (disclosed) | private figures only (PAGASA terms); not representative |
 
 W1 ranks pressure-fall days well, but its neural wind, pressure and humidity forecasts are less accurate than persistence on the same
