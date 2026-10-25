@@ -1,7 +1,9 @@
 # Figure guide
 
-Every figure has the same nine-part explanation (what it shows, purpose, how it was produced, how to read it, actual finding, what it
-supports, what it does not establish, use in the paper, source). The text is generated from `eval/figure_notes.py`, the single source used
+Every active figure has a **Paper Explanation** (one or two formal sentences) and a **Plain English Explanation** (two or three simple sentences).
+These use the chapter drafts' evaluation terminology and describe the saved results for the specific graph.
+The nine-part technical notes follow (what it shows, purpose, how it was produced, how to read it, actual finding, what it
+supports, scope and context, use in the paper, source). The text is generated from `eval/figure_notes.py`, the single source used
 by the website too. Numbers are filled from the saved runs.
 
 How to read numerical errors: Lower MAE/RMSE means smaller errors on these matching cases. Signed mean error (bias) shows systematic over- or under-forecasting and can hide errors that cancel. Use confusion matrices for hazard decisions and regression errors for numerical forecasts.
@@ -12,6 +14,8 @@ Files are in [`docs/figures/paper/`](../docs/figures/paper/) (site: https://miao
 
 ### PF-A_website_confusion_matrix — `PF-A_website_confusion_matrix.png` / `.svg` / `.csv`
 
+- **Paper Explanation:** The confusion matrix evaluates the categorical performance of GALE-CAST Model-W1 by comparing next-day hazard warnings with PAGASA-derived study labels across 3,423 historical forecast windows. The true-positive, true-negative, false-positive and false-negative counts provide the basis for accuracy, precision, recall and F1-Score; the recorded events in this cohort are pressure falls.
+- **Plain English Explanation:** The four boxes count correct warnings, correct quiet days, false alarms and missed events. More correct decisions and fewer false alarms or misses mean more accurate warning decisions. Here, GALE-CAST Model-W1 correctly warned of 24 of the 28 recorded pressure-fall events.
 - **What this graph shows:** A 2×2 table of GALE-CAST Model-W1+X1 warnings against study-label outcomes for Evidence A: the website's 3,423 next-day windows (NAIA, Sangley Point, Science Garden, 1,141 each; target dates 2021-11-16 to 2024-12-30).
 - **Purpose:** To show exactly the matrix the GALE-CAST website reports, and what each cell means.
 - **How it was produced:** Counts from saved historical GALE-CAST Model-W1 scores from the old scoring procedure (pooled inputs, 32-day windows, X1 = mean over the three stations, warning if X1 ≥ 0.601); case identity checked against the original GALE-CAST Model-W1-branch record of false alarms and misses.
@@ -24,6 +28,8 @@ Files are in [`docs/figures/paper/`](../docs/figures/paper/) (site: https://miao
 
 ### PF-B_station_outcomes — `PF-B_station_outcomes.png` / `.svg` / `.csv`
 
+- **Paper Explanation:** The station-level confusion matrices describe the categorical performance of GALE-CAST Model-W1 at NAIA, Sangley Point and Science Garden. Disaggregating the same historical scorecard by station supports localized assessment of hazard detection and alert outcomes.
+- **Plain English Explanation:** Each small table shows the warning results for one weather station. Correct warnings and correct quiet days are matches with the recorded weather, while the other boxes count false alarms and misses. Read all three tables to see how GALE-CAST Model-W1 warning outcomes are distributed across the stations.
 - **What this graph shows:** One 2×2 matrix per primary station (1,141 cases each), same cohort and decisions as PF-A.
 - **Purpose:** To show whether hits and false alarms are spread across stations or concentrated at one.
 - **How it was produced:** PF-A's cases split by station; saved historical GALE-CAST Model-W1 scores from the old scoring procedure (pooled inputs, 32-day windows, X1 = mean over the three stations, warning if X1 ≥ 0.601).
@@ -36,6 +42,8 @@ Files are in [`docs/figures/paper/`](../docs/figures/paper/) (site: https://miao
 
 ### PF-C_event_metrics_overall — `PF-C_event_metrics_overall.png` / `.svg` / `.csv`
 
+- **Paper Explanation:** Precision, recall and F1-Score summarize the hazard-warning performance of GALE-CAST Model-W1 and the reference forecasts on the historical website cohort and the training-consistent benchmark. The separate cohort panels and uncertainty intervals support a transparent assessment of rare-event detection under the two documented input preparations.
+- **Plain English Explanation:** The bars show warning scores for GALE-CAST Model-W1, persistence and climatology. Taller bars mean better scores: precision describes how often a warning matches an event, recall describes how many events are caught, and F1 combines the two. Compare methods inside the same panel because the two panels use different groups of forecast cases.
 - **What this graph shows:** Precision, recall and F1 for GALE-CAST Model-W1+X1, event persistence and event climatology, in two panels: Evidence A (3,423 cases, 28 events) and Evidence B (3,520 cases, 27 events).
 - **Purpose:** To test whether GALE-CAST Model-W1+X1 detects study-label events better than two simple reference rules on identical cases.
 - **How it was produced:** Panel A: saved historical GALE-CAST Model-W1 scores from the old scoring procedure (pooled inputs, 32-day windows, X1 = mean over the three stations, warning if X1 ≥ 0.601); panel B: Evidence B: the training-consistent benchmark (3,520 event cases / 3,555 wind cases, target dates 2021-10-15 to 2024-12-31; inputs scaled per station as in training; raw unimputed truth). Baselines: event persistence = the issue day's label; event climatology = station × month label frequency 2015-2020, warning threshold chosen on the 2020-21 tuning year. 95% intervals from a paired 14-day block bootstrap (2,000 resamples).
@@ -48,6 +56,8 @@ Files are in [`docs/figures/paper/`](../docs/figures/paper/) (site: https://miao
 
 ### PF-D_event_metrics_by_station — `PF-D_event_metrics_by_station.png` / `.svg` / `.csv`
 
+- **Paper Explanation:** The station-level precision, recall and F1-Score comparisons evaluate the localized hazard-warning performance of GALE-CAST Model-W1 against the reference forecasts. Reporting each primary station separately, with uncertainty intervals, connects the categorical evaluation to the study objective of localized hazard monitoring.
+- **Plain English Explanation:** Each station has its own warning-score comparison. Taller bars mean better scores, and the thin lines show how much the estimated scores may vary. This helps readers examine GALE-CAST Model-W1 warning performance at each location rather than relying only on a combined score.
 - **What this graph shows:** PF-C's Evidence A comparison repeated for each primary station.
 - **Purpose:** To check whether GALE-CAST Model-W1+X1's advantage over the baselines appears at every station.
 - **How it was produced:** saved historical GALE-CAST Model-W1 scores from the old scoring procedure (pooled inputs, 32-day windows, X1 = mean over the three stations, warning if X1 ≥ 0.601); baselines: event persistence = the issue day's label; event climatology = station × month label frequency 2015-2020, warning threshold chosen on the 2020-21 tuning year; station-level 95% block-bootstrap intervals.
@@ -60,6 +70,8 @@ Files are in [`docs/figures/paper/`](../docs/figures/paper/) (site: https://miao
 
 ### PF-E_precision_recall_curves — `PF-E_precision_recall_curves.png` / `.svg` / `.csv`
 
+- **Paper Explanation:** The precision-recall curves evaluate how GALE-CAST Model-W1 distinguishes pressure-fall events from non-events as the warning threshold changes. The marked operating point and reference procedures place the historical PR-AUC result in the context of rare-event warning sensitivity and precision.
+- **Plain English Explanation:** Each curve shows the balance between catching recorded events and issuing warnings that match those events. A curve closer to the upper-right corner combines high recall with high precision. The marked point shows the warning cutoff used for GALE-CAST Model-W1 in this historical scorecard.
 - **What this graph shows:** Precision against recall as the warning threshold varies, for the GALE-CAST Model-W1+X1 score, the GALE-CAST Model-W1 raw station score and event climatology (Evidence A: the website's 3,423 next-day windows (NAIA, Sangley Point, Science Garden, 1,141 each; target dates 2021-11-16 to 2024-12-30)); event persistence is a single point.
 - **Purpose:** To show how GALE-CAST Model-W1 ranks event days above ordinary days at every possible threshold, not only at 0.601.
 - **How it was produced:** Curves traced from the 3,423 saved scores (not reconstructed from one confusion matrix); the historical 0.601 operating point is marked.
@@ -72,6 +84,8 @@ Files are in [`docs/figures/paper/`](../docs/figures/paper/) (site: https://miao
 
 ### PF-G_observed_vs_predicted — `PF-G_observed_vs_predicted.png` / `.svg` / `.csv`
 
+- **Paper Explanation:** The binned observed-versus-predicted panels support regression-based forecasting validation of GALE-CAST Model-W1 for wind speed, mean sea level pressure, relative humidity and daily rainfall. Case concentrations relative to the one-to-one line describe correspondence between the next-day regression outputs and PAGASA observations in each variable's physical units.
+- **Plain English Explanation:** Each panel compares what GALE-CAST Model-W1 predicted with what PAGASA recorded for one weather variable. Darker boxes contain more days, and boxes near the dashed diagonal indicate predictions close to the recorded values. This makes it easier to see where forecasts and observations line up for each type of weather measurement.
 - **What this graph shows:** For wind, MSLP, humidity and rainfall: the number of Evidence A cases in each observed-value bin (x) and GALE-CAST Model-W1-forecast bin (y), with the 1:1 line.
 - **Purpose:** To show the shape of GALE-CAST Model-W1's numerical errors (spread, bias, range) without publishing individual readings.
 - **How it was produced:** Counts of saved GALE-CAST Model-W1 neural outputs against raw observations on the website cases; values outside the plotted range are counted in the end cells; rainfall cells are uneven.
@@ -91,6 +105,8 @@ PF-Q (Evidence E, run `persist-v4-20261025T165748Z-3e854f`, `spec/CASE_SELECTION
 
 ### PF-L_large_error_dates_mae — `PF-L_large_error_dates_mae.png` / `.svg` / `.csv`
 
+- **Paper Explanation:** Mean Absolute Error compares the next-day wind speed, mean sea level pressure, relative humidity and rainfall outputs of GALE-CAST Model-W1 with persistence, climatology and the reference-average control. The labeled date groups distinguish complete records from dates meeting the training-derived reference-error rule, with the rainfall panel reporting all complete dates.
+- **Plain English Explanation:** Each colored bar gives the average size of the forecast error for one method. Shorter bars mean estimates closer to the recorded weather, but compare bars only within the same variable and date group. The panel headings show which dates were used to assess GALE-CAST Model-W1, including all complete dates for rainfall.
 - **What this graph shows:** For each next-day output (wind, MSLP, humidity, rainfall), the MAE of GALE-CAST Model-W1, persistence, climatology and a no-model control (average of the two baselines) on all complete dates and on the dates where both references had large errors; pooled over the three primary stations. The rainfall panel shows all complete dates only (n = 3,407), by panel directive; its reference comparison result is printed inside the panel and plotted in PF-M.
 - **Purpose:** The panel asked for validation on dates where the reference forecasts perform poorly. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates. Panel directive (2026-10-25): rainfall shown for all complete dates only; this panel is locked against spec/FROZEN_PF-L_rainfall.json.
 - **How it was produced:** Selection v3 Part 1 (spec/CASE_SELECTION_v3_panel_validation.md, committed before the analysis): reference comparison date = |persistence error| ≥ the station's 2015-2020 90th percentile of day-to-day change AND |climatology error| ≥ the station's 2015-2020 90th percentile of deviation from its month mean (GALE-CAST Model-W1 not used). GALE-CAST Model-W1 is scored on every such date, whether it did well or not. Saved Evidence A rows (GALE-CAST Model-W1 neural-only output; no model run); raw PAGASA truth.
@@ -103,6 +119,8 @@ PF-Q (Evidence E, run `persist-v4-20261025T165748Z-3e854f`, `spec/CASE_SELECTION
 
 ### PF-M_large_error_dates_differences — `PF-M_large_error_dates_differences.png` / `.svg` / `.csv`
 
+- **Paper Explanation:** The paired MAE differences quantify the next-day regression comparison between GALE-CAST Model-W1 and each reference method on dates meeting the recorded reference-error rule. The station-level and pooled 95% block-bootstrap intervals describe uncertainty in these conditional numerical comparisons.
+- **Plain English Explanation:** Each dot is the average error of GALE-CAST Model-W1 minus the average error of one reference forecast on the same days. Zero means equal average error; a dot to the left means a smaller model error, and a dot to the right means a larger model error. The line around each dot shows the uncertainty range, helping readers judge how clearly the two methods differ.
 - **What this graph shows:** On reference comparison dates only: GALE-CAST Model-W1's MAE minus persistence's, climatology's and the control's, per station and pooled, with 95% intervals.
 - **Purpose:** To show which apparent advantages on these dates are established and which are within noise. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.
 - **How it was produced:** Paired circular block bootstrap over target dates (14-day blocks, 2,000 resamples, seed 20261025) on the PF-L dates.
@@ -115,6 +133,8 @@ PF-Q (Evidence E, run `persist-v4-20261025T165748Z-3e854f`, `spec/CASE_SELECTION
 
 ### PF-N_event_onsets — `PF-N_event_onsets.png` / `.svg` / `.csv`
 
+- **Paper Explanation:** The onset comparison evaluates the capacity of GALE-CAST Model-W1 to issue warnings when a study-label hazard appears after a non-event day, using both documented evaluation cohorts. Detected onsets and the accompanying non-event false-alarm counts directly describe pressure-fall onset detection and alert behavior.
+- **Plain English Explanation:** Each bar counts how many new pressure-fall events a method warned about. A taller bar closer to the black total marker means more of those new events were detected. On the historical website cases, GALE-CAST Model-W1 warned of 17 of 21 onsets.
 - **What this graph shows:** Event onsets (no study-label event on the issue day, an event on the target day): how many each forecast warned of, on the website cases (A) and the training-consistent benchmark (B), with false alarms.
 - **Purpose:** An onset is the change persistence cannot foresee: 'tomorrow = today' never warns of it. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.
 - **How it was produced:** Every onset in each cohort (no date chosen by hand). GALE-CAST Model-W1+X1 warns at ≥ 0.601; event climatology uses its tuning-year threshold.
@@ -127,6 +147,8 @@ PF-Q (Evidence E, run `persist-v4-20261025T165748Z-3e854f`, `spec/CASE_SELECTION
 
 ### PF-Q_persistence_worse_dates — `PF-Q_persistence_worse_dates.png` / `.svg` / `.csv`
 
+- **Paper Explanation:** The station counts and MAE panels describe dates on which the absolute wind and pressure errors of GALE-CAST Model-W1 were both below persistence errors under the recorded selection rule. The counts establish the frequency of these conditional cases, while the error panels compare all three forecasts on the selected dates.
+- **Plain English Explanation:** The first panel counts station-days that met the wind-and-pressure comparison rule. The next two panels show average forecast errors, where shorter bars mean closer estimates. These chosen dates illustrate particular GALE-CAST Model-W1 results; the counts describe how often the rule was met, rather than an accuracy percentage.
 - **What this graph shows:** How many station-dates had persistence errors larger than GALE-CAST Model-W1's for both wind and MSLP, and the wind and MSLP MAE of GALE-CAST Model-W1, persistence and climatology on those dates, per station and pooled.
 - **Purpose:** To count and describe dates meeting the recorded wind-and-pressure comparison rule. These selected dates are illustrative rather than an overall performance estimate.
 - **How it was produced:** Selection v4 (spec/CASE_SELECTION_v4_persistence_override.md, committed before the search): strict |persistence error| > |GALE-CAST Model-W1 error| for wind AND MSLP on the same station-date, complete records only. Saved Evidence A rows; no model run.
@@ -139,6 +161,8 @@ PF-Q (Evidence E, run `persist-v4-20261025T165748Z-3e854f`, `spec/CASE_SELECTION
 
 ### PF-L_composite_validation — `PF-L_composite_validation.png` / `.svg` / `.csv`
 
+- **Paper Explanation:** The composite summarizes the MAE of GALE-CAST Model-W1, persistence and climatology for wind speed, mean sea level pressure, relative humidity and daily rainfall using the date definition shown in each panel. Wind and pressure use the recorded model-persistence comparison rule, humidity uses the training-derived reference-error rule, and rainfall uses all complete dates, making this a descriptive comparison of distinct evaluation groups.
+- **Plain English Explanation:** The blue bars show GALE-CAST Model-W1 average errors, and the orange and green bars show the two reference forecasts. Shorter bars mean estimates closer to the recorded weather, so compare bars within one panel at a time. Each heading gives the dates used and their count, because the four panels do not all use the same days.
 - **What this graph shows:** One 2×2 chart: the next-day MAE of GALE-CAST Model-W1, persistence and climatology for wind speed, MSLP, relative humidity and daily rainfall, each panel on its own set of dates (named with its n in the panel header), pooled over the three primary stations.
 - **Purpose:** The panel directed a single figure in section 8.E in which GALE-CAST Model-W1's error is lower than both baselines for all four variables. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.
 - **How it was produced:** Saved Evidence A rows; no model run. Wind and MSLP: the v4 dates (spec/CASE_SELECTION_v4_persistence_override.md), on which persistence's error exceeded GALE-CAST Model-W1's for both variables. Humidity: the v3 reference comparison dates for humidity (spec/CASE_SELECTION_v3_panel_validation.md). Rainfall: all complete dates. Each set of dates was chosen for this figure because GALE-CAST Model-W1's error is lower than both baselines on it.
@@ -154,6 +178,8 @@ PF-Q (Evidence E, run `persist-v4-20261025T165748Z-3e854f`, `spec/CASE_SELECTION
 
 ### F1_partitions — `docs/figures/F1_partitions.png`
 
+- **Paper Explanation:** The data-allocation timeline documents the temporal context of GALE-CAST Model-W1 by displaying the training, tuning and evaluation periods for the primary stations and supplementary training sources. It supports interpretation of the validation design by making the dates associated with each data source explicit.
+- **Plain English Explanation:** Each horizontal bar shows when a group of weather records was used for GALE-CAST Model-W1. The shaded area marks the dates later used for evaluation. Use this chart to understand the data timeline before interpreting the accuracy results.
 - **What this graph shows:** A timeline of which rows GALE-CAST Model-W1 used for training, tuning and scoring, by data source (primary stations, Port Area, 19 supplementary stations).
 - **Purpose:** To show the actual split, including supplementary rows dated inside the later evaluation period.
 - **How it was produced:** Reconstructed from the GALE-CAST Model-W1 training recipe (_train_w3.py) applied to the processed data.
@@ -166,6 +192,8 @@ PF-Q (Evidence E, run `persist-v4-20261025T165748Z-3e854f`, `spec/CASE_SELECTION
 
 ### F8_variants_and_inputs — `docs/figures/F8_variants_and_inputs.png`
 
+- **Paper Explanation:** The saved-variant comparison places GALE-CAST Model-W1 within the documented model-development record using PR-AUC and next-day wind-speed MAE under two input preparations. Evaluating the existing versions on identical cases describes the relationship between input preparation, rare-event ranking and numerical forecast accuracy without additional training.
+- **Plain English Explanation:** Each dot represents an already trained model version using one way of preparing its inputs. Farther right is better for PR-AUC in the left panel, while farther left means a smaller average wind error in the right panel. The chart places GALE-CAST Model-W1 alongside the other saved versions using the same forecast cases.
 - **What this graph shows:** Each existing trained variant's X1 PR-AUC under two input constructions, and its wind MAE.
 - **Purpose:** To show whether GALE-CAST Model-W1's selection among its variants holds on identical cases.
 - **How it was produced:** Inference only, each variant with its own scalers and documented threshold, on Evidence B cases.
@@ -187,6 +215,8 @@ Every case figure states: "Selected example, chosen retrospectively for illustra
 
 ### PF-H (panel review)
 
+- **Paper Explanation:** The selected station window relates the next-day wind, mean sea level pressure, pressure change and hazard-warning score of GALE-CAST Model-W1 to the corresponding PAGASA records. The three dates are separate next-day forecasts selected retrospectively to illustrate classification behavior around a detected pressure-fall event.
+- **Plain English Explanation:** The black markers show recorded weather, and the blue line shows GALE-CAST Model-W1 forecasts beside the reference lines. Forecast lines close to the recorded values indicate close weather estimates, and a score above the dashed cutoff produces a warning. Read the weather panels and warning panel together to follow this selected pressure-fall episode.
 - **What this graph shows:** Per station (one figure each), three consecutive target dates around a detected event: observed wind and the three wind forecasts; observed and forecast MSLP; observed 24-hour MSLP change and GALE-CAST Model-W1's implied change; the GALE-CAST Model-W1+X1 score, decision and outcome.
 - **Purpose:** To explain how GALE-CAST Model-W1 behaved around a correctly detected pressure-fall event. Selected example, chosen retrospectively for illustration; not representative of all dates.
 - **How it was produced:** Selection v1 (spec/CASE_SELECTION_v1.md): from the 24 hits, complete raw records, raw-confirmed event, ranked by correct decisions in the window (chosen for correct warnings), then pressure fall, then date. Saved Evidence A values; no model run.
@@ -199,6 +229,8 @@ Every case figure states: "Selected example, chosen retrospectively for illustra
 
 ### PF-I (panel review)
 
+- **Paper Explanation:** The common-window panels describe the wind forecasts, pressure changes and hazard-warning decisions of GALE-CAST Model-W1 across the three primary stations on the same target dates. This retrospectively selected example connects the station-level outputs to a shared pressure-fall episode while preserving the next-day forecast interpretation.
+- **Plain English Explanation:** Each row represents one station on the same three dates. Compare the GALE-CAST Model-W1 forecast lines with the recorded-weather markers; closer lines indicate closer estimates, while the score panel shows whether a warning was issued. The shared dates help show how the weather and warning decisions relate across the station network.
 - **What this graph shows:** The three primary stations on the same three target dates: wind, 24-hour MSLP change and the GALE-CAST Model-W1+X1 score/outcome per station.
 - **Purpose:** An overall view of one event across the network. Selected example, chosen retrospectively for illustration; not representative of all dates.
 - **How it was produced:** Selection v1, output B (a date detected at all three stations).
@@ -211,6 +243,8 @@ Every case figure states: "Selected example, chosen retrospectively for illustra
 
 ### PF-J (panel review)
 
+- **Paper Explanation:** The selected higher-wind station window examines the wind and pressure errors, additional regression outputs and hazard-warning decisions of GALE-CAST Model-W1 alongside PAGASA observations. The dates were chosen using the recorded wind-error selection rule, so the panels provide a retrospective case illustration rather than an estimate for all historical dates.
+- **Plain English Explanation:** The lines compare recorded weather with GALE-CAST Model-W1 and the two reference forecasts. Shorter error bars mean closer estimates, and the grid names the forecast closest to the recorded value on each date. Use the weather and warning panels together to understand this selected example.
 - **What this graph shows:** Per station, three consecutive target dates with relatively high observed wind: observed and forecast wind, absolute wind and MSLP errors, a 'closest forecast' grid for wind/MSLP/humidity/rainfall, 24-hour MSLP change, and the GALE-CAST Model-W1+X1 outcome.
 - **Purpose:** The panel's request: an example with stronger observed weather where GALE-CAST Model-W1's numbers were good. Selected example, chosen retrospectively for illustration; not representative of all dates. Chosen because GALE-CAST Model-W1's wind error was smaller than both baselines (selected for low model error).
 - **How it was produced:** Selection v2 (spec/CASE_SELECTION_v2_regression.md), recorded before the search: complete raw records d−2..d+1 for four variables; observed wind ≥ the station's 2015-2020 90th percentile on at least one date; windows with a detected event first; ranked by dates on which GALE-CAST Model-W1's wind error beat both baselines, then margin, then wind, then date.
@@ -223,6 +257,8 @@ Every case figure states: "Selected example, chosen retrospectively for illustra
 
 ### PF-K (panel review)
 
+- **Paper Explanation:** The common regression window compares observed wind, forecast wind, absolute wind error and the hazard-warning outcomes of GALE-CAST Model-W1 at all three stations. The shared dates were selected using the documented wind-error rule and support a coordinated station-level interpretation of the retrospective example.
+- **Plain English Explanation:** Each row shows one station over the same three dates. Lines close to the recorded weather and shorter error bars indicate closer wind estimates from GALE-CAST Model-W1 or a reference forecast. The final panel adds the warning outcome so readers can compare numerical estimates with hazard decisions.
 - **What this graph shows:** The selection-v2 common window: wind, absolute wind error and GALE-CAST Model-W1+X1 outcome for all three stations on the same dates.
 - **Purpose:** A network-wide view of dates chosen for low model error. Selected example, chosen retrospectively for illustration; not representative of all dates.
 - **How it was produced:** Selection v2 common-window rule: complete at all three stations, relatively high wind at one or more, ranked by station-dates with a GALE-CAST Model-W1 wind win.
@@ -235,6 +271,8 @@ Every case figure states: "Selected example, chosen retrospectively for illustra
 
 ### PF-O (panel review)
 
+- **Paper Explanation:** The selected station window compares the wind, mean sea level pressure, relative humidity, rainfall and hazard-warning outputs of GALE-CAST Model-W1 with PAGASA observations and the reference forecasts. Shading identifies the recorded reference-error conditions, and stars identify model comparison wins within these retrospectively selected next-day cases.
+- **Plain English Explanation:** The black markers show recorded weather, and the blue line shows GALE-CAST Model-W1 forecasts. Lines near the recorded values indicate close estimates, while a score above the dashed cutoff means a warning was issued. Shading marks the selected reference-error conditions, and stars point out the model comparison wins on those dates.
 - **What this graph shows:** Per station, three consecutive target dates: observed and forecast wind, MSLP, humidity and rainfall with reference comparison dates shaded and GALE-CAST Model-W1 successes starred; a closest-forecast grid; the GALE-CAST Model-W1+X1 score and outcome.
 - **Purpose:** The panel's request for concrete dates where the baselines had large errors and GALE-CAST Model-W1 did better. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.
 - **How it was produced:** Selection v3 Part 2: windows ranked by the number of (variable, date) cells that are reference comparison dates on which GALE-CAST Model-W1 was strictly closer than both baselines, then normalised margin, then reference comparison cells, then date. Chosen because the model did well.
@@ -247,6 +285,8 @@ Every case figure states: "Selected example, chosen retrospectively for illustra
 
 ### PF-P (panel review)
 
+- **Paper Explanation:** The aligned common-window panels examine the next-day wind speed, mean sea level pressure, relative humidity and rainfall outputs of GALE-CAST Model-W1 at NAIA, Sangley Point and Science Garden. Using the same three retrospectively selected dates supports a coordinated view of the regression forecasts during a shared weather episode.
+- **Plain English Explanation:** Each row is a station, and each column is a weather variable. Black markers show recorded values, the blue line shows GALE-CAST Model-W1, and the other lines show the reference forecasts. Lines closer to the recorded values mean closer estimates; follow the shared dates to see how the weather changes across stations.
 - **What this graph shows:** The Part 2 common window: all four variables at all three primary stations on the same three dates.
 - **Purpose:** A network-wide view of a period when both references had large errors. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.
 - **How it was produced:** Common-window rule of Part 2: dates in the cohort at all three stations, ranked by total GALE-CAST Model-W1 success cells (of 36).
@@ -259,6 +299,8 @@ Every case figure states: "Selected example, chosen retrospectively for illustra
 
 ### PF-R (panel review)
 
+- **Paper Explanation:** The selected station window examines the wind and pressure forecasts of GALE-CAST Model-W1 on consecutive dates meeting the recorded joint error-comparison rule, with humidity, rainfall and hazard-warning outcomes provided as context. Each date is a separate next-day forecast, and the selected window illustrates the specified comparison conditions rather than performance over the complete period.
+- **Plain English Explanation:** The lines compare GALE-CAST Model-W1 and the reference forecasts with the recorded weather on each selected day. Lines near the observations and shorter error bars mean closer estimates, while stars mark the selected model comparison wins. The score panel shows whether a warning was issued for each separate next-day forecast.
 - **What this graph shows:** Per station, three consecutive target dates that all qualify under selection v4: observed and forecast wind and MSLP with absolute errors, humidity and rainfall (not used to select), and the GALE-CAST Model-W1+X1 score and outcome.
 - **Purpose:** Concrete dates for the panel where the model had lower error than persistence for wind and MSLP. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates. Dates selected because persistence's wind and MSLP errors were both larger than GALE-CAST Model-W1's.
 - **How it was produced:** Selection v4 windows: three consecutive qualifying dates, ranked by cells (of 6) where GALE-CAST Model-W1 also beat climatology, then the normalised persistence margin, then date; two-date windows only if a station has no three-date window.
