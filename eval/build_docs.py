@@ -13,6 +13,7 @@ import figure_notes as FN
 import paper_ledger as PL
 import tech_stack
 import terms
+import site_policy
 
 PANEL_PUB = ["PF-L_large_error_dates_mae", "PF-M_large_error_dates_differences", "PF-N_event_onsets", "PF-Q_persistence_worse_dates",
              "PF-L_composite_validation"]
@@ -142,7 +143,7 @@ def md_table(headers, rows):
 
 def public_md(text: str, where: str = "document") -> str:
     """Panel naming rules for a public Markdown document (model name; no banned words)."""
-    text = terms.markdown(text)
+    text = terms.markdown(site_policy.current_references(text))
     terms.check(text, where)
     return text
 
@@ -463,9 +464,10 @@ evaluation on observations from 2025 onward.
 
     # ------------------------------------------------------------ FIGURE_GUIDE.md
     NOTES = X["NOTES"]
-    pub_ids = [g["figure"] for g in pf["figures"]]
+    pub_ids = [g["figure"] for g in pf["figures"] if site_policy.published_figure(g["figure"])]
     legacy = ["F1_partitions", "F2_wind_mae_by_station", "F3_wind_monthly_means", "F4_wind_obs_vs_pred_counts",
               "F5_event_timeline_monthly", "F6_confusion_matrices", "F7_event_benchmarks", "F8_variants_and_inputs"]
+    legacy = [name for name in legacy if site_policy.published_figure(name)]
     write("FIGURE_GUIDE.md", f"""
 # Figure guide
 
@@ -596,6 +598,11 @@ Evidence for the thesis *GALE-CAST*, about the frozen, deployed model **W1** (`g
 
 W1 ranks pressure-fall days well, and its numerical wind, pressure and humidity forecasts are evaluated on the same
 cases, its scores are not calibrated probabilities, and every evaluation-period event is a pressure fall rather than gale-force wind.
+
+## Website presentation
+
+The benchmark results section shows PF-G as its only figure. Numerical comparisons
+and saved evaluation records remain available in the result tables and data exports.
 
 ## Documents
 

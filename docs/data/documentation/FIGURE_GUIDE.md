@@ -70,42 +70,6 @@ Files are in [`docs/figures/paper/`](../docs/figures/paper/) (site: https://miao
 - **Use in the paper:** Chapter 4, Model Evaluation (PR-AUC paragraph). Caption: 'Figure 4.x. Precision-recall curves of the deployed model's scores on the historical scorecard cases, with the 0.601 operating point.'
 - **Source:** figures/paper/PF-E_precision_recall_curves.csv; run w-cohort-20261024T205646Z-6b7a96.
 
-### PF-F_wind_mae_rmse — `PF-F_wind_mae_rmse.png` / `.svg` / `.csv`
-
-- **What this graph shows:** Mean absolute error and root-mean-square error (m/s) of next-day wind for GALE-CAST Model-W1, persistence and climatology, pooled and per station (3,421 of the 3,423 Evidence A cases).
-- **Purpose:** To test whether GALE-CAST Model-W1's numerical wind forecast is more accurate than two no-skill references.
-- **How it was produced:** GALE-CAST Model-W1 neural-only wind output on the website cases (no post-processing); raw unimputed observed wind; persistence = the issue day's observation; climatology = station × calendar-month mean of 2015-01-01 to 2020-10-14 observations; 95% block-bootstrap intervals.
-- **How to read it:** Lower bars are better. Lower MAE/RMSE means smaller errors on these matching cases. Signed mean error (bias) shows systematic over- or under-forecasting and can hide errors that cancel. Use confusion matrices for hazard decisions and regression errors for numerical forecasts.
-- **Actual finding:** Pooled MAE: GALE-CAST Model-W1 0.987, persistence 0.474, climatology 0.588 m/s; GALE-CAST Model-W1 bias 0.17 m/s. Science Garden: GALE-CAST Model-W1 1.334 vs persistence 0.216.
-- **What it supports:** Reports next-day wind accuracy by station and across the three stations on identical cases.
-- **Scope and context:** Says nothing about event detection (PF-C) or about strong winds (none reached 10.8 m/s); the wind statistic, averaging period and sensor height are undocumented.
-- **Use in the paper:** Chapter 4, regression results (replacing Table 4.5). Caption: 'Figure 4.x. Next-day wind-speed error of the deployed model and two reference forecasts on identical cases.'
-- **Source:** figures/paper/PF-F_wind_mae_rmse.csv; run w-cohort-20261024T205646Z-6b7a96.
-
-### PF-F2_website_regression_provenance — `PF-F2_website_regression_provenance.png` / `.svg` / `.csv`
-
-- **What this graph shows:** How the website's wind MAE of 0.5365 m/s arises: GALE-CAST Model-W1's own error, then two post-processing steps, beside persistence on the same 3,423 cases.
-- **Purpose:** To show which procedure produced the website's regression numbers before they are attributed to GALE-CAST Model-W1.
-- **How it was produced:** Port of validate_model_multioutput.py at GALE-CAST Model-W1 commit 1fd1ef9 (isotonic MOS per station × season, then a persistence blend), run on the saved website cases; truth = processed (forward-filled) wind, as in that script.
-- **How to read it:** Shorter bars are smaller errors. Bars marked 'fitted on evaluation outcomes' used the same period's observations to tune themselves.
-- **Actual finding:** GALE-CAST Model-W1 neural 0.9875 → after MOS 0.5764 → after blend 0.5365 (website value reproduced exactly); persistence 0.4744 m/s.
-- **What it supports:** Traces the reported regression result through neural output, MOS and blending. Each processing step is identified separately.
-- **Scope and context:** Not a GALE-CAST Model-W1 result and not an out-of-sample estimate; the blend uses an observation two days before the target (script indexing). MASE < 1 here uses an in-sample denominator.
-- **Use in the paper:** Chapter 4, note under the regression results, or Appendix. Caption: 'Figure 4.x. Provenance of the previously reported wind error: model output, in-period calibration and blending, and same-case persistence.'
-- **Source:** figures/paper/PF-F2_website_regression_provenance.csv; run reg-prov-20261024T205749Z-ce57af.
-
-### PF-F3_regression_variables_mae — `PF-F3_regression_variables_mae.png` / `.svg` / `.csv`
-
-- **What this graph shows:** Pooled MAE of GALE-CAST Model-W1, persistence and climatology for each regression output in its own unit and panel: wind (m/s), MSLP (hPa), humidity (%), rainfall (mm).
-- **Purpose:** To check every supported regression output, not only wind, against the same references.
-- **How it was produced:** GALE-CAST Model-W1 neural-only outputs on Evidence A cases with complete raw observations; rainfall inverted from log1p to mm; persistence = the issue day's observation; climatology = station × calendar-month mean of 2015-01-01 to 2020-10-14 observations; 95% block-bootstrap intervals.
-- **How to read it:** Lower is better within each panel; panels have different units and must not be compared with each other. Lower MAE/RMSE means smaller errors on these matching cases. Signed mean error (bias) shows systematic over- or under-forecasting and can hide errors that cancel. Use confusion matrices for hazard decisions and regression errors for numerical forecasts.
-- **Actual finding:** GALE-CAST Model-W1 vs persistence vs climatology MAE: wind 0.99/0.47/0.59; MSLP 1.94/0.85/1.59; humidity 8.73/4.63/5.40; rainfall 6.74/7.76/7.47 (rainfall RMSE GALE-CAST Model-W1 17.1 vs climatology 16.1; GALE-CAST Model-W1 bias -3.66 mm).
-- **What it supports:** Reports accuracy for all four weather variables, with model and reference forecasts evaluated on the same cases.
-- **Scope and context:** MAE, RMSE and signed bias describe different aspects of accuracy. Rainfall has many dry days and a few large values, so all three measures should be read together.
-- **Use in the paper:** Chapter 4, regression results table/figure. Caption: 'Figure 4.x. Next-day error of each regression output of the deployed model and two reference forecasts (separate units).'
-- **Source:** figures/paper/PF-F3_regression_variables_mae.csv; run w-cohort-20261024T205646Z-6b7a96.
-
 ### PF-G_observed_vs_predicted — `PF-G_observed_vs_predicted.png` / `.svg` / `.csv`
 
 - **What this graph shows:** For wind, MSLP, humidity and rainfall: the number of Evidence A cases in each observed-value bin (x) and GALE-CAST Model-W1-forecast bin (y), with the 1:1 line.
@@ -169,7 +133,7 @@ PF-Q (Evidence E, run `persist-v4-20261025T165748Z-3e854f`, `spec/CASE_SELECTION
 - **How to read it:** Left: number (and share) of qualifying dates. Middle and right: shorter bars are better. GALE-CAST Model-W1 below persistence is guaranteed by the selection; the climatology bars are the only comparison the rule does not fix.
 - **Actual finding:** 258 of 3,421 station-dates qualify (7.5%): NAIA 115 (10.1%), Sangley Point 115 (10.1%), Science Garden 28 (2.5%). On them, wind MAE GALE-CAST Model-W1 0.59 vs persistence 1.20, climatology 0.65 m/s; MSLP GALE-CAST Model-W1 0.63 vs 1.33 / 1.75 hPa. GALE-CAST Model-W1 was also closer than climatology for both variables on 116 of them.
 - **What it supports:** Dates exist, about one in thirteen, on which GALE-CAST Model-W1 beat persistence for both wind and MSLP; on them it was usually also closer than climatology for MSLP.
-- **Scope and context:** Dates were selected using the model and persistence errors, so the comparison is conditional on that rule. Table PE-2 and PF-F3 report all complete dates. Event counts and available consecutive windows vary by station.
+- **Scope and context:** Dates were selected using the model and persistence errors, so the comparison is conditional on that rule. Table PE-2 reports all complete dates. Event counts and available consecutive windows vary by station.
 - **Use in the paper:** Chapter 4, same subsection as PF-L (panel request). Caption: 'Figure 4.x. Station-dates on which persistence's next-day wind and MSLP errors were both larger than the model's, and errors on those dates. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates. Dates selected because persistence's wind and MSLP errors were both larger than GALE-CAST Model-W1's.'
 - **Source:** figures/paper/PF-Q_persistence_worse_dates.csv; run persist-v4-20261025T165748Z-3e854f; spec/CASE_SELECTION_v4_persistence_override.md.
 
@@ -181,8 +145,8 @@ PF-Q (Evidence E, run `persist-v4-20261025T165748Z-3e854f`, `spec/CASE_SELECTION
 - **How to read it:** Shorter bars are better (GALE-CAST Model-W1 blue, persistence orange, climatology green). Compare bars within a panel only: each panel has a different set of dates, n and unit.
 - **Actual finding:** wind (v4 dates (selected wind-and-pressure comparison dates), n = 258): GALE-CAST Model-W1 0.59 vs persistence 1.20, climatology 0.65 m/s; MSLP (v4 dates (selected wind-and-pressure comparison dates), n = 258): GALE-CAST Model-W1 0.63 vs persistence 1.33, climatology 1.75 hPa; humidity (v3 reference comparison dates for humidity, n = 114): GALE-CAST Model-W1 10.83 vs persistence 13.44, climatology 14.58 %; rainfall (all complete dates, n = 3,407): GALE-CAST Model-W1 6.74 vs persistence 7.76, climatology 7.47 mm.
 - **What it supports:** There are identifiable sets of dates on which GALE-CAST Model-W1's next-day error is lower than both simple references for each variable, and on all complete dates GALE-CAST Model-W1's rainfall error is lower than both.
-- **Scope and context:** Wind and pressure dates were selected using the model-persistence error comparison; humidity uses the training-derived reference-error rule; rainfall includes all complete dates. Each panel has its own dates and case count. These selected examples are descriptive; use PF-F3 and Table PE-2 for all-date results.
-- **Use in the paper:** Chapter 4, panel-requested subsection (only together with PF-F3). Caption: 'Figure 4.x. Next-day MAE of the deployed model, persistence and climatology on four selected sets of dates (wind and MSLP: dates on which the model had lower error than persistence for both; humidity: dates on which both references had large errors; rainfall: all complete dates). Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.'
+- **Scope and context:** Wind and pressure dates were selected using the model-persistence error comparison; humidity uses the training-derived reference-error rule; rainfall includes all complete dates. Each panel has its own dates and case count. These selected examples are descriptive; use Table PE-2 for all-date results.
+- **Use in the paper:** Chapter 4, panel-requested subsection (only together with Table PE-2). Caption: 'Figure 4.x. Next-day MAE of the deployed model, persistence and climatology on four selected sets of dates (wind and MSLP: dates on which the model had lower error than persistence for both; humidity: dates on which both references had large errors; rainfall: all complete dates). Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.'
 - **Source:** figures/paper/PF-L_composite_validation.csv; run persist-v4-20261025T165748Z-3e854f; spec/CASE_SELECTION_v3_panel_validation.md; spec/CASE_SELECTION_v4_persistence_override.md.
 
 
@@ -199,78 +163,6 @@ PF-Q (Evidence E, run `persist-v4-20261025T165748Z-3e854f`, `spec/CASE_SELECTION
 - **Scope and context:** Does not explain why these cut-off dates were chosen (not recorded) and does not prove the split valid.
 - **Use in the paper:** Chapter 3, Data Partitioning. Caption: 'Figure 3.x. Data allocation of the deployed model by source and date.'
 - **Source:** data/F1_partitions.csv; run fig-20261025T165933Z-1486cf.
-
-### F2_wind_mae_by_station — `docs/figures/F2_wind_mae_by_station.png`
-
-- **What this graph shows:** Next-day wind MAE (m/s) by station for GALE-CAST Model-W1, persistence and climatology on 3,520 identical Evidence B cases.
-- **Purpose:** To test GALE-CAST Model-W1's wind forecast against two references with training-consistent inputs.
-- **How it was produced:** Evidence B: the training-consistent benchmark (3,520 event cases / 3,555 wind cases, target dates 2021-10-15 to 2024-12-31; inputs scaled per station as in training; raw unimputed truth); persistence = the issue day's observation; climatology = station × calendar-month mean of 2015-01-01 to 2020-10-14 observations; 95% block-bootstrap intervals.
-- **How to read it:** Lower is better. Lower MAE/RMSE means smaller errors on these matching cases. Signed mean error (bias) shows systematic over- or under-forecasting and can hide errors that cancel. Use confusion matrices for hazard decisions and regression errors for numerical forecasts.
-- **Actual finding:** Pooled MAE GALE-CAST Model-W1 1.021, persistence 0.467, climatology 0.584 m/s.
-- **What it supports:** Provides station-level and pooled next-day wind accuracy with inputs prepared as in training.
-- **Scope and context:** No day reached 10.8 m/s, so strong-wind accuracy is untested.
-- **Use in the paper:** Chapter 4, regression results (training-consistent benchmark). Caption: 'Figure 4.x. Next-day wind MAE on the training-consistent benchmark.'
-- **Source:** data/F2_wind_mae_by_station.csv; run b-benchmark-20261023T162436Z-874640.
-
-### F3_wind_monthly_means — `docs/figures/F3_wind_monthly_means.png`
-
-- **What this graph shows:** Monthly means of observed wind and of each forecast, per station, over the whole Evidence B period (no dates selected).
-- **Purpose:** To show whether GALE-CAST Model-W1 follows seasonal and station differences in wind.
-- **How it was produced:** Daily Evidence B values averaged within each calendar month.
-- **How to read it:** Each line shows a monthly mean. Compare the model and reference lines with the observed line at the same station.
-- **Actual finding:** Monthly means summarise the observed and forecast wind values for each station across the evaluation period.
-- **What it supports:** Provides a view of seasonal and station differences in observed and forecast wind.
-- **Scope and context:** Monthly averaging hides day-to-day behaviour.
-- **Use in the paper:** Appendix (regression diagnostics). Caption: 'Figure A.x. Monthly mean observed and forecast wind by station.'
-- **Source:** data/wind_monthly_means_by_station.csv; run b-benchmark-20261023T162436Z-874640.
-
-### F4_wind_obs_vs_pred_counts — `docs/figures/F4_wind_obs_vs_pred_counts.png`
-
-- **What this graph shows:** Counts of Evidence B cases by observed-wind bin and GALE-CAST Model-W1-forecast bin.
-- **Purpose:** To show the range of GALE-CAST Model-W1's wind forecasts relative to observations.
-- **How it was produced:** Binned counts of all Evidence B wind cases.
-- **How to read it:** The horizontal axis groups observed wind values; the vertical axis groups predicted values. Each cell gives the number of cases.
-- **Actual finding:** Cell counts show the distribution of model forecasts and observations on all eligible dates.
-- **What it supports:** Provides a distribution view alongside the numerical accuracy tables.
-- **Scope and context:** Does not show why (the audit points to the wind target's small share of the training loss and per-station scaling).
-- **Use in the paper:** Appendix. Caption: 'Figure A.x. Observed versus forecast wind (counts), training-consistent benchmark.'
-- **Source:** data/F4_wind_obs_vs_pred_counts.csv; run fig-20261025T165933Z-1486cf.
-
-### F5_event_timeline_monthly — `docs/figures/F5_event_timeline_monthly.png`
-
-- **What this graph shows:** Monthly counts of hits, misses and false alarms per station for GALE-CAST Model-W1+X1 at 0.601 (Evidence B).
-- **Purpose:** To show when events and errors happened, without publishing exact dates.
-- **How it was produced:** Evidence B decisions aggregated by month; totals equal the PF-C panel B matrix.
-- **How to read it:** Bars above the axis are hits and misses; below are false alarms.
-- **Actual finding:** Events cluster in a few storm months; 27 events in total, all pressure falls.
-- **What it supports:** Results rest on a small number of episodes.
-- **Scope and context:** Monthly counts cannot show lead-time behaviour; events are not independent.
-- **Use in the paper:** Appendix. Caption: 'Figure A.x. Monthly event outcomes by station, training-consistent benchmark.'
-- **Source:** data/event_outcomes_monthly_by_station.csv; run b-benchmark-20261023T162436Z-874640.
-
-### F6_confusion_matrices — `docs/figures/F6_confusion_matrices.png`
-
-- **What this graph shows:** 2×2 matrices with correct negatives for every Evidence B procedure on the same 3,520 cases.
-- **Purpose:** To compare the warning burden (misses vs false alarms) of GALE-CAST Model-W1 and the baselines.
-- **How it was produced:** Evidence B: the training-consistent benchmark (3,520 event cases / 3,555 wind cases, target dates 2021-10-15 to 2024-12-31; inputs scaled per station as in training; raw unimputed truth); frozen thresholds (GALE-CAST Model-W1 raw 0.64, GALE-CAST Model-W1+X1 0.601/0.62); event persistence = the issue day's label; event climatology = station × month label frequency 2015-2020, warning threshold chosen on the 2020-21 tuning year.
-- **How to read it:** Each matrix sums to the case count; compare hits against false alarms.
-- **Actual finding:** GALE-CAST Model-W1+X1 at 0.601: 16 hits, 11 misses, 8 false alarms; event persistence 6 hits, 20 false alarms.
-- **What it supports:** With training-consistent inputs GALE-CAST Model-W1+X1 at 0.601 still has the highest F1 of the procedures shown.
-- **Scope and context:** This cohort uses training-consistent inputs and has a different case count from the historical scorecard; all events are pressure falls.
-- **Use in the paper:** Chapter 4, baseline comparison (training-consistent). Caption: 'Figure 4.x. Confusion matrices of all procedures on the training-consistent benchmark.'
-- **Source:** data/F6_confusion_matrices.csv; run b-benchmark-20261023T162436Z-874640.
-
-### F7_event_benchmarks — `docs/figures/F7_event_benchmarks.png`
-
-- **What this graph shows:** F1 and PR-AUC with 95% intervals for GALE-CAST Model-W1 and the event baselines (Evidence B).
-- **Purpose:** To show how certain the event-detection comparison is.
-- **How it was produced:** Paired circular block bootstrap over target dates (14-day blocks, 2,000 resamples).
-- **How to read it:** Higher is better; wide intervals mean uncertain values.
-- **Actual finding:** GALE-CAST Model-W1+X1 F1 0.627 vs persistence 0.226 (established: positive); PR-AUC 0.487 vs climatology 0.022.
-- **What it supports:** GALE-CAST Model-W1+X1 ranks pressure-fall days better than both baselines on training-consistent inputs.
-- **Scope and context:** Uncertainty intervals reflect the 27 observed events.
-- **Use in the paper:** Chapter 4, baseline comparison. Caption: 'Figure 4.x. Event-detection scores with 95% block-bootstrap intervals, training-consistent benchmark.'
-- **Source:** data/F7_event_benchmarks.csv; run b-benchmark-20261023T162436Z-874640.
 
 ### F8_variants_and_inputs — `docs/figures/F8_variants_and_inputs.png`
 
@@ -325,7 +217,7 @@ Every case figure states: "Selected example, chosen retrospectively for illustra
 - **How to read it:** Error bars: shorter is better. The grid names the closest forecast per variable and date (GALE-CAST Model-W1 shaded). Each date is a separate next-day forecast.
 - **Actual finding:** GALE-CAST Model-W1 wind beat both baselines on NAIA 3/3 dates (MSLP 0, humidity 1, rainfall 1); Sangley Point 3/3 dates (MSLP 1, humidity 1, rainfall 2); Science Garden 1/3 dates (MSLP 1, humidity 1, rainfall 1). Outcomes: NAIA Correct negative, Hit, Correct negative; Sangley Point Correct negative, Miss, Hit; Science Garden Miss, False alarm, Hit.
 - **What it supports:** On selected dates with relatively strong wind, GALE-CAST Model-W1's wind forecast can be closer than both references.
-- **Scope and context:** Chosen for low GALE-CAST Model-W1 wind error; does not hold for pressure in these windows; Science Garden's '90th percentile' is only 2 m/s and its window has 1 wind win, a miss and a false alarm; overall GALE-CAST Model-W1 wind error is larger than persistence (PF-F).
+- **Scope and context:** Chosen for low GALE-CAST Model-W1 wind error; does not hold for pressure in these windows; Science Garden's '90th percentile' is only 2 m/s and its window has 1 wind win, a miss and a false alarm; overall GALE-CAST Model-W1 wind error is larger than persistence (Table PE-2).
 - **Use in the paper:** Chapter 4, selected case studies (separate from PF-H). Caption: 'Figure 4.x. Selected regression example: three consecutive next-day wind forecasts during relatively strong wind. Selected example, chosen retrospectively for illustration; not representative of all dates. Selected for low model wind error.'
 - **Source:** panel-review PNG/SVG/CSV: docs/figures/paper/; source archive: _private/thesis_export/case-v2-20261025T163813Z-0ec8d0/; public counts: runs/case-v2-20261025T163813Z-0ec8d0/case_selection_v2_summary.json.
 
@@ -373,6 +265,6 @@ Every case figure states: "Selected example, chosen retrospectively for illustra
 - **How to read it:** Shaded = qualifying date; ★ = GALE-CAST Model-W1 also closer than climatology. Each date is a separate next-day forecast.
 - **Actual finding:** NAIA: 3-date window, GALE-CAST Model-W1 also beat climatology on 5 of 6 cells; Sangley Point: 3-date window, GALE-CAST Model-W1 also beat climatology on 5 of 6 cells; Science Garden: no window (no two consecutive qualifying dates). No common window qualifies at all three stations.
 - **What it supports:** On these dates GALE-CAST Model-W1's wind and MSLP were closer than persistence's, and mostly closer than climatology's.
-- **Scope and context:** Chosen for GALE-CAST Model-W1's success; Science Garden has no qualifying window; not a performance estimate (see PF-Q, PF-F).
+- **Scope and context:** Chosen for GALE-CAST Model-W1's success; Science Garden has no qualifying window; not a performance estimate (see PF-Q, Table PE-2).
 - **Use in the paper:** Chapter 4, same subsection (thesis and panel-review site). Caption: 'Figure 4.x. Selected window comparing model and persistence wind and MSLP errors. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates. Dates selected because persistence's wind and MSLP errors were both larger than GALE-CAST Model-W1's.'
 - **Source:** panel-review PNG/SVG/CSV: docs/figures/paper/; source archive: _private/thesis_export/persist-v4-20261025T165748Z-3e854f/; public counts: runs/persist-v4-20261025T165748Z-3e854f/persistence_v4_results.json.

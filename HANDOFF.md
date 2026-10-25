@@ -1,6 +1,17 @@
 # Handoff: GALE-CAST W1 evaluation `GCV-W1-v1` (+ amendment A2)
 
-Last updated: 2026-10-25.
+Last updated: 2026-10-26.
+
+## Section 5 presentation update (2026-10-26)
+
+Section 5.2 was removed from the site template. PF-G is the only figure in the
+benchmark-results section. The former wind, monthly, event-chart and regression
+comparison images are excluded from the website, download gallery and figure
+guide by `eval/site_policy.py`; rebuilding does not restore them.
+Historical runs and numerical exports remain unchanged. Table PE-2 retains the
+all-date comparison, and the metrics registry retains the complete benchmark.
+Run `python eval/audit_presentation.py` after a build to verify the publication
+exclusions, the PF-G-only section, downloads and navigation anchors.
 
 ## Panel review publication update (2026-10-26)
 

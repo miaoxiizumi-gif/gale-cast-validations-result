@@ -17,6 +17,7 @@ import build_docs
 import figure_notes as FN
 import tech_stack
 import terms
+import site_policy
 import publish_cases
 from content import CLAIMS, LIMITS, OMISSIONS, REV
 
@@ -36,7 +37,7 @@ def J(p):
 
 
 def e(s):
-    return html.escape(str(s))
+    return html.escape(site_policy.current_references(str(s)))
 
 
 def md_inline(s: str) -> str:
@@ -110,7 +111,8 @@ def main():
     (DOCS / "figures").mkdir(parents=True)
     (DOCS / "data").mkdir()
     for p in runs["fig"].glob("F*.png"):
-        shutil.copy(p, DOCS / "figures" / p.name)
+        if site_policy.published_figure(p.stem):
+            shutil.copy(p, DOCS / "figures" / p.name)
     for p in runs["fig"].glob("F*.csv"):
         shutil.copy(p, DOCS / "data" / p.name)
     X = build_docs.main()  # writes documentation/*.md and README.md from the same runs
@@ -118,7 +120,8 @@ def main():
     (DOCS / "figures" / "paper").mkdir()
     for p in [*(X["runs"]["pf"] / "figures").glob("PF-*"), *(X["runs"]["case3"] / "figures").glob("PF-*"),
               *(X["runs"]["case4"] / "figures").glob("PF-*")]:
-        shutil.copy(p, DOCS / "figures" / "paper" / p.name)
+        if p.suffix not in (".png", ".svg") or site_policy.published_figure(p.stem):
+            shutil.copy(p, DOCS / "figures" / "paper" / p.name)
     case_figures = publish_cases.publish(X, DOCS / "figures" / "paper")
     (DOCS / "data" / "documentation").mkdir(exist_ok=True)
     for p in (C.WORKSPACE / "documentation").glob("*"):
@@ -415,10 +418,6 @@ comparison, with 95% intervals, is PF-F3 in the regression section.</p>
 <code>validate_model_multioutput.py</code> at W1 commit <code>1fd1ef9</code> and reproduced <b>exactly</b> (run <code>{PH['run_rp']}</code>). It is not
 W1's own output: isotonic MOS and a persistence blend were fitted on the same evaluation period. Chapter 4's Table 4.5 (2.04 km/h) is the same
 pipeline on the model before W1, and its wind-direction row comes from a separate direction-only model.</p>
-{fig("PF-F2_website_regression_provenance", "Bars: neural 0.987, after MOS 0.576, after blend 0.5365, persistence 0.474", "<b>PF-F2.</b> From W1's neural wind error to the website's 0.5365 m/s, with issue-day persistence on the same cases and truth for reference.")}
-{fig("PF-F_wind_mae_rmse", "Wind MAE and RMSE by station for W1, persistence and climatology", f"<b>PF-F.</b> W1's neural next-day wind against both baselines on {PH['a_wind_n']} website cases with raw observations: W1's MAE and RMSE are higher at every station; the MAE difference is established against persistence at every station and against climatology everywhere except NAIA.")}
-{fig("PF-F3_regression_variables_mae", "MAE of four regression outputs, one panel each", "<b>PF-F3.</b> Every supported regression output in its own unit. MAE, RMSE and bias describe different aspects of forecast accuracy; each variable is reported in its own unit.")}
-{fig("PF-G_observed_vs_predicted", "Binned observed versus forecast counts with a 1:1 line", "<b>PF-G.</b> Observed vs W1-forecast values as counts per cell (no individual readings), with the 1:1 line.")}
 """)
 
     # identity
@@ -561,18 +560,6 @@ post-processing fitted in the evaluation period. {md_inline(fill(CLAIMS[17][2]))
 
     # results
     arows = [[k, "✔" if v else "✘"] for k, v in A["reproduction"].items()]
-    wtab = []
-    for sc in ["pooled", *C.PRIMARY]:
-        bw = Bm["wind"][sc]
-        for meth in ("W1", "persistence", "climatology"):
-            p = bw["point"][meth]
-            wtab.append([sc if meth == "W1" else "", meth, p["n"], f(p["mae"]), ci(bw["ci"][f"mae_{meth}"]), f(p["rmse"]), f(p["bias"], 3)])
-    wdiff = []
-    for sc in ["pooled", *C.PRIMARY]:
-        bw = Bm["wind"][sc]["ci"]
-        for k, lab in (("dmae_W1_persistence", "W1 − persistence"), ("dmae_W1_climatology", "W1 − climatology")):
-            pt = Bm["wind"][sc]["point"]["W1"]["mae"] - Bm["wind"][sc]["point"][k.split("_")[-1]]["mae"]
-            wdiff.append([sc, lab, f(pt), ci(bw[k]), e(bw[k]["verdict"])])
     etab = []
     for n, c in cls.items():
         etab.append([e(n), int(c["tp"]), int(c["fn"]), int(c["fp"]), int(c["tn"]), f(c["accuracy"], 4), f(c["precision"]),
@@ -597,12 +584,7 @@ post-processing fitted in the evaluation period. {md_inline(fill(CLAIMS[17][2]))
 {f(A['neural_only_wind_legacy_windows']['mae'])} m/s (the scorecard's 0.5365 includes post-processing fitted on the test period and is not reproduced).</p>
 <details><summary>Reproduction checks (run <code>{ph['a']}</code>)</summary>{table(["Check", "Result"], arows)}</details>
 
-<h3>5.2 Wind speed, next day (identical cases)</h3>
-{table(["Scope", "Method", "n", "MAE m/s", "MAE 95% CI", "RMSE m/s", "Bias m/s"], wtab)}
-{table(["Scope", "Difference in MAE", "Point", "95% CI", "Interval summary"], wdiff)}
-{figL("F2_wind_mae_by_station", "Next-day wind MAE by station for the model and reference forecasts", "F2_wind_mae_by_station.csv")}
-{figL("F3_wind_monthly_means", "Monthly observed and forecast wind means at each station", "wind_monthly_means_by_station.csv")}
-{figL("F4_wind_obs_vs_pred_counts", "Counts of observed and forecast wind values in each bin", "F4_wind_obs_vs_pred_counts.csv")}
+{fig("PF-G_observed_vs_predicted", "Binned observed versus forecast counts with a 1:1 line", "<b>PF-G.</b> Observed vs W1-forecast values as counts per cell (no individual readings), with the 1:1 line.")}
 
 <h3>5.3 Events (study label: wind ≥ 10.8 m/s or pressure fall ≥ 3 hPa), identical cases</h3>
 <p>{bc['event']['eligible']:,} cases, {ph['ev_n']} events (prevalence {f(x1['prevalence'], 4)}); every event is a pressure fall; no wind event; no gale-force day.</p>
@@ -613,9 +595,6 @@ post-processing fitted in the evaluation period. {md_inline(fill(CLAIMS[17][2]))
 <p class="small">df1 = model F1 minus reference F1; dprauc = model PR-AUC minus reference PR-AUC; dbrier = model Brier score minus reference Brier score.</p>
 <h4>By station (W1+X1 at 0.601; hits/false alarms/misses)</h4>
 {table(["Station", "Events", "W1+X1 H/FA/M", "W1+X1 F1", "Persistence H/FA/M", "W1+X1 PR-AUC"], stn)}
-{figL("F6_confusion_matrices", "Five binary confusion matrices including correct negatives", "F6_confusion_matrices.csv")}
-{figL("F5_event_timeline_monthly", "Monthly hits, misses and false alarms per station; events cluster in typhoon seasons 2022-2024", "F5_event_timeline_monthly.csv")}
-{figL("F7_event_benchmarks", "F1 and PR-AUC with confidence intervals; W1+X1 above persistence and climatology, with wide intervals", "F7_event_benchmarks.csv")}
 
 <h3>5.4 Declared sensitivities</h3>
 <ul>
@@ -720,6 +699,7 @@ Download: <a href="data/revision_ledger.csv">CSV</a>, <a href="data/revisions.js
 
     figs = sorted([*(X["runs"]["pf"] / "figures").glob("PF-*.png"), *(X["runs"]["case3"] / "figures").glob("PF-*.png"),
                    *(X["runs"]["case4"] / "figures").glob("PF-*.png")], key=lambda p: p.name)
+    figs = [p for p in figs if site_policy.published_figure(p.stem)]
     figs += case_figures
     frows = [[e(p.stem), f'<a href="figures/paper/{p.name}">PNG</a> · <a href="figures/paper/{p.stem}.svg">SVG</a> · <a href="figures/paper/{p.stem}.csv">CSV</a>',
               next((g["evidence_group"] for g in X["pf"]["figures"] if g["figure"] == p.stem),
@@ -821,7 +801,7 @@ Only the selected case windows include station readings and individual forecasts
 <nav><div class="wrap">{navh}</div></nav><main class="wrap">{''.join(S)}</main>
 <footer><div class="wrap">Aggregate results only; no individual station-day readings are published. PAGASA is the source of the station observations. Maintained by Courtney (miaoxiizumi-gif); see Credits. Generated by <code>eval/build_site.py</code>.</div></footer>
 </body></html>"""
-    page = terms.html(page)  # panel naming rules on every visible text node
+    page = terms.html(site_policy.current_references(page))  # panel naming rules on every visible text node
     page = re.sub(r'\b(alt|content)="([^"]*)"', lambda m: f'{m.group(1)}="{terms.text(m.group(2))}"', page)
     visible = re.sub(r"<code>.*?</code>", " ", page, flags=re.S)
     visible = re.sub(r"<[^>]+>", " ", visible)

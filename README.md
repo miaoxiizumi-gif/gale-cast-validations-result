@@ -19,6 +19,11 @@ Evidence for the thesis *GALE-CAST*, about the frozen, deployed model **GALE-CAS
 GALE-CAST Model-W1 ranks pressure-fall days well, and its numerical wind, pressure and humidity forecasts are evaluated on the same
 cases, its scores are not calibrated probabilities, and every evaluation-period event is a pressure fall rather than gale-force wind.
 
+## Website presentation
+
+The benchmark results section shows PF-G as its only figure. Numerical comparisons
+and saved evaluation records remain available in the result tables and data exports.
+
 ## Documents
 
 | Document | Content |

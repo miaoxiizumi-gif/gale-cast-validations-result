@@ -9,6 +9,7 @@ import re
 import build_docs
 import common as C
 import terms
+import site_policy
 
 
 class Visible(HTMLParser):
@@ -56,6 +57,21 @@ def main():
                if not url.startswith(('http:', 'https:', '#', 'mailto:', 'data:'))
                and not (docs / url.split('#')[0]).exists()]
     assert not missing, missing
+    assert all(url[1:] in page.ids for url in page.links if url.startswith('#')), 'Broken page anchor'
+    html = (docs / 'index.html').read_text(encoding='utf-8')
+    assert not re.search(r'<h[1-6][^>]*>\s*5\.2\b', html), 'Removed subsection restored'
+    result_section = re.search(r'<section\b[^>]*id="results"[^>]*>(.*?)</section>', html, re.S)
+    assert result_section, 'Benchmark results section missing'
+    images = re.findall(r'<img\b[^>]*src="([^"]+)"', result_section[1])
+    assert images == ['figures/paper/PF-G_observed_vs_predicted.png'], images
+    assert result_section[1].count('<figure>') == 1, 'Extra figure card in Section 5'
+    assert result_section[1].count('class="fignotes"') == 1, 'Extra figure notes in Section 5'
+    guide = (docs / 'data' / 'documentation' / 'FIGURE_GUIDE.md').read_text(encoding='utf-8')
+    for name in site_policy.REMOVED_FIGURES:
+        assert not list((docs / 'figures').rglob(name + '.png')), name
+        assert not list((docs / 'figures').rglob(name + '.svg')), name
+        assert not re.search(r'^### ' + re.escape(name) + r'\b', guide, re.M), name
+        assert not any(name + ext in html for ext in ('.png', '.svg')), name
     figures = list((docs / 'figures').rglob('*.svg'))
     for path in figures:
         svg = Visible()
