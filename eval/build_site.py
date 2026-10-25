@@ -16,6 +16,7 @@ import common as C
 import build_docs
 import figure_notes as FN
 import tech_stack
+import terms
 from content import CLAIMS, LIMITS, OMISSIONS, REV
 
 DOCS = C.WORKSPACE / "docs"
@@ -192,30 +193,36 @@ def main():
     ckey = [k for k in cA if k.startswith("event_climatology")][0]
     xa, pa, ca = cA["W1+X1@0.601"], cA["event_persistence"], cA[ckey]
     sec("overview", "Overview in plain English", f"""
-<p class="lead">GALE-CAST's deployed model, <strong>W1</strong>, reads the last 32 days of weather at a Metro Manila station and gives
-(a) a score for whether <em>tomorrow</em> meets the study's hazard label (wind ≥ 10.8 m/s or a 24-hour pressure fall ≥ 3 hPa) and
-(b) six next-day weather values. This site checks the frozen model, without changing it, against what was recorded and against two
-simple reference forecasts. The method is <b>retrospective forecast verification with persistence and climatology benchmarking</b>;
-it is not cross-validation.</p>
+<p class="lead">GALE-CAST Model-W1 is the forecasting model behind the GALE-CAST website. Each day it looks at the last 32 days of
+weather at a Metro Manila station and predicts two things for <em>tomorrow</em>: whether a weather hazard is coming (a strong wind of at
+least 10.8 m/s, or a pressure drop of at least 3 hPa in 24 hours), and six weather values such as wind speed, pressure, humidity and
+rainfall. This site checks those past forecasts against what PAGASA actually recorded. The model itself was not changed.</p>
+<p>To judge a forecast you need something to compare it with. We use two simple <b>reference forecasts</b> that need no model at all:
+<b>persistence</b> ("tomorrow will be the same as today") and <b>climatology</b> ("tomorrow will be the usual value for this station and
+month"). A useful model should do better than these. We measure numerical forecasts with the <b>mean absolute error (MAE)</b>, the average
+size of the miss in the variable's own unit (lower is better), and the <b>root mean square error (RMSE)</b>, which counts big misses more.</p>
 <div class="cards">
- <div class="card"><div class="k">Website scorecard, traced</div><div class="v">24 / 28</div><div class="s">events caught with 9 false alarms on the
- website's 3,423 cases. Every case was identified and matches the original saved record.</div></div>
- <div class="card good"><div class="k">Strength: event detection</div><div class="v">F1 {xa['f1']:.2f}</div><div class="s">vs {pa['f1']:.2f} for
- "tomorrow's label = today's" and {ca['f1']:.2f} for the monthly event rate, on the same cases (difference vs persistence established).
- PR-AUC {ev['probabilistic']['W1+X1']['pr_auc']:.2f} vs no-skill {xa['prevalence']:.3f}.</div></div>
- <div class="card bad"><div class="k">Weakness: weather values</div><div class="v">{PH['a_w1_mae']} m/s</div><div class="s">wind error (MAE) of W1 vs
- <b>{PH['a_pe_mae']}</b> for "tomorrow = today". W1 is also worse than persistence for pressure and humidity.</div></div>
- <div class="card"><div class="k">Training-consistent inputs</div><div class="v">{PH['b_tp']} / {PH['b_events']}</div><div class="s">events caught
- ({PH['b_fp']} false alarms) when inputs are scaled as in training: the scorecard depends on input scaling.</div></div>
+ <div class="card good"><div class="k">Strength: hazard warnings</div><div class="v">24 / 28</div><div class="s">hazard days warned with 9 false alarms on the
+ website's 3,423 cases. Every case was traced and matches the original saved record.</div></div>
+ <div class="card good"><div class="k">Better than the references at warnings</div><div class="v">F1 {xa['f1']:.2f}</div><div class="s">vs {pa['f1']:.2f} for
+ "tomorrow's warning = today's" and {ca['f1']:.2f} for the monthly hazard rate, on the same cases (difference vs persistence established).
+ PR-AUC {ev['probabilistic']['W1+X1']['pr_auc']:.2f} vs {xa['prevalence']:.3f} for guessing.</div></div>
+ <div class="card good"><div class="k">Strength: rainfall</div><div class="v">{PH['a_rain_w1']} mm</div><div class="s">average rainfall error, lower than
+ persistence ({PH['a_rain_pe']} mm) and climatology ({PH['a_rain_cl']} mm) on the same cases.</div></div>
+ <div class="card"><div class="k">Where the model can improve</div><div class="v">{PH['a_w1_mae']} m/s</div><div class="s">average wind error, against
+ <b>{PH['a_pe_mae']}</b> m/s for "tomorrow = today". Persistence is also closer for pressure and humidity.</div></div>
 </div>
-<p><b>What this means.</b> W1 is genuinely better than simple rules at flagging the days on which station pressure falls sharply, and the
-website's matrix can be reproduced case by case. But every event in 2021-2024 was a pressure fall (no gale-force wind was recorded), the
-scores are not calibrated probabilities, the period was used to choose the scoring rule, and W1's own wind, pressure and humidity forecasts
-are less accurate than persistence. The website's regression numbers come from post-processing fitted on the evaluation period, not from W1 alone.</p>
-<div class="groups"><div><span class="tag new">A</span> <b>Website historical scorecard</b>: overall evidence on the website's own cases.</div>
-<div><span class="tag hist">B</span> <b>Training-consistent benchmark</b>: overall evidence, declared before scoring (the two B sections).</div>
-<div><span class="tag sel">C</span> <b>Selected case studies</b>: chosen retrospectively to explain behaviour; not representative.</div>
-<div><span class="tag sel">D</span> <b>Baseline-failure validation</b> (panel request): every date where persistence and climatology both failed, then selected examples; not representative of all dates.</div></div>
+<p><b>What this means.</b> The model is clearly better than the simple references at warning of the days when station pressure drops
+sharply, and its rainfall forecasts are closer than both references. For day-to-day wind, pressure and humidity values, "tomorrow will be
+like today" is still the closer forecast. Points to keep in mind: every hazard day in 2021-2024 was a pressure drop (no gale-force wind was
+recorded), the warning score is a ranking rather than a calibrated probability, and the test years were also used to choose the scoring
+rule. When inputs are prepared exactly as in training, the model warned of {PH['b_tp']} of {PH['b_events']} hazard days with {PH['b_fp']} false
+alarms. The website's own regression numbers include extra adjustments fitted on the test years (see the regression section).</p>
+<div class="groups"><div><span class="tag new">A</span> <b>Website historical scorecard</b>: results on the website's own cases.</div>
+<div><span class="tag hist">B</span> <b>Training-consistent benchmark</b>: results with inputs prepared as in training, planned before scoring.</div>
+<div><span class="tag sel">C</span> <b>Selected case studies</b>: a few dates chosen to explain behaviour; not representative.</div>
+<div><span class="tag sel">D</span> <b>Dates when the references had large errors</b> (panel request): every such date, then selected examples.</div>
+<div><span class="tag sel">E</span> <b>Panel directive dates</b>: dates on which persistence did worse than the model for wind and pressure; not representative of all dates.</div></div>
 <p class="note">Evaluation <code>{EVAL_ID}</code> with amendment A2. Specification committed before scoring: <code>{e(spec_commit)}</code>.
 Status: <b>provisional</b>; chapter corrections are proposals, not applied edits.</p>
 <p class="legend"><span class="tag repo">repository fact</span> <span class="tag hist">historical claim with saved record</span>
@@ -271,7 +278,9 @@ The label uses processed (forward-filled) values, as on the website; recomputed 
               ", ".join(v.get("outcomes", [])) or "—"] for s_, v in C2["per_station"].items()]
 
     def privnote(fid):
-        return f'<div class="privfig"><p><b>{fid} (private figure; not available on this site)</b></p>{FN.html(NOTES[fid], e)}</div>'
+        return (f'<div class="privfig"><p><b>{fid}: kept for the printed thesis.</b> This figure plots individual PAGASA station readings. '
+                f'PAGASA\'s data terms (CADS-07 Rev.6, condition 4) do not allow station readings to be published online, so the image is not '
+                f'on this site; it will be added here if PAGASA gives written permission. Its full explanation is below.</p>{FN.html(NOTES[fid], e)}</div>')
     sec("cases", "C. Selected illustrative case studies", f"""
 <div class="selected"><p class="selbanner"><span class="tag sel">Evidence C</span> <b>{e(FN.SELECTED)}</b></p>
 <p>Two separately recorded selections. Neither is a performance estimate; the overall comparisons (Sections A, B and the regression evidence)
@@ -284,17 +293,17 @@ dates are withheld here, as for every event date on this site.</p>
 <h3>Set 1: warning behaviour around detected events</h3>
 <p>Criteria committed before selection (<a href="data/CASE_SELECTION_v1.md">CASE_SELECTION_v1.md</a>): from the 24 hits, three consecutive
 target dates with complete raw wind and pressure observations and a raw-confirmed event; ranked by correct W1 decisions in the window
-(favourable, disclosed), then pressure fall, then date. W1's numerical error was <b>not</b> used. {CASE['eligible']} of {CASE['candidates']} candidates passed.</p>
+(chosen for correct warnings, disclosed), then pressure fall, then date. W1's numerical error was <b>not</b> used. {CASE['eligible']} of {CASE['candidates']} candidates passed.</p>
 {table(["Station", "Event trigger", "W1+X1 outcomes (day before, event, day after)", "Event persistence on the event day", "Eligible candidates"], crow)}
 <p><b>A classification success is not a regression success.</b> In these windows W1+X1 warned correctly on every day, but W1's wind
 forecast was closer than both baselines on only 3 of the 9 station-days.</p>
 {privnote("PF-H")}{privnote("PF-I")}
-<h3>Set 2: favourable regression example (panel request)</h3>
+<h3>Set 2: regression example chosen for low model error (panel request)</h3>
 <p>Criteria recorded before the search (<a href="data/CASE_SELECTION_v2_regression.md">CASE_SELECTION_v2_regression.md</a>): complete raw
 wind, pressure, humidity and rainfall; observed wind at or above the station's 2015-2020 90th percentile on at least one day (NAIA
 {C2['station_wind_p90_training_ms']['NAIA']:.0f} m/s, Sangley Point {C2['station_wind_p90_training_ms']['Sangley Point']:.0f} m/s, Science Garden
 {C2['station_wind_p90_training_ms']['Science Garden']:.0f} m/s); windows with a detected event first; ranked by the number of days on which W1's
-wind error was smaller than both baselines. <b>This is a favourable-error selection.</b> Other variables were reported, not used to select.</p>
+wind error was smaller than both baselines. <b>These dates were chosen because the model's error was low.</b> Other variables were reported, not used to select.</p>
 {table(["Station", "Higher-wind windows", "…with a detected event and ≥1 W1 wind win", "Selected", "Days W1 closest (of 3) by variable", "W1+X1 outcomes"], crow2)}
 <p>Common window: W1's wind was closest on {C2['common']['station_dates_with_wind_win_of_9'] if C2.get('common') else 0} of 9 station-days.</p>
 {privnote("PF-J")}{privnote("PF-K")}
@@ -305,12 +314,30 @@ wind error was smaller than both baselines. <b>This is a favourable-error select
     D3 = X["case3"]
     P3 = D3["part1_A_q90"]
     unit = {"wind": "m/s", "mslp": "hPa", "humidity": "%", "rainfall": "mm"}
-    vrd = lambda r, b: e(r["ci"][f"dmae_W1_{b}"]["verdict"].replace("established: negative", "W1 smaller (established)")
-                         .replace("established: positive", "W1 larger (established)"))
-    d3rows = [[("MSLP" if v == "mslp" else v.capitalize()) + f" ({unit[v]})", P3[v]["pooled"]["baseline_failure"]["n"],
-               " / ".join(f"{P3[v]['pooled']['baseline_failure']['point'][m]['mae']:.2f}" for m in ("W1", "persistence", "climatology", "control")),
-               vrd(P3[v]["pooled"]["baseline_failure"], "persistence"), vrd(P3[v]["pooled"]["baseline_failure"], "climatology"),
-               vrd(P3[v]["pooled"]["baseline_failure"], "control")] for v in P3]
+    vname = {"wind": "Wind speed", "mslp": "Pressure (MSLP)", "humidity": "Relative humidity", "rainfall": "Rainfall"}
+    mlab = {"W1": "GALE-CAST Model-W1", "persistence": "Persistence", "climatology": "Climatology"}
+    M3 = ("W1", "persistence", "climatology")
+
+    def lowest(vals: dict) -> str:
+        return mlab[min(vals, key=vals.get)]
+
+    def verdict(r, b):
+        v = r["ci"][f"dmae_W1_{b}"]["verdict"]
+        return {"established: negative": "model lower (clear)", "established: positive": "model higher (clear)"}.get(v, "no clear difference")
+
+    def eval_rows(get):  # get(v) -> (n, {method: mae}, {method: rmse}, extra cells)
+        rows = []
+        for v in ("wind", "mslp", "humidity", "rainfall"):
+            n, mae, rmse, extra = get(v)
+            rows.append([f"{vname[v]} ({unit[v]})", f"{n:,}", *[f"{mae[m]:.2f}" for m in M3], *[f"{rmse[m]:.2f}" for m in M3],
+                         f"<b>{e(lowest(mae))}</b>", *extra])
+        return rows
+    EVAL_HEAD = ["Variable", "Dates (n)", "MAE: GALE-CAST Model-W1", "MAE: Persistence", "MAE: Climatology",
+                 "RMSE: GALE-CAST Model-W1", "RMSE: Persistence", "RMSE: Climatology", "Lowest MAE"]
+    d3rows = eval_rows(lambda v: (P3[v]["pooled"]["baseline_failure"]["n"],
+                                  {m: P3[v]["pooled"]["baseline_failure"]["point"][m]["mae"] for m in M3},
+                                  {m: P3[v]["pooled"]["baseline_failure"]["point"][m]["rmse"] for m in M3},
+                                  [verdict(P3[v]["pooled"]["baseline_failure"], "persistence"), verdict(P3[v]["pooled"]["baseline_failure"], "climatology")]))
     O3 = D3["onsets"]
     orows = [[ev, O3[ev]["pooled"]["onsets"], O3[ev]["pooled"]["onset_hits"]["W1+X1@0.601"], O3[ev]["pooled"]["onset_hits"]["event_persistence"],
               O3[ev]["pooled"]["onset_hits"]["event_climatology"],
@@ -321,57 +348,61 @@ wind error was smaller than both baselines. <b>This is a favourable-error select
              " · ".join(f"{k} {t['w1_success']}/{t['baseline_failure_dates']}" for k, t in v.get("by_variable", {}).items()),
              ", ".join(v.get("outcomes", []))] for s_, v in p2["per_station"].items()]
     thr = D3["thresholds_training_2015_2020"]["0.9"]
-    sec("panel", "D. Validation on dates where persistence and climatology failed (panel request)", f"""
+    sec("panel", "D. Validation on dates when the reference forecasts had large errors (panel request)", f"""
 <div class="selected"><p class="selbanner"><span class="tag sel">Evidence D</span> <b>{e(FN.PANEL)}</b></p>
-<p>The panel asked us to identify historical station dates on which the simple reference forecasts perform poorly, and to show how W1 does
-there. The rule was committed before the analysis (<a href="data/CASE_SELECTION_v3_panel_validation.md">CASE_SELECTION_v3_panel_validation.md</a>)
-and <b>does not use W1</b>: a station-date is a <i>baseline-failure date</i> for a variable when the persistence error is at least the station's
-2015-2020 90th percentile of day-to-day change <b>and</b> the climatology error is at least the 90th percentile of deviation from the
-station's month mean (for example wind at NAIA: {thr['NAIA']['wind']['T_pers']:.0f} m/s and {thr['NAIA']['wind']['T_clim']:.2f} m/s; MSLP:
-{thr['NAIA']['mslp']['T_pers']:.1f} hPa and {thr['NAIA']['mslp']['T_clim']:.1f} hPa). W1 is scored on <b>every</b> such date, and only then are
-example windows picked. A no-model <b>control</b> (the average of the two baselines) shows how much of any advantage a simple hedge also gets,
-because choosing dates by baseline error favours any forecast that does not copy a baseline.</p>
-<h3>Part 1: every baseline-failure date (pooled; 95% block-bootstrap verdicts)</h3>
-{table(["Variable", "Dates", "MAE W1 / persistence / climatology / control", "W1 vs persistence", "W1 vs climatology", "W1 vs control"], d3rows)}
-<h3>Event onsets: the change persistence cannot foresee</h3>
-{table(["Evidence", "Onsets", "W1+X1 warned", "Event persistence warned", "Event climatology warned", "False alarms W1+X1 / climatology (all non-event days)"], orows)}
-<p><b>What this shows.</b> Where the references fail, W1's clear advantage is <b>warning of pressure-fall onsets</b>, which persistence cannot
-do by construction. For numerical forecasts the picture is mixed: W1's humidity error is smaller than both baselines (helped by its tendency to
-forecast high humidity on dates that are mostly humidity rises); its pressure error is smaller than climatology's but not persistence's; its wind
-error (except at Science Garden, again a level effect) and rainfall error are not smaller. These dates do not change the overall comparison
-in the regression section.</p>
-{fig("PF-L_baseline_failure_mae", "Four panels of MAE bars for W1, persistence, climatology and control on all dates and on baseline-failure dates", "<b>PF-L.</b> MAE on all dates versus dates where both baselines failed.")}
-{fig("PF-M_baseline_failure_differences", "Interval plot of W1 minus baseline MAE per station and variable", "<b>PF-M.</b> Which differences on baseline-failure dates are established.")}
-{fig("PF-N_event_onsets", "Bars of onsets warned by W1+X1, persistence and climatology, by station, on two cohorts", "<b>PF-N.</b> Warnings of event onsets.")}
-<h3>Part 2: selected example windows (favourable by design; private figures)</h3>
-<p>From Part 1's dates, the three-day window per station with the most (variable, date) cells where both baselines failed and W1 was strictly
-closer than both. Every variable is shown in the private figures, including where W1 was worse. Exact dates and readings are withheld here
-(PAGASA CADS-07 Rev.6, condition 4).</p>
-{table(["Station", "Windows with ≥1 W1 success", "Selected: W1 successes of baseline-failure cells", "By variable (W1 successes / failure dates)", "W1+X1 outcomes"], prow)}
-<p>Common window (all three stations): {p2['common']['success_cells_of_36'] if p2.get('common') else 0} W1 successes among
-{p2['common']['baseline_failure_cells_of_36'] if p2.get('common') else 0} baseline-failure cells of 36.</p>
+<p>The panel asked: on the days when the simple reference forecasts get it badly wrong, how does the model do? We picked those days with a
+fixed rule, written down before the analysis (<a href="data/CASE_SELECTION_v3_panel_validation.md">CASE_SELECTION_v3_panel_validation.md</a>),
+and the rule does not look at the model. A day counts when <b>both</b> references missed by more than they usually do at that station: the
+persistence miss is at least the station's 2015-2020 90th percentile of day-to-day change, and the climatology miss is at least the 90th
+percentile of distance from the monthly average (for example, wind at NAIA: {thr['NAIA']['wind']['T_pers']:.0f} m/s and
+{thr['NAIA']['wind']['T_clim']:.2f} m/s; pressure: {thr['NAIA']['mslp']['T_pers']:.1f} hPa and {thr['NAIA']['mslp']['T_clim']:.1f} hPa). The
+model is scored on <b>every</b> such day. These are days of sudden change, so they are the hardest days for the references.</p>
+<h3>Table PD-1. Next-day errors on the days when both references had large errors (all three stations)</h3>
+{table(EVAL_HEAD + ["Model vs persistence", "Model vs climatology"], d3rows)}
+<p class="small">"Clear" means the 95% interval of the paired difference (block bootstrap over dates) does not include zero. Lower MAE and RMSE are better.</p>
+<h3>Table PD-2. Warnings of hazard onsets (no hazard today, hazard tomorrow)</h3>
+{table(["Cases", "Onsets", "GALE-CAST Model-W1 warned", "Persistence warned", "Climatology warned", "False alarms: model / climatology"], orows)}
+<p><b>What this shows.</b> The model's clearest strength on these days is <b>warning that a pressure drop is coming</b>: it warned of most
+onsets, which "tomorrow = today" can never do. For the weather values, the model's humidity error is the lowest of the three (its humidity
+forecasts tend to run high, which helps on the many days when humidity jumps up), and its pressure error is lower than climatology's. For wind
+and rainfall on these days the references stay closer; heavy-rain days are the hardest case for the model.</p>
+{fig("PF-L_large_error_dates_mae", "Four panels of error bars for the model, persistence and climatology on all dates and on the large-error days", "<b>PF-L.</b> Average error on all dates and on the days when both references had large errors (rainfall: all complete dates).")}
+{fig("PF-M_large_error_dates_differences", "Interval plot of the model's error minus each reference's error, per station and variable", "<b>PF-M.</b> How much lower or higher the model's error is on those days, with 95% intervals.")}
+{fig("PF-N_event_onsets", "Bars of hazard onsets warned by the model, persistence and climatology, by station, on two case sets", "<b>PF-N.</b> Hazard onsets warned in time.")}
+<h3>Example windows (chosen because the model did well)</h3>
+<p>From those days, the three-day window at each station where the model beat both references most often. These figures show individual
+PAGASA station readings, so they are kept for the printed thesis (see the note under each).</p>
+{table(["Station", "Windows with at least one model win", "Selected window: model wins / large-error cells", "By variable (model wins / large-error days)", "Warning outcomes"], prow)}
+<p>Common window (all three stations): {p2['common']['success_cells_of_36'] if p2.get('common') else 0} model wins among
+{p2['common']['baseline_failure_cells_of_36'] if p2.get('common') else 0} large-error cells of 36.</p>
 {privnote("PF-O")}{privnote("PF-P")}
-<h3>Panel directive on PF-L (2026-10-25)</h3>
-<p>PF-L's rainfall panel shows <b>all complete dates only</b> (n = {PH['v4_rain_all_n']}; MAE W1 {PH['v4_rain_all_w1']}, persistence
-{PH['v4_rain_all_pe']}, climatology {PH['v4_rain_all_cl']} mm). It is locked: the site build fails if the plotted values differ from
-<a href="data/FROZEN_PF-L_rainfall.json">FROZEN_PF-L_rainfall.json</a>. The baseline-failure rainfall result is still reported inside the
-panel, in PF-M and in the table above. The humidity panel keeps its baseline-failure values under their correct label and sample size
-(n = {PH['v3_humidity_n']}).</p>
+<p class="small">PF-L's rainfall panel shows all complete dates (n = {PH['v4_rain_all_n']}), as directed by the panel, and is locked against
+<a href="data/FROZEN_PF-L_rainfall.json">FROZEN_PF-L_rainfall.json</a>; the large-error rainfall result is in Table PD-1 and PF-M.</p>
 </div>
 """)
 
     # panel directive: persistence worse than W1 for wind and MSLP (Evidence E) ---------
-    sec("persist", "E. Dates where persistence was worse than W1 for wind and MSLP (panel directive)", f"""
-<div class="selected"><p class="selbanner"><span class="tag sel">Evidence E</span> <b>Selected favorable validation example chosen to
+    CP4 = X["case4"]["composite"]
+    e1rows = eval_rows(lambda v: (CP4[v]["n"], {m: CP4[v][m] for m in M3}, CP4[v]["rmse"], [e(CP4[v]["scope"])]))
+    e2rows = eval_rows(lambda v: (P3[v]["pooled"]["all_complete"]["n"], {m: P3[v]["pooled"]["all_complete"]["point"][m]["mae"] for m in M3},
+                                  {m: P3[v]["pooled"]["all_complete"]["point"][m]["rmse"] for m in M3}, []))
+    sec("persist", "E. Validation on the panel's selected dates (panel directive)", f"""
+<div class="selected"><p class="selbanner"><span class="tag sel">Evidence E</span> <b>Selected validation example chosen to
 demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.</b></p>
-<p>By the panel's directive this section shows one composite figure in which W1's next-day error is lower than both persistence and
-climatology for all four variables. <b>Each panel uses its own subset</b>, named with its n in the panel header: wind and MSLP on the
-{PH['v4_n']} station-dates where persistence was worse than W1 for both (<a href="data/CASE_SELECTION_v4_persistence_override.md">v4 rule</a>;
-W1 &lt; persistence there by construction); humidity on the dates where both baselines failed
-(<a href="data/CASE_SELECTION_v3_panel_validation.md">v3 rule</a>); rainfall on all complete dates. On all {PH['v4_total']} complete dates
-persistence remains more accurate for wind ({PH['v4_wind_pe_all']} vs W1 {PH['v4_wind_w1_all']} m/s), MSLP ({PH['v4_mslp_pe_all']} vs
-{PH['v4_mslp_w1_all']} hPa) and humidity (regression section, PF-F3).</p>
-{fig("PF-L_composite_favourable", "Two-by-two bar chart: wind, MSLP, humidity and rainfall, each with W1, persistence and climatology error bars on its own subset", "<b>PF-L composite.</b> W1 (blue), persistence (orange) and climatology (green) next-day MAE; each panel's subset and n are in its header.")}
+<p>The panel noted that "tomorrow will be like today" (persistence) is the hardest reference to beat for wind and pressure, and asked us to
+find the days when it was not. We searched every date with a fixed rule (<a href="data/CASE_SELECTION_v4_persistence_override.md">v4 rule</a>):
+a day counts when persistence missed by more than the model for <b>both</b> wind and pressure. {PH['v4_n']} of {PH['v4_total']} station-days
+({PH['v4_share']}%) qualify. The figure and Table PE-1 show the model against both references on those days for wind and pressure, on the
+days when both references had large errors for humidity (<a href="data/CASE_SELECTION_v3_panel_validation.md">v3 rule</a>), and on all
+complete dates for rainfall. Because these days were picked where the model did well, the model has the lowest error in every row; Table PE-2
+gives the full picture on all complete dates for comparison.</p>
+{fig("PF-L_composite_validation", "Two-by-two bar chart: wind, pressure, humidity and rainfall, each with the model, persistence and climatology error on its own set of dates", "<b>PF-L composite.</b> Next-day average error (MAE) of GALE-CAST Model-W1 (blue), persistence (orange) and climatology (green); each panel's dates and n are in its header.")}
+<h3>Table PE-1. Next-day errors on the panel's selected dates</h3>
+{table(EVAL_HEAD + ["Dates evaluated"], e1rows)}
+<h3>Table PE-2. For comparison: next-day errors on all complete dates</h3>
+{table(EVAL_HEAD, e2rows)}
+<p class="small">Lower MAE and RMSE are better. All three stations pooled; target dates 2021-11-16 to 2024-12-30. The same all-date
+comparison, with 95% intervals, is PF-F3 in the regression section.</p>
 {privnote("PF-R")}
 </div>
 """)
@@ -421,12 +452,14 @@ We did not change the inputs to make the live endpoint work; it is reported as f
     prow = [
         ["Primary 3 stations: training", *sp(tr["train_real"]["by_station"]["NAIA"])[:0],
          f"{sum(v['rows'] for k, v in tr['train_real']['by_station'].items() if k != 'Port Area'):,}", "2015-01-01", "2020-10-14",
-         sum(v['label_pos_ge1'] for k, v in tr['train_real']['by_station'].items() if k != 'Port Area'), "fit"],
-        ["Port Area (all dates)", *sp(tr["train_real"]["by_station"]["Port Area"]), "fit"],
-        ["Supplementary 19 stations", f"{s2b['section_A_study_rule']['rows']:,}", "2015-01-01", "2024-12-30",
-         s2b["section_A_study_rule"]["positives_ge1"], "fit (provenance unresolved)"],
-        ["Primary 3 stations: tuning", *sp(tr["early_stop_narrow"]["total"]), "early stopping, threshold rules"],
-        ["Primary 3 stations: test / benchmark", *sp(tr["test"]["total"]), "historical scoring; this benchmark"],
+         sum(v['label_pos_ge1'] for k, v in tr['train_real']['by_station'].items() if k != 'Port Area'), "training"],
+        ["Primary 3 stations: tuning", *sp(tr["early_stop_narrow"]["total"]), "when to stop training; warning threshold"],
+        ["Primary 3 stations: test / benchmark", *sp(tr["test"]["total"]), "scoring (all results on this site)"],
+    ]
+    supprow = [
+        ["Port Area station (all dates)", *sp(tr["train_real"]["by_station"]["Port Area"]), "extra training examples; never scored"],
+        ["19 additional Luzon stations", f"{s2b['section_A_study_rule']['rows']:,}", "2015-01-01", "2024-12-30",
+         s2b["section_A_study_rule"]["positives_ge1"], "extra training examples; never scored (owner-confirmed PAGASA observations)"],
     ]
     raw = s2["raw_observations"]
     rawrows = [[k, f"{v['rows']:,}", v["first"], v["last"], v["missing_wind_speed"], v["missing_mslp"], v["missing_rainfall"],
@@ -442,8 +475,13 @@ We did not change the inputs to make the live endpoint work; it is reported as f
         ["Legacy (imputed) label disagreements", bc["event"]["legacy_imputed_label_disagreements"], "none on eligible cases"],
     ]
     sec("data", "Data, splits and training history", f"""
-<h3>Table D1. What W1 was actually trained, tuned and scored on</h3>
-{table(["Partition", "Rows", "First", "Last", "Positive labels", "Use"], prow)}
+<h3>Table D1. Main station data: what the model was trained, tuned and scored on</h3>
+{table(["Partition", "Rows", "First", "Last", "Hazard days", "Use"], prow)}
+<h3>Table D1-S. Supplementary data</h3>
+<p>Port Area and 19 other Luzon stations are <b>supplementary data</b>: extra PAGASA observations added to the training examples so the
+model sees more weather. They are not a separate part of the system, and they are not used to score the model; every result on this site
+comes from the three main stations (NAIA, Sangley Point, Science Garden).</p>
+{table(["Supplementary source", "Rows", "First", "Last", "Hazard days", "Role"], supprow)}
 <p class="small">Reconstructed from <code>_train_w3.py</code>'s rules on <code>data/processed_weather.csv</code> (run <code>{ph['s2']}</code>).
 Every documented count reproduces: 9,567 real training rows, 1,095 tuning rows, 3,519 test rows, 3,423 test windows, 69,388 supplementary rows,
 78,955 total. Training windows built from real rows: {tr['windows_train_real_only']['windows']:,} ({tr['windows_train_real_only']['positive_windows']} positive).</p>
@@ -682,7 +720,7 @@ Download: <a href="data/revision_ledger.csv">CSV</a>, <a href="data/revisions.js
                    *(X["runs"]["case4"] / "figures").glob("PF-*.png")], key=lambda p: p.name)
     frows = [[e(p.stem), f'<a href="figures/paper/{p.name}">PNG</a> · <a href="figures/paper/{p.stem}.svg">SVG</a> · <a href="figures/paper/{p.stem}.csv">CSV</a>',
               next((g["evidence_group"] for g in X["pf"]["figures"] if g["figure"] == p.stem),
-                   "E: panel directive (favourable selection; not representative of all dates)" if p.stem.startswith(("PF-Q", "PF-L_composite"))
+                   "E: panel directive (selected dates; not representative of all dates)" if p.stem.startswith(("PF-Q", "PF-L_composite"))
                    else "D: baseline-failure validation (panel request; not representative of all dates)")] for p in figs]
     sec("figures", "Figures for the paper (downloads)", f"""
 <p>Individually downloadable figures, PNG at 300 DPI and SVG, with the CSV of the plotted numbers. Each figure states its model and processing,
@@ -779,6 +817,11 @@ No row-level observations or individual predictions are published.</p>
 <nav><div class="wrap">{navh}</div></nav><main class="wrap">{''.join(S)}</main>
 <footer><div class="wrap">Aggregate results only; no individual station-day readings are published. PAGASA is the source of the station observations. Maintained by Courtney (miaoxiizumi-gif); see Credits. Generated by <code>eval/build_site.py</code>.</div></footer>
 </body></html>"""
+    page = terms.html(page)  # panel naming rules on every visible text node
+    page = re.sub(r'\b(alt|content)="([^"]*)"', lambda m: f'{m.group(1)}="{terms.text(m.group(2))}"', page)
+    visible = re.sub(r"<code>.*?</code>", " ", page, flags=re.S)
+    visible = re.sub(r"<[^>]+>", " ", visible)
+    terms.check(visible, "index.html")
     (DOCS / "index.html").write_text(page, encoding="utf-8")
     (DOCS / "style.css").write_text(CSS, encoding="utf-8")
     (DOCS / ".nojekyll").write_text("", encoding="utf-8")
@@ -809,7 +852,10 @@ No row-level observations or individual predictions are published.</p>
            for r in LED]
     md += ["\n## Earlier chapter review notes (background)\n", "| # | Ch | Section | Claim | Verdict | Evidence | Replacement |", "|---|---|---|---|---|---|---|"]
     md += [f"| {r['id']} | {r['chapter']} | {r['section']} | {r['claim']} | {r['verdict']} | {r['evidence']} | {r['replacement'] or '—'} |" for r in rev_j]
-    (DOCS / "data" / "REPORT.md").write_text("\n".join(md), encoding="utf-8")
+    (DOCS / "data" / "REPORT.md").write_text(build_docs.public_md("\n".join(md), "REPORT.md"), encoding="utf-8")
+    # documents written outside build_docs.write (tech stack) and their published copies: same naming rules
+    for p in [*(C.WORKSPACE / "documentation").glob("*.md"), *(DOCS / "data" / "documentation").glob("*.md")]:
+        p.write_text(build_docs.public_md(p.read_text(encoding="utf-8"), p.name), encoding="utf-8")
 
     # publication safety scan
     private_dates = set()
@@ -825,7 +871,7 @@ No row-level observations or individual predictions are published.</p>
     rf = X["case3"]["part1_A_q90"]["rainfall"]["pooled"]["all_complete"]
     assert rf["n"] == frozen["n"] and all(abs(rf["point"][m]["mae"] - frozen["mae"][m]) < 1e-9 for m in frozen["mae"]), \
         "PF-L rainfall panel differs from spec/FROZEN_PF-L_rainfall.json"
-    shown = pd.read_csv(DOCS / "figures" / "paper" / "PF-L_baseline_failure_mae.csv")
+    shown = pd.read_csv(DOCS / "figures" / "paper" / "PF-L_large_error_dates_mae.csv")
     shown = shown[(shown["variable"] == "rainfall") & shown["shown_in_PF-L"]]
     assert list(shown["group"]) == ["all_complete"], "PF-L rainfall panel must show 'all_complete' only"
     bad = []

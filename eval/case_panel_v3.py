@@ -1,7 +1,7 @@
 """Group D, selection v3 (spec/CASE_SELECTION_v3_panel_validation.md): baseline-failure validation requested by the panel.
 
 Part 1 scores W1 on EVERY date where both persistence and climatology failed (thresholds from the 2015-2020 training period; W1 not
-used to choose dates). Part 2 picks favourable illustration windows from those dates. Saved rows only; no model is run.
+used to choose dates). Part 2 picks illustration windows where W1 did well from those dates. Saved rows only; no model is run.
 Public outputs (run dir): aggregates and aggregate figures PF-L, PF-M, PF-N. Private outputs: cell ledger, selected dates and window
 figures PF-O (per station), PF-P (common window) in _private/thesis_export/ (PAGASA CADS-07 Rev.6, condition 4).
 """
@@ -217,7 +217,7 @@ def fig_L(P1: dict, T: dict, out, run) -> list[str]:
                    f"target dates 2021-11-16 to 2024-12-30). Truth: raw PAGASA observations. Lower is better. Rainfall panel: all complete dates only, by panel "
                    f"directive (locked; spec/FROZEN_PF-L_rainfall.json). Spec: spec/CASE_SELECTION_v3_panel_validation.md. Run {run.name}."],
              width=200)
-    return S.save(fig, out, "PF-L_baseline_failure_mae")
+    return S.save(fig, out, "PF-L_large_error_dates_mae")
 
 
 def fig_M(P1: dict, out, run) -> list[str]:
@@ -247,7 +247,7 @@ def fig_M(P1: dict, out, run) -> list[str]:
                    "over target dates (14-day blocks, 2,000 resamples). An interval entirely left of 0 means W1's smaller error is established on these dates. "
                    "The grey control (average of persistence and climatology, no model) shows how much of any advantage a simple hedge also gets. "
                    f"Rule and data as PF-L. Run {run.name}."], width=200)
-    return S.save(fig, out, "PF-M_baseline_failure_differences")
+    return S.save(fig, out, "PF-M_large_error_dates_differences")
 
 
 def fig_N(OA: dict, OB: dict, out, run) -> list[str]:
@@ -418,7 +418,7 @@ def main():
         grid_axes(a[2], cw)
         score_axes(a[5], Ww)
         S.title(fig, f"PF-O. {s}: baseline-failure validation window around {d:%d %B %Y}", LABEL + " Chosen because W1 was closer than both "
-                "baselines on dates where both failed (favourable selection, Part 2 of spec/CASE_SELECTION_v3_panel_validation.md).")
+                "baselines on dates where both failed (chosen because the model did well; Part 2 of spec/CASE_SELECTION_v3_panel_validation.md).")
         S.footer(fig, ["Shaded date = baseline-failure date for that variable (both baseline errors ≥ the station's 2015-2020 90th percentiles). "
                        "★ = W1 strictly closer than both baselines on that baseline-failure date. Each date is its own next-day forecast issued after the previous "
                        "day's observation; the three dates are not a +1/+2/+3-day forecast from one origin. A gap in a line = PAGASA observation missing (not imputed). "
@@ -462,13 +462,13 @@ def main():
                 if r["n"]:
                     rows.append({"variable": v, "scope": s, "group": grp, "shown_in_PF-L": s == "pooled" and grp in PFL_GROUPS[v], "n": r["n"], **{f"mae_{m}": r["point"][m]["mae"] for m in METHODS},
                                  **{f"rmse_{m}": r["point"][m]["rmse"] for m in METHODS}, "w1_beats_both_share": r["w1_beats_both_share"]})
-    pd.DataFrame(rows).to_csv(figdir / "PF-L_baseline_failure_mae.csv", index=False)
+    pd.DataFrame(rows).to_csv(figdir / "PF-L_large_error_dates_mae.csv", index=False)
     pd.DataFrame([{"variable": v, "scope": s, "n": P1[v][s]["baseline_failure"]["n"], "comparison": b,
                    "dmae": P1[v][s]["baseline_failure"]["point"].get(f"dmae_W1_{b}"),
                    "lo": P1[v][s]["baseline_failure"].get("ci", {}).get(f"dmae_W1_{b}", {}).get("lo"),
                    "hi": P1[v][s]["baseline_failure"].get("ci", {}).get(f"dmae_W1_{b}", {}).get("hi"),
                    "verdict": P1[v][s]["baseline_failure"].get("ci", {}).get(f"dmae_W1_{b}", {}).get("verdict")}
-                  for v in VARS for s in SCOPES for b in ("persistence", "climatology", "control")]).to_csv(figdir / "PF-M_baseline_failure_differences.csv", index=False)
+                  for v in VARS for s in SCOPES for b in ("persistence", "climatology", "control")]).to_csv(figdir / "PF-M_large_error_dates_differences.csv", index=False)
     pd.DataFrame([{"evidence": ev, "scope": s, "onsets": O[s]["onsets"], **{f"hits_{k}": n for k, n in O[s]["onset_hits"].items()},
                    **{f"false_alarms_{k}": n for k, n in O[s]["false_alarms_on_non_events"].items()}, "non_events": O[s]["non_events"]}
                   for ev, O in (("A", OA), ("B", OB)) for s in SCOPES]).to_csv(figdir / "PF-N_event_onsets.csv", index=False)

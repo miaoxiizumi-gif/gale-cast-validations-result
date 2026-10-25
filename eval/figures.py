@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 
 import common as C
+import terms
 
 BLUE, ORANGE, AQUA, VIOLET = "#2a78d6", "#eb6834", "#1baf7a", "#6250d6"
 INK, INK2, GRID, SURF = "#0b0b0b", "#52514e", "#e4e3df", "#fcfcfb"
@@ -26,7 +27,8 @@ def latest(prefix: str):
 
 
 def save(fig, out, name, table: pd.DataFrame):
-    fig.savefig(out / f"{name}.png", dpi=160, bbox_inches="tight")
+    terms.bake(fig)
+    fig.savefig(out / f"{name}.png", dpi=300, bbox_inches="tight")
     plt.close(fig)
     table.to_csv(out / f"{name}.csv", index=False)
 
@@ -76,6 +78,7 @@ def main():
     ax.set_xticks(np.arange(len(scopes)), ["All 3 stations"] + C.PRIMARY)
     ax.set_ylabel("MAE, m/s (lower = smaller error)")
     ax.set_title("Next-day wind: mean absolute error on identical cases (95% block-bootstrap CI)", loc="left", color=INK)
+    ax.set_ylim(0, ax.get_ylim()[1] * 1.15)  # headroom so the longer model name in the legend clears the bars
     ax.legend(frameon=False, ncol=3, loc="upper left")
     save(fig, run, "F2_wind_mae_by_station", t2)
 

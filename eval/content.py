@@ -210,7 +210,7 @@ REV = [
   "On the 2021-2024 evaluation period the historical procedure detected 24 of 28 hazard-label events (all but one defined by pressure falls) with 9 false alarms. Under training-consistent inputs on identical cases, it detected {x1_tp} of {ev_n} with {x1_fp} false alarms and outperformed event persistence on F1, but its probabilities were not calibrated and its wind forecasts were less accurate than persistence and climatology. Because this period informed earlier modelling decisions, these results are retrospective."),
  ("R-5-04", 5, "Summaries / Conclusions 4-7", "GWMs 3.69, 3.47, 3.85, 3.72; 'ready for deployment', 'definitive proof of operational utility'",
   "Partly correct", "The GWM arithmetic is correct. Usability ratings cannot establish forecast accuracy or deployment readiness.",
-  "Evaluators rated the prototype's usability favourably (general weighted means 3.47-3.85 on a 4-point scale). These ratings describe perceived usability and do not establish forecast accuracy or operational readiness, which require prospective verification against observations."),
+  "Evaluators rated the prototype's usability positively (general weighted means 3.47-3.85 on a 4-point scale). These ratings describe perceived usability and do not establish forecast accuracy or operational readiness, which require prospective verification against observations."),
  ("R-5-05", 5, "Recommendation 1", "Compare with simpler baselines such as persistence and climatology",
   "Correct", "This evaluation now performs that comparison (benchmark sections A and B).", "Keep, and add: evaluate the frozen model prospectively on 2025+ observations before any operational claim."),
 ]

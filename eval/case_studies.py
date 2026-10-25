@@ -169,7 +169,7 @@ def main():
                 S.EVIDENCE["C"])
         S.footer(fig, [TIMING, PROC, BASE,
                        f"Station: {s} (primary). Dates: {win['date'].iloc[0]:%Y-%m-%d} to {win['date'].iloc[2]:%Y-%m-%d}; n = 3 station-days. "
-                       f"Selection: spec/CASE_SELECTION_v1.md (E1-E3; ranked by correct decisions in the window [favourable, disclosed], then pressure fall, then date); "
+                       f"Selection: spec/CASE_SELECTION_v1.md (E1-E3; ranked by correct decisions in the window [chosen for correct warnings, disclosed], then pressure fall, then date); "
                        f"W1 error relative to baselines was NOT used to select. Observations: PAGASA; not for online publication. Run {run.name}."])
         figs += S.save(fig, exp, f"PF-H_case_{s.replace(' ', '_')}")
 

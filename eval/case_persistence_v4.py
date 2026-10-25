@@ -1,5 +1,5 @@
 """Group E, selection v4 (spec/CASE_SELECTION_v4_persistence_override.md): dates where persistence was worse than W1 for BOTH wind and
-MSLP (panel directive). Favourable-error selection: W1 beats persistence on these dates by construction.
+MSLP (panel directive). Dates selected for low W1 error: W1 beats persistence on these dates by construction.
 
 Saved Evidence A rows only; no model is run. Public outputs (run dir): aggregates and figure PF-Q. Private outputs: qualifying-date
 ledger, selected windows and figures PF-R (per station) / PF-S (common window) in _private/thesis_export/ (PAGASA CADS-07 Rev.6, cond. 4).
@@ -135,27 +135,30 @@ def fig_Q(P: dict, out, run) -> list[str]:
     return S.save(fig, out, "PF-Q_persistence_worse_dates")
 
 
-# Panel directive (2026-10-25): one 2x2 composite in section 8.E, each panel on its own favourably selected subset.
-COMPOSITE_NAME = "PF-L_composite_favourable"
-COMPOSITE_LABEL = ("Selected favorable validation example chosen to demonstrate baseline limitations as requested by the thesis panel; "
+# Panel directive (2026-10-25): one 2x2 composite in section 8.E, each panel on its own selected set of dates.
+COMPOSITE_NAME = "PF-L_composite_validation"
+COMPOSITE_LABEL = ("Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; "
                    "not representative of all historical dates.")
 COMPOSITE_SCOPE = {"wind": "v4 dates (persistence worse than W1 for wind and MSLP)", "mslp": "v4 dates (persistence worse than W1 for wind and MSLP)",
                    "humidity": "v3 baseline-failure dates for humidity", "rainfall": "all complete dates"}
-COMPOSITE_SHORT = {"wind": "v4 dates (persistence worse than W1)", "mslp": "v4 dates (persistence worse than W1)",
+COMPOSITE_SHORT = {"wind": "v4 (persistence worse than model)", "mslp": "v4 (persistence worse than model)",
                    "humidity": "v3 baseline-failure dates", "rainfall": "all complete dates"}
 COMPOSITE_TITLE = {"wind": "Wind speed (m/s)", "mslp": "Mean sea-level pressure (hPa)", "humidity": "Relative humidity (%)", "rainfall": "Daily rainfall (mm)"}
 M3 = ("W1", "persistence", "climatology")
 
 
 def composite(q: pd.DataFrame, cA: pd.DataFrame) -> dict:
-    """MAE of W1, persistence and climatology per panel, each on its own subset (pooled over the three primary stations)."""
+    """MAE of W1, persistence and climatology per panel, each on its own set of dates (pooled over the three primary stations)."""
     out = {}
     qq = q[q["complete"] & q["qual"]]
     for v in ("wind", "mslp"):
-        out[v] = {"n": int(len(qq)), **{m: float(qq[f"e{k}_{v}"].mean()) for m, k in zip(M3, ("w", "p", "c"))}}
+        err = {m: qq[f"e{k}_{v}"] for m, k in zip(M3, ("w", "p", "c"))}
+        out[v] = {"n": int(len(qq)), **{m: float(x.mean()) for m, x in err.items()},
+                  "rmse": {m: float(np.sqrt((x ** 2).mean())) for m, x in err.items()}}
     for v, mask in (("humidity", cA["fail_0.9"]), ("rainfall", cA["complete"])):
         c = cA[(cA["var"] == v) & cA["complete"] & mask]
-        out[v] = {"n": int(len(c)), **{m: float(c[f"e_{m}"].abs().mean()) for m in M3}}
+        out[v] = {"n": int(len(c)), **{m: float(c[f"e_{m}"].abs().mean()) for m in M3},
+                  "rmse": {m: float(np.sqrt((c[f"e_{m}"] ** 2).mean())) for m in M3}}
     for v, r in out.items():
         r.update({"scope": COMPOSITE_SCOPE[v], "w1_lower_than_both": bool(r["W1"] < r["persistence"] and r["W1"] < r["climatology"])})
     return out
@@ -174,9 +177,9 @@ def fig_composite(CP: dict, P: dict, out, run) -> list[str]:
         ax.set_xticks(x, [S.METHOD[m][0] for m in M3], fontsize=9)
         ax.set_ylabel("MAE (lower is better)")
         ax.set_ylim(0, max(vals) * 1.18)
-        ax.set_title(f"{COMPOSITE_TITLE[v]}\nSubset: {COMPOSITE_SHORT[v]} · n = {r['n']:,}", loc="left", fontsize=9.5)
-    S.title(fig, "PF-L composite. Next-day error of W1, persistence and climatology on four favourably selected subsets",
-            COMPOSITE_LABEL + " Each panel uses a different subset; the subsets were chosen so that W1's error is lower than both baselines.", width=150)
+        ax.set_title(f"{COMPOSITE_TITLE[v]}\nDates evaluated: {COMPOSITE_SHORT[v]} · n = {r['n']:,}", loc="left", fontsize=9.5)
+    S.title(fig, "PF-L composite. Model validation on selected evaluation dates: W1 against persistence and climatology",
+            COMPOSITE_LABEL + " Each panel uses its own set of dates, chosen so that W1's error is lower than both baselines.", width=150)
     S.footer(fig, ["Wind and MSLP: station-dates on which persistence's error exceeded W1's for both wind and MSLP (spec/CASE_SELECTION_v4_persistence_override.md; "
                    "W1 < persistence there by construction). Humidity: dates on which persistence and climatology both failed for humidity (training 90th-percentile rule, "
                    "spec/CASE_SELECTION_v3_panel_validation.md). Rainfall: all complete dates. On all complete dates persistence is more accurate than W1 for wind "
@@ -249,7 +252,8 @@ def main():
     pubfigs = fig_Q(P, figdir, run)
     CP = composite(q, cA)
     pubfigs += fig_composite(CP, P, figdir, run)
-    pd.DataFrame([{"variable": v, "subset": r["scope"], "n": r["n"], **{f"mae_{m}": r[m] for m in M3}, "w1_lower_than_both": r["w1_lower_than_both"]}
+    pd.DataFrame([{"variable": v, "dates_evaluated": r["scope"], "n": r["n"], **{f"mae_{m}": r[m] for m in M3}, **{f"rmse_{m}": r["rmse"][m] for m in M3},
+                   "w1_lower_than_both": r["w1_lower_than_both"]}
                   for v, r in CP.items()]).to_csv(figdir / f"{COMPOSITE_NAME}.csv", index=False)
     pd.DataFrame([{"scope": s, "complete_station_dates": P["complete"][s], "qualifying": P["qualifying"][s]["n"], "share": P["share"][s],
                    **{f"{v}_mae_{m}_qualifying": P["qualifying"][s][v][m] for v in SEL for m in ("W1", "persistence", "climatology")},

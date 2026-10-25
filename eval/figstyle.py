@@ -7,11 +7,13 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+import terms
+
 # validated categorical order (dataviz validator, light surface #fcfcfb): W1, persistence, climatology
 W1C, PERC, CLIMC = "#2a78d6", "#eb6834", "#1baf7a"
 INK, INK2, GRID, SURF = "#0b0b0b", "#52514e", "#e4e3df", "#fcfcfb"
 OBS = INK  # observations are drawn in ink, never in a series colour
-METHOD = {"W1": ("W1", W1C, "o", "-"), "persistence": ("Persistence", PERC, "s", "--"),
+METHOD = {"W1": (terms.MODEL, W1C, "o", "-"), "persistence": ("Persistence", PERC, "s", "--"),
           "climatology": ("Climatology", CLIMC, "^", ":")}
 plt.rcParams.update({"font.size": 9.5, "font.family": "DejaVu Sans", "axes.edgecolor": INK2, "axes.labelcolor": INK,
                      "xtick.color": INK2, "ytick.color": INK2, "axes.spines.top": False, "axes.spines.right": False,
@@ -27,17 +29,21 @@ EVIDENCE = {
 
 
 def title(fig, main: str, sub: str, width: int = 175):
+    main = terms.text(main)
+    if len(main) > 110:  # longer after the model rename: wrap instead of running off the page
+        main = textwrap.fill(main, 110)
     fig.suptitle(main, x=0.01, y=0.995, ha="left", va="top", fontsize=12, fontweight="bold", color=INK)
-    fig.text(0.01, 0.955, textwrap.fill(sub, width), ha="left", va="top", fontsize=9, color=INK2)
+    fig.text(0.01, 0.955 - 0.025 * main.count("\n"), textwrap.fill(terms.text(sub), width), ha="left", va="top", fontsize=9, color=INK2)
 
 
 def footer(fig, lines: list[str], width: int = 150):
-    txt = "\n".join(textwrap.fill(l, width) for l in lines)
+    txt = "\n".join(textwrap.fill(terms.text(l), width) for l in lines)
     fig.text(0.01, 0.005, txt, ha="left", va="bottom", fontsize=7.2, color=INK2, linespacing=1.35)
 
 
 def save(fig, out_dir, name: str) -> list[str]:
     out_dir.mkdir(parents=True, exist_ok=True)
+    terms.bake(fig)
     fig.savefig(out_dir / f"{name}.png", dpi=300)
     fig.savefig(out_dir / f"{name}.svg")
     plt.close(fig)

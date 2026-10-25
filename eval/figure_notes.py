@@ -10,7 +10,7 @@ FIELDS = [("shows", "What this graph shows"), ("purpose", "Purpose"), ("produced
           ("read", "How to read it"), ("finding", "Actual finding"), ("supports", "What it supports"),
           ("limits", "What it does not establish"), ("paper", "Use in the paper"), ("source", "Source")]
 
-SELECTED = "Selected favourable example, chosen retrospectively for illustration; not representative of all dates."
+SELECTED = "Selected example, chosen retrospectively for illustration; not representative of all dates."
 ERRORS = ("Lower MAE/RMSE means smaller errors on these matching cases. Signed mean error (bias) shows systematic over- or "
           "under-forecasting and can hide errors that cancel. A good confusion matrix does not establish accurate numerical wind forecasts.")
 A_COH = "Evidence A: the website's 3,423 next-day windows (NAIA, Sangley Point, Science Garden, 1,141 each; target dates 2021-11-16 to 2024-12-30)"
@@ -220,7 +220,7 @@ def notes(ctx: dict) -> dict:
     N["PF-H"] = dict(
         shows="Per station (one figure each), three consecutive target dates around a detected event: observed wind and the three wind forecasts; observed and forecast MSLP; observed 24-hour MSLP change and W1's implied change; the W1+X1 score, decision and outcome.",
         purpose="To explain how W1 behaved around a correctly detected pressure-fall event. " + SELECTED,
-        produced="Selection v1 (spec/CASE_SELECTION_v1.md): from the 24 hits, complete raw records, raw-confirmed event, ranked by correct decisions in the window (favourable), then pressure fall, then date. Saved Evidence A values; no model run.",
+        produced="Selection v1 (spec/CASE_SELECTION_v1.md): from the 24 hits, complete raw records, raw-confirmed event, ranked by correct decisions in the window (chosen for correct warnings), then pressure fall, then date. Saved Evidence A values; no model run.",
         read="Black diamonds are observations; blue W1, orange persistence, green climatology. In the score panel the dashed line is the 0.601 warning threshold. Each date is a separate next-day forecast.",
         finding="Outcomes (day before, event, day after): " + "; ".join(f"{s}: {', '.join(v['outcomes'])}" for s, v in c1.items()) + ". All events were pressure-triggered. W1's wind error was smaller than both baselines on 2 of 3 NAIA dates (not the event day), on 0 of 3 Sangley Point dates and on 1 of 3 Science Garden dates.",
         supports="W1+X1 warned on the event days and stayed quiet on the neighbouring non-event days in these windows.",
@@ -239,23 +239,23 @@ def notes(ctx: dict) -> dict:
         source=f"private: _private/thesis_export/{ctx['run_case1']}/.")
     N["PF-J"] = dict(
         shows="Per station, three consecutive target dates with relatively high observed wind: observed and forecast wind, absolute wind and MSLP errors, a 'closest forecast' grid for wind/MSLP/humidity/rainfall, 24-hour MSLP change, and the W1+X1 outcome.",
-        purpose="The panel's request: an example with stronger observed weather where W1's numbers were favourable. " + SELECTED + " Chosen because W1's wind error was smaller than both baselines (favourable-error selection).",
+        purpose="The panel's request: an example with stronger observed weather where W1's numbers were good. " + SELECTED + " Chosen because W1's wind error was smaller than both baselines (selected for low model error).",
         produced="Selection v2 (spec/CASE_SELECTION_v2_regression.md), recorded before the search: complete raw records d−2..d+1 for four variables; observed wind ≥ the station's 2015-2020 90th percentile on at least one date; windows with a detected event first; ranked by dates on which W1's wind error beat both baselines, then margin, then wind, then date.",
         read="Error bars: shorter is better. The grid names the closest forecast per variable and date (W1 shaded). Each date is a separate next-day forecast.",
         finding="W1 wind beat both baselines on " + "; ".join(f"{s} {v.get('wind_wins_of_3', 0)}/3 dates (MSLP {v.get('wins_by_variable_of_3', {}).get('mslp', 0)}, humidity {v.get('wins_by_variable_of_3', {}).get('humidity', 0)}, rainfall {v.get('wins_by_variable_of_3', {}).get('rainfall', 0)})" for s, v in c2.items()) + ". Outcomes: " + "; ".join(f"{s} {', '.join(v.get('outcomes', []))}" for s, v in c2.items()) + ".",
         supports="On selected dates with relatively strong wind, W1's wind forecast can be closer than both references.",
         limits="Chosen for low W1 wind error; does not hold for pressure in these windows; Science Garden's '90th percentile' is only 2 m/s and its window has 1 wind win, a miss and a false alarm; overall W1 wind error is larger than persistence (PF-F).",
-        paper="Chapter 4, selected case studies (separate from PF-H). Caption: 'Figure 4.x. Selected favourable regression example: three consecutive next-day wind forecasts during relatively strong wind. " + SELECTED + " Selected for low model wind error.'",
+        paper="Chapter 4, selected case studies (separate from PF-H). Caption: 'Figure 4.x. Selected regression example: three consecutive next-day wind forecasts during relatively strong wind. " + SELECTED + " Selected for low model wind error.'",
         source=f"private: _private/thesis_export/{ctx['run_case2']}/; public counts: runs/{ctx['run_case2']}/case_selection_v2_summary.json.")
     N["PF-K"] = dict(
         shows="The selection-v2 common window: wind, absolute wind error and W1+X1 outcome for all three stations on the same dates.",
-        purpose="An overall favourable-regression view across the network. " + SELECTED,
+        purpose="A network-wide view of dates chosen for low model error. " + SELECTED,
         produced="Selection v2 common-window rule: complete at all three stations, relatively high wind at one or more, ranked by station-dates with a W1 wind win.",
         read="One row per station; shorter error bars are better.",
         finding=f"W1 wind beat both baselines on {ctx['case2']['common']['station_dates_with_wind_win_of_9'] if ctx['case2'].get('common') else 0} of 9 station-dates.",
         supports="On these dates W1's wind was the closest forecast more often than not at NAIA and Sangley Point.",
-        limits="At Science Garden W1's wind was the worst forecast on every date of this window; selected for favourable error.",
-        paper="Chapter 4, selected case studies. Caption: 'Figure 4.x. Selected favourable regression window across the three primary stations. " + SELECTED + "'",
+        limits="At Science Garden W1's wind was the worst forecast on every date of this window; selected for low model error.",
+        paper="Chapter 4, selected case studies. Caption: 'Figure 4.x. Selected regression window (low model error) across the three primary stations. " + SELECTED + "'",
         source=f"private: _private/thesis_export/{ctx['run_case2']}/.")
     N.update(panel_notes(ctx))
     N.update(persistence_notes(ctx))
@@ -272,32 +272,32 @@ def persistence_notes(ctx: dict) -> dict:
     CP = D["composite"]
     A3 = ctx["case3"]["part1_A_q90"]
     allm = lambda v, m: A3[v]["pooled"]["all_complete"]["point"][m]["mae"]
-    N["PF-L_composite_favourable"] = dict(
+    N["PF-L_composite_validation"] = dict(
         shows="One 2×2 chart: the next-day MAE of W1, persistence and climatology for wind speed, MSLP, relative humidity and daily rainfall, "
-              "each panel on its own subset (named with its n in the panel header), pooled over the three primary stations.",
+              "each panel on its own set of dates (named with its n in the panel header), pooled over the three primary stations.",
         purpose="The panel directed a single figure in section 8.E in which W1's error is lower than both baselines for all four variables. "
-                "Selected favorable validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not "
+                "Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not "
                 "representative of all historical dates.",
         produced="Saved Evidence A rows; no model run. Wind and MSLP: the v4 dates (spec/CASE_SELECTION_v4_persistence_override.md), on which "
                  "persistence's error exceeded W1's for both variables. Humidity: the v3 baseline-failure dates for humidity "
-                 "(spec/CASE_SELECTION_v3_panel_validation.md). Rainfall: all complete dates. Each subset was chosen for this figure because "
+                 "(spec/CASE_SELECTION_v3_panel_validation.md). Rainfall: all complete dates. Each set of dates was chosen for this figure because "
                  "W1's error is lower than both baselines on it.",
         read="Shorter bars are better (W1 blue, persistence orange, climatology green). Compare bars within a panel only: each panel has a "
-             "different subset, n and unit.",
+             "different set of dates, n and unit.",
         finding="; ".join(f"{VNAME[v][0]} ({r['scope']}, n = {r['n']:,}): W1 {r['W1']:.2f} vs persistence {r['persistence']:.2f}, "
                           f"climatology {r['climatology']:.2f} {VNAME[v][1]}" for v, r in CP.items()) + ".",
         supports="There are identifiable sets of dates on which W1's next-day error is lower than both simple references for each variable, "
                  "and on all complete dates W1's rainfall error is lower than both.",
-        limits="A favorable composite, not a performance estimate: the wind and MSLP subset was selected because W1 beat persistence there, and "
-               "the humidity subset is dates on which both baselines failed. On all complete dates persistence is more accurate than W1 for wind "
+        limits="A composite of selected dates, not a performance estimate: the wind and MSLP dates were selected because W1 beat persistence there, and "
+               "the humidity dates are those on which both baselines failed. On all complete dates persistence is more accurate than W1 for wind "
                f"({allm('wind', 'persistence'):.2f} vs {allm('wind', 'W1'):.2f} m/s), MSLP ({allm('mslp', 'persistence'):.2f} vs "
                f"{allm('mslp', 'W1'):.2f} hPa) and humidity ({allm('humidity', 'persistence'):.2f} vs {allm('humidity', 'W1'):.2f} %); see PF-F3 "
-               f"and PF-L. The wind and MSLP subset is {CP['wind']['n']} of {cp['pooled']:,} station-dates.",
+               f"and PF-L. The wind and MSLP dates are {CP['wind']['n']} of {cp['pooled']:,} station-dates.",
         paper="Chapter 4, panel-requested subsection (only together with PF-F3). Caption: 'Figure 4.x. Next-day MAE of the deployed model, "
-              "persistence and climatology on four selected subsets (wind and MSLP: dates on which persistence was worse than the model for both; "
-              "humidity: dates on which both references failed; rainfall: all complete dates). Selected favorable validation example chosen to "
+              "persistence and climatology on four selected sets of dates (wind and MSLP: dates on which persistence was worse than the model for both; "
+              "humidity: dates on which both references failed; rainfall: all complete dates). Selected validation example chosen to "
               "demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.'",
-        source=f"figures/paper/PF-L_composite_favourable.csv; run {run}; spec/CASE_SELECTION_v3_panel_validation.md; spec/CASE_SELECTION_v4_persistence_override.md.")
+        source=f"figures/paper/PF-L_composite_validation.csv; run {run}; spec/CASE_SELECTION_v3_panel_validation.md; spec/CASE_SELECTION_v4_persistence_override.md.")
     N["PF-Q_persistence_worse_dates"] = dict(
         shows="How many station-dates had persistence errors larger than W1's for both wind and MSLP, and the wind and MSLP MAE of W1, "
               "persistence and climatology on those dates, per station and pooled.",
@@ -367,7 +367,7 @@ def panel_notes(ctx: dict) -> dict:
     B = D["part1_B_wind_q90"]["pooled"]["baseline_failure"]
     p2 = D["part2"]
     N = {}
-    N["PF-L_baseline_failure_mae"] = dict(
+    N["PF-L_large_error_dates_mae"] = dict(
         shows="For each next-day output (wind, MSLP, humidity, rainfall), the MAE of W1, persistence, climatology and a no-model control "
               "(average of the two baselines) on all complete dates and on the dates where both baselines failed; pooled over the three primary stations. "
               f"The rainfall panel shows all complete dates only (n = {al('rainfall')['n']:,}), by panel directive; its baseline-failure result is "
@@ -393,8 +393,8 @@ def panel_notes(ctx: dict) -> dict:
         paper="Chapter 4, new subsection 'Validation on dates where the reference forecasts failed (panel request)'. Caption: 'Figure 4.x. Next-day "
               "MAE on all dates and on dates where both persistence and climatology failed (training-period 90th-percentile rule), three primary "
               "stations, 2021-11-16 to 2024-12-30. " + PANEL + "'",
-        source=f"figures/paper/PF-L_baseline_failure_mae.csv; run {run}; spec/CASE_SELECTION_v3_panel_validation.md.")
-    N["PF-M_baseline_failure_differences"] = dict(
+        source=f"figures/paper/PF-L_large_error_dates_mae.csv; run {run}; spec/CASE_SELECTION_v3_panel_validation.md.")
+    N["PF-M_large_error_dates_differences"] = dict(
         shows="On baseline-failure dates only: W1's MAE minus persistence's, climatology's and the control's, per station and pooled, with 95% intervals.",
         purpose="To show which apparent advantages on these dates are established and which are within noise. " + PANEL,
         produced="Paired circular block bootstrap over target dates (14-day blocks, 2,000 resamples, seed 20261025) on the PF-L dates.",
@@ -411,7 +411,7 @@ def panel_notes(ctx: dict) -> dict:
                f"{mae(B, 'persistence'):.2f}, climatology {mae(B, 'climatology'):.2f} m/s.",
         paper="Chapter 4, same subsection. Caption: 'Figure 4.x. Paired MAE differences on baseline-failure dates with 95% block-bootstrap "
               "intervals. " + PANEL + "'",
-        source=f"figures/paper/PF-M_baseline_failure_differences.csv; run {run}.")
+        source=f"figures/paper/PF-M_large_error_dates_differences.csv; run {run}.")
     N["PF-N_event_onsets"] = dict(
         shows="Event onsets (no study-label event on the issue day, an event on the target day): how many each forecast warned of, on the "
               "website cases (A) and the training-consistent benchmark (B), with false alarms.",
@@ -433,7 +433,7 @@ def panel_notes(ctx: dict) -> dict:
               "shaded and W1 successes starred; a closest-forecast grid; the W1+X1 score and outcome.",
         purpose="The panel's request for concrete dates where the baselines failed and W1 did better. " + PANEL,
         produced="Selection v3 Part 2: windows ranked by the number of (variable, date) cells that are baseline-failure dates on which W1 was "
-                 "strictly closer than both baselines, then normalised margin, then baseline-failure cells, then date. Favourable by design.",
+                 "strictly closer than both baselines, then normalised margin, then baseline-failure cells, then date. Chosen because the model did well.",
         read="Shaded = both baselines failed for that variable; ★ = W1 closest there. Every variable and date is shown, including those where W1 "
              "was worse. Each date is a separate next-day forecast; a gap in a line is a missing observation.",
         finding="W1 success cells (of 12): " + "; ".join(f"{s} {v.get('success_cells_of_12', 0)} of {v.get('baseline_failure_cells_of_12', 0)} "
@@ -453,7 +453,7 @@ def panel_notes(ctx: dict) -> dict:
                  "of 36 (success cells by station: " + ", ".join(f"{s} {n}" for s, n in p2["common"]["by_station_success"].items()) + ")."
                  ) if p2.get("common") else "No common window qualified.",
         supports="During a multi-station disturbance, W1 was closer than both failed baselines on a minority of the variable-station-dates.",
-        limits="Favourable selection; W1 missed the heavy rainfall of the window at every station.",
+        limits="Chosen because the model did well; W1 missed the heavy rainfall of the window at every station.",
         paper="Chapter 4, same subsection (printed thesis only). Caption: 'Figure 4.x. Selected common validation window. " + PANEL + "'",
         source=f"private: _private/thesis_export/{run}/.")
     return N

@@ -1,4 +1,4 @@
-"""Group C, selection v2 (spec/CASE_SELECTION_v2_regression.md): favourable regression case.
+"""Group C, selection v2 (spec/CASE_SELECTION_v2_regression.md): regression case chosen for low W1 error.
 
 Searches the saved Group A rows only (no model run). Writes a private candidate ledger and private figures PF-J (per station) and
 PF-K (common window) to _private/thesis_export/; the public run directory receives counts only (no dates, no readings).
@@ -99,8 +99,8 @@ def grid_axes(ax, win):
     ax.set_title("Closest forecast per variable and date (W1 shaded)", loc="left")
 
 
-LABEL = ("Selected favourable example, chosen retrospectively for illustration; not representative of all dates. "
-         "Chosen because W1's wind error was smaller than both baselines (favourable-error selection, spec/CASE_SELECTION_v2_regression.md).")
+LABEL = ("Selected example, chosen retrospectively for illustration; not representative of all dates. "
+         "Chosen because W1's wind error was smaller than both baselines (selected for low model error, spec/CASE_SELECTION_v2_regression.md).")
 
 
 def main():
@@ -151,7 +151,7 @@ def main():
         for ax in (a[1], a[2]):
             ax.set_xticks(np.arange(3), [f"{t:%d %b %Y}\n(target date)" for t in win["date"]], fontsize=8)
         a[1].legend(loc="upper left", fontsize=7.5, ncol=3)
-        S.title(fig, f"PF-J. {s}: selected favourable regression case around {top['date']:%d %B %Y}", LABEL)
+        S.title(fig, f"PF-J. {s}: selected regression case (low model error) around {top['date']:%d %B %Y}", LABEL)
         S.footer(fig, [CS.TIMING, CS.PROC, CS.BASE,
                        f"Station: {s} (primary). n = 3 station-days. Relatively higher wind = observed wind ≥ the station's training-period 90th percentile "
                        f"({p90[s]:.1f} m/s) on at least one date. Tier {int(top['tier'])} ({'contains a detected event' if top['tier'] == 1 else 'no detected event in the window'}). "
@@ -181,7 +181,7 @@ def main():
             axs[i][0].set_title(f"{s}: wind speed", loc="left"); axs[i][1].set_title(f"{s}: absolute wind error", loc="left")
             axs[i][2].set_title(f"{s}: W1+X1 score and outcome", loc="left")
         axs[0][1].legend(loc="upper left", fontsize=7.5, ncol=3)
-        S.title(fig, f"PF-K. All three primary stations: selected favourable regression window around {d:%d %B %Y}", LABEL)
+        S.title(fig, f"PF-K. All three primary stations: selected regression window (low model error) around {d:%d %B %Y}", LABEL)
         S.footer(fig, [CS.TIMING, CS.PROC, CS.BASE, f"Stations: NAIA, Sangley Point, Science Garden. n = 9 station-days. "
                        f"Common-window rule: spec/CASE_SELECTION_v2_regression.md. Observations: PAGASA; not for online publication. Run {run.name}."], width=190)
         figs += S.save(fig, exp, "PF-K_regression_common_window")
@@ -189,7 +189,7 @@ def main():
     summ["figures"] = figs
     (priv / "PRIVATE_selection_summary_v2.json").write_text(json.dumps(summ, indent=2, default=str), encoding="utf-8")
     (run / "case_selection_v2_summary.json").write_text(json.dumps(pub, indent=2, default=str), encoding="utf-8")
-    C.write_manifest(run, {"stage": "Group C selection v2 (favourable regression case)", "spec": "CASE_SELECTION_v2_regression"})
+    C.write_manifest(run, {"stage": "Group C selection v2 (regression case chosen for low W1 error)", "spec": "CASE_SELECTION_v2_regression"})
     print(json.dumps(pub, indent=1, default=str)); print(json.dumps(summ, indent=1, default=str))
 
 
