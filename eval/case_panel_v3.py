@@ -209,7 +209,7 @@ def fig_L(P1: dict, T: dict, out, run) -> list[str]:
         ax.set_ylim(0, ax.get_ylim()[1] * (1.28 if len(groups) > 1 else 2.1))
         ax.set_title(v.replace("mslp", "MSLP").capitalize() if v != "mslp" else "MSLP", loc="left")
     axs[0].legend(loc="upper left", fontsize=7.2, ncol=1)
-    S.title(fig, "PF-L. Next-day error on dates where both baselines failed, compared with all dates (pooled, three primary stations)",
+    S.title(fig, "PF-L. Next-day error on dates when both references had large errors, compared with all dates (pooled, three stations)",
             "Evidence D (panel request). " + LABEL + " Dates chosen only by baseline error; W1 is scored on every such date.")
     S.footer(fig, ["Baseline-failure date (per station and variable): |persistence error| ≥ the station's 2015-2020 90th percentile of day-to-day change AND "
                    "|climatology error| ≥ the 90th percentile of deviation from the station × month mean. Persistence = issue-day observation; climatology = "

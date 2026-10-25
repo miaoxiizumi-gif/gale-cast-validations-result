@@ -59,8 +59,26 @@ def bake(fig) -> None:
     for t in fig.findobj(Text):
         s = t.get_text()
         if s:
-            t.set_text(text(s))
+            new = text(s)
+            if new != s and "\n" in s and t.axes is not None:  # small multi-line labels inside a panel: name on two lines
+                new = new.replace(MODEL, "GALE-CAST\nModel-W1")
+            t.set_text(new)
             check(t.get_text(), "figure text")
+    _fit_titles(fig)
+
+
+def _fit_titles(fig) -> None:
+    """Wrap panel titles that became wider than their panel after the rename."""
+    import textwrap
+    fig.canvas.draw()
+    r = fig.canvas.get_renderer()
+    for ax in fig.axes:
+        width = ax.get_window_extent(r).width
+        for t in (ax.title, ax._left_title, ax._right_title):
+            s = t.get_text()
+            w = t.get_window_extent(r).width
+            if s and "\n" not in s and w > width * 1.02:
+                t.set_text(textwrap.fill(s, max(20, int(len(s) * width / w))))
 
 
 def check(s: str, where: str) -> None:
