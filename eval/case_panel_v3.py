@@ -294,7 +294,7 @@ def window_axes(ax, cw: pd.DataFrame, v: str, legend=False):
         if r.fail:
             ax.axvspan(i - 0.42, i + 0.42, color="#f3e3d6", zorder=0, lw=0)
         if r.success:
-            ax.text(i, 1.0, "★ W1 closest", transform=ax.get_xaxis_transform(), ha="center", va="bottom", fontsize=7.2, color=S.W1C, fontweight="bold")
+            ax.text(i, 1.0, "★", transform=ax.get_xaxis_transform(), ha="center", va="bottom", fontsize=9, color=S.W1C, fontweight="bold")  # meaning in the footer
     vals = cw[["obs", "W1", "persistence", "climatology"]].values.astype(float)
     lo, hi = np.nanmin(vals), np.nanmax(vals)
     pad = max((hi - lo) * 0.25, 0.5 if v != "rainfall" else 1.0)

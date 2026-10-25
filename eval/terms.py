@@ -68,17 +68,31 @@ def bake(fig) -> None:
 
 
 def _fit_titles(fig) -> None:
-    """Wrap panel titles that became wider than their panel after the rename."""
+    """Wrap panel titles and axis labels that became longer than their panel after the rename; rename table cells."""
     import textwrap
+    for ax in fig.axes:
+        for tab in ax.tables:
+            cells = tab.get_celld().values()
+            hit = False
+            for c in cells:
+                s = c.get_text().get_text()
+                if text(s) != s:
+                    c.get_text().set_text(text(s).replace(MODEL, "GALE-CAST\nModel-W1")); hit = True
+            if hit:
+                for c in cells:
+                    c.set_height(c.get_height() * 1.7)
     fig.canvas.draw()
     r = fig.canvas.get_renderer()
     for ax in fig.axes:
-        width = ax.get_window_extent(r).width
-        for t in (ax.title, ax._left_title, ax._right_title):
-            s = t.get_text()
-            w = t.get_window_extent(r).width
-            if s and "\n" not in s and w > width * 1.02:
-                t.set_text(textwrap.fill(s, max(20, int(len(s) * width / w))))
+        box = ax.get_window_extent(r)
+        for t in (ax.title, ax._left_title, ax._right_title, ax.xaxis.label):
+            s, w = t.get_text(), t.get_window_extent(r).width
+            if s and "\n" not in s and w > box.width * 1.02:
+                t.set_text(textwrap.fill(s, max(20, int(len(s) * box.width / w))))
+        t = ax.yaxis.label
+        s, h = t.get_text(), t.get_window_extent(r).height
+        if s and "\n" not in s and h > box.height * 1.02:
+            t.set_text(textwrap.fill(s, max(15, int(len(s) * box.height / h))))
 
 
 def check(s: str, where: str) -> None:
