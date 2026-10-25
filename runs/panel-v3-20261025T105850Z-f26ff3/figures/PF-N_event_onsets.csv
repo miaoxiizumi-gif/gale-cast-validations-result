@@ -1,0 +1,9 @@
+evidence,scope,onsets,hits_W1+X1@0.601,hits_event_persistence,hits_event_climatology,false_alarms_W1+X1@0.601,false_alarms_event_persistence,false_alarms_event_climatology,non_events
+A,pooled,21,17,0,0,9,21,0,3395
+A,NAIA,7,6,0,0,2,7,0,1131
+A,Sangley Point,6,5,0,0,4,6,0,1133
+A,Science Garden,8,6,0,0,3,8,0,1131
+B,pooled,21,11,0,7,8,20,317,3493
+B,NAIA,7,4,0,2,2,7,106,1164
+B,Sangley Point,6,4,0,2,3,5,105,1165
+B,Science Garden,8,3,0,3,3,8,106,1164

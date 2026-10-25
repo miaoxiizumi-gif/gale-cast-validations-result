@@ -22,6 +22,7 @@ on evaluation-period outcomes (see `MODEL_AND_DATA_SUMMARY.md`, regression prove
 |---|---|---|---|---|
 | **A. Website historical scorecard** | the website's 3,423 next-day windows (1,141 per primary station; target dates 2021-11-16 to 2024-12-30) | historical scoring procedure: pooled `scaled_weather` inputs, 32-day windows | processed (forward-filled) label, as on the website; raw observations for regression | reproduce and explain what the website shows; add same-case baselines |
 | **B. Training-consistent benchmark** | 3,520 event cases / 3,520 wind cases, target dates 2021-10-15 to 2024-12-31 | per-station scalers as in training | raw, unimputed observations | the declared benchmark of `spec/EVAL_SPEC_v1.md` |
+| **D. Baseline-failure validation (panel request)** | every Group A station-date on which both persistence and climatology failed (training-period 90th-percentile rule, `CASE_SELECTION_v3_panel_validation.md`) and every event onset; then favourable example windows | as A (saved rows; no model run); wind and onsets also on B | raw observations | show where the reference forecasts fail and how W1 does there; examples not representative |
 | **C. Selected illustrative case studies** | set 1 (`CASE_SELECTION_v1.md`): 3 station windows + 1 common window around detected events; set 2 (`CASE_SELECTION_v2_regression.md`): 3 station windows + 1 common window with relatively high wind and favourable W1 wind error (favourable-error selection, disclosed) | as A (saved rows; no model run) | raw observations | explanation only; not representative |
 
 ### Selected illustrative case studies: what the two sets show
@@ -33,6 +34,35 @@ on evaluation-period outcomes (see `MODEL_AND_DATA_SUMMARY.md`, regression prove
   Its rule was recorded before the search (relatively higher wind = observed wind ≥ the station's 2015-2020 90th percentile on at least one
   day). Results by station are in `FIGURE_GUIDE.md` (PF-J, PF-K). The pressure forecast was the closest on few of these days.
 - Neither set establishes general superiority; the overall comparisons (Evidence A and B) do.
+
+### Baseline-failure validation (Evidence D, panel request)
+
+*Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.*
+
+The panel asked for historical dates on which persistence and climatology perform poorly. `spec/CASE_SELECTION_v3_panel_validation.md`
+(committed before the analysis) defines them **without using W1**: a station-date is a *baseline-failure date* for a variable when the
+persistence error is at least the station's 2015-2020 90th percentile of day-to-day change **and** the climatology error is at least the
+90th percentile of deviation from the station × month mean. W1 is then scored on **every** such date (Part 1); favourable example windows
+are picked only afterwards (Part 2, private figures). A no-model control (the average of the two baselines) shows how much of any advantage
+on these dates a simple hedge also gets, because choosing dates by baseline error favours any forecast that does not copy a baseline.
+
+| Variable (pooled) | Baseline-failure dates | MAE W1 / persistence / climatology / control | W1 − persistence | W1 − climatology | W1 − control |
+|---|---|---|---|---|---|
+| wind | 253 | 1.69 / 1.43 / 1.76 / 1.49 | established: positive | no established difference | established: positive |
+| mslp | 91 | 3.98 / 3.32 / 5.52 / 3.64 | no established difference | established: negative | no established difference |
+| humidity | 114 | 10.83 / 13.44 / 14.58 / 13.31 | established: negative | established: negative | established: negative |
+| rainfall | 191 | 51.13 / 46.71 / 45.46 / 44.94 | established: positive | established: positive | established: positive |
+
+"established: negative" = W1's error is smaller and the 95% interval excludes zero; "positive" = W1's error is larger. Event onsets (no
+event on the issue day, an event on the target day): Evidence A 21 onsets, W1+X1 warned of 17
+(9 false alarms on all non-event days), event persistence 0, event climatology 0;
+Evidence B 21 onsets, W1+X1 11 (8 false alarms), event climatology 7
+(317 false alarms).
+
+Reading: where the references fail, W1's clearest advantage is **warning of pressure-fall onsets**. For numerical forecasts the advantage
+is limited to humidity (helped by W1's high humidity bias, since these dates are mostly humidity rises) and to MSLP against climatology
+only; for wind (except Science Garden, again a bias effect) and rainfall W1 is not better on these dates. Per-station detail:
+`FIGURE_GUIDE.md` (PF-L to PF-P).
 
 Group A's case identity was recovered without regenerating predictions: the saved reproduction rows (`a-legacy-20261023T162426Z-b5f446`)
 match the original W1-branch record `nine_fp_report.json` for all 9 false alarms and 4 misses (station, date and score), and the matrix is
@@ -74,7 +104,8 @@ W1's thresholds are unchanged: X1 ≥ 0.601 (website) and raw ≥ 0.64 (document
 - **Precision, recall, F1, PR-AUC:** reported with all four confusion-matrix cells. Accuracy is shown with the all-negative reference.
 - **Uncertainty:** paired circular block bootstrap over target dates (14-day blocks, 2,000 resamples). "Established" means the 95% interval
   excludes zero.
-- **Selected dates cannot establish general forecasting superiority.**
+- **Selected dates cannot establish general forecasting superiority.** Conditioning on baseline failure (Evidence D) is a stratified
+  view of the same cases, not a new test, and it favours forecasts that do not copy a baseline.
 
 ## Why persistence and climatology
 

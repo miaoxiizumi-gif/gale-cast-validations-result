@@ -17,7 +17,7 @@ Last updated: 2026-10-25.
 `stage1_identity.py` → `stage2_partitions.py` → `stage2b_supplementary.py` → `cohort_a_legacy.py` → `benchmark.py` → `variants.py` →
 `diag_inputs.py`, `diag_insample.py` (post-hoc, labelled) → `figures.py` →
 amendment A2: `website_cohort.py` → `regression_provenance.py` → `split_facts.py` → `case_studies.py` → `case_regression.py`
-(selection v2) → `paper_figures.py` → `build_site.py` (also runs `build_docs.py`, which renders `figure_notes.py` into the site, the
+(selection v2) → `case_panel_v3.py` (selection v3, panel request) → `paper_figures.py` → `build_site.py` (also runs `build_docs.py`, which renders `figure_notes.py` into the site, the
 figure guide and the private `_private/thesis_export/INDEX.md`, and `tech_stack.py` into `TECH_STACK.md`). Then publish `docs/` to the `gh-pages` branch (`git subtree split --prefix docs`).
 Every script creates a new run directory. Never overwrite or delete a run; mark failures with `FAILED.txt`.
 
@@ -36,6 +36,13 @@ Every script creates a new run directory. Never overwrite or delete a run; mark 
   3 of 9 station-days); set 2 under `spec/CASE_SELECTION_v2_regression.md` (relatively high wind, favourable-error selection: W1 wind closest
   on 3/3 days at NAIA and Sangley Point, 1/3 at Science Garden; pressure rarely). Figures and dates are private (PAGASA terms); local index
   `_private/thesis_export/INDEX.md`.
+- **Baseline-failure validation (Evidence D, panel request; 2026-10-25):** `spec/CASE_SELECTION_v3_panel_validation.md` (committed
+  `085126c` before the analysis), run `panel-v3-20261025T105850Z-f26ff3` (two earlier runs marked `FAILED.txt`, identical numbers). Dates
+  where persistence AND climatology both failed (training 90th percentiles; W1 not used to choose), W1 scored on all of them: humidity W1
+  better than both baselines and the no-model control (helped by W1's +6.9 % humidity bias); MSLP better than climatology only; wind
+  (except Science Garden, a level effect) and rainfall not better. Onsets: W1+X1 warned of 17/21 (A) and 11/21 (B); event persistence 0;
+  climatology 0 (A) / 7 with 317 false alarms (B). Public figures PF-L, PF-M, PF-N; private example windows PF-O, PF-P (dates in INDEX.md).
+  Ledger entries P-39 (Ch 4 insertion) and P-40 (Ch 5). The site build now fails if any private case date appears in `docs/`.
 - **Figure explanations:** every graph (public and private) has a nine-part explanation from `eval/figure_notes.py`.
 
 ## Open items (owner decisions; not decided here)

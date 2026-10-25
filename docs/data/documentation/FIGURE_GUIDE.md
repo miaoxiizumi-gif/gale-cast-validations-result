@@ -119,6 +119,48 @@ Files are in [`docs/figures/paper/`](../docs/figures/paper/) (site: https://miao
 - **Source:** figures/paper/PF-G_observed_vs_predicted.csv; run w-cohort-20261024T205646Z-6b7a96.
 
 
+## Baseline-failure validation figures (Evidence D, panel request; public aggregates)
+
+Every figure in this group states: "Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates." Rule: `spec/CASE_SELECTION_v3_panel_validation.md`. Run `panel-v3-20261025T105850Z-f26ff3`; files in
+[`docs/figures/paper/`](../docs/figures/paper/). PF-L to PF-N are aggregates over every qualifying date (no dates or readings).
+
+### PF-L_baseline_failure_mae — `PF-L_baseline_failure_mae.png` / `.svg` / `.csv`
+
+- **What this graph shows:** For each next-day output (wind, MSLP, humidity, rainfall), the MAE of W1, persistence, climatology and a no-model control (average of the two baselines) on all complete dates and on the dates where both baselines failed; pooled over the three primary stations.
+- **Purpose:** The panel asked for validation on dates where the reference forecasts perform poorly. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.
+- **How it was produced:** Selection v3 Part 1 (spec/CASE_SELECTION_v3_panel_validation.md, committed before the analysis): baseline-failure date = |persistence error| ≥ the station's 2015-2020 90th percentile of day-to-day change AND |climatology error| ≥ the station's 2015-2020 90th percentile of deviation from its month mean (W1 not used). W1 is scored on every such date, whether it did well or not. Saved Evidence A rows (W1 neural-only output; no model run); raw PAGASA truth.
+- **How to read it:** Shorter bars are better. Compare the four bars within a group; units differ between panels. The left group is the ordinary picture, the right group the baseline-failure dates only.
+- **Actual finding:** On baseline-failure dates: wind n = 253, W1 1.69 vs persistence 1.43, climatology 1.76, control 1.49 m/s; MSLP n = 91, W1 3.98 vs persistence 3.32, climatology 5.52, control 3.64 hPa; humidity n = 114, W1 10.83 vs persistence 13.44, climatology 14.58, control 13.31 %; rainfall n = 191, W1 51.13 vs persistence 46.71, climatology 45.46, control 44.94 mm. On all dates W1's MAE is larger than persistence's for wind, MSLP and humidity and smaller for rainfall.
+- **What it supports:** Where both baselines failed, W1's humidity error was smaller than both baselines and the control, and its MSLP error was smaller than climatology's (not persistence's).
+- **What it does not establish:** Choosing dates by baseline error favours any forecast that does not follow persistence or climatology; the control shows how much of that a no-model hedge also gets. W1's humidity forecasts run +6.9 percentage points high on average, so dates with sudden humidity rises favour it; on humidity falls (n = 35) W1 is worse (16.4 vs persistence 11.4 %). On heavy-rain baseline-failure dates W1 under-forecasts and has the largest error. These dates are 253 of 3421 wind cases; they do not change the overall result.
+- **Use in the paper:** Chapter 4, new subsection 'Validation on dates where the reference forecasts failed (panel request)'. Caption: 'Figure 4.x. Next-day MAE on all dates and on dates where both persistence and climatology failed (training-period 90th-percentile rule), three primary stations, 2021-11-16 to 2024-12-30. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.'
+- **Source:** figures/paper/PF-L_baseline_failure_mae.csv; run panel-v3-20261025T105850Z-f26ff3; spec/CASE_SELECTION_v3_panel_validation.md.
+
+### PF-M_baseline_failure_differences — `PF-M_baseline_failure_differences.png` / `.svg` / `.csv`
+
+- **What this graph shows:** On baseline-failure dates only: W1's MAE minus persistence's, climatology's and the control's, per station and pooled, with 95% intervals.
+- **Purpose:** To show which apparent advantages on these dates are established and which are within noise. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.
+- **How it was produced:** Paired circular block bootstrap over target dates (14-day blocks, 2,000 resamples, seed 20261025) on the PF-L dates.
+- **How to read it:** Left of the zero line = W1's error smaller. A difference is established only if its whole interval is on one side of zero. n is the number of baseline-failure station-dates.
+- **Actual finding:** Pooled: wind: vs persistence W1 larger (established), vs climatology no established difference, vs control W1 larger (established); MSLP: vs persistence no established difference, vs climatology W1 smaller (established), vs control no established difference; humidity: vs persistence W1 smaller (established), vs climatology W1 smaller (established), vs control W1 smaller (established); rainfall: vs persistence W1 larger (established), vs climatology W1 larger (established), vs control W1 larger (established). Established smaller than both baselines at: wind at Science Garden, humidity at NAIA, humidity at Science Garden.
+- **What it supports:** W1 adds value over both baselines for humidity on dates when humidity jumped, and over climatology for pressure on dates with large pressure changes; Science Garden is the one station where W1's wind is better on these dates.
+- **What it does not establish:** Science Garden's wind advantage comes from W1's high wind level there (bias +1.33 m/s on all dates): almost all of its baseline-failure dates are wind rises. On large MSLP falls (n = 61) W1 is not established better than persistence. Training-consistent inputs (Evidence B) give the same wind picture: n = 256, W1 1.72 vs persistence 1.43, climatology 1.75 m/s.
+- **Use in the paper:** Chapter 4, same subsection. Caption: 'Figure 4.x. Paired MAE differences on baseline-failure dates with 95% block-bootstrap intervals. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.'
+- **Source:** figures/paper/PF-M_baseline_failure_differences.csv; run panel-v3-20261025T105850Z-f26ff3.
+
+### PF-N_event_onsets — `PF-N_event_onsets.png` / `.svg` / `.csv`
+
+- **What this graph shows:** Event onsets (no study-label event on the issue day, an event on the target day): how many each forecast warned of, on the website cases (A) and the training-consistent benchmark (B), with false alarms.
+- **Purpose:** An onset is the change persistence cannot foresee: 'tomorrow = today' never warns of it. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.
+- **How it was produced:** Every onset in each cohort (no date chosen by hand). W1+X1 warns at ≥ 0.601; event climatology uses its tuning-year threshold.
+- **How to read it:** Bars = onsets each forecast warned of; the black dash is the number of onsets. False alarms are listed under each station.
+- **Actual finding:** Evidence A: 21 onsets; W1+X1 warned of 17 with 9 false alarms; event persistence 0; event climatology 0. Evidence B: 21 onsets; W1+X1 11 (8 false alarms); persistence 0; climatology 7 (317 false alarms).
+- **What it supports:** W1+X1 warns of most sudden pressure-fall onsets that both simple references miss, with few false alarms.
+- **What it does not establish:** Every onset is a pressure fall, not gale-force wind; the 0.601 threshold was adopted after the website results were seen, so Evidence A is not an independent test; fewer onsets are caught with training-consistent inputs (B).
+- **Use in the paper:** Chapter 4, same subsection. Caption: 'Figure 4.x. Warnings of event onsets by W1+X1, event persistence and event climatology. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.'
+- **Source:** figures/paper/PF-N_event_onsets.csv; run panel-v3-20261025T105850Z-f26ff3.
+
+
 ## Earlier benchmark figures (Evidence B unless stated; PNG on the site, data in `docs/data/`)
 
 ### F1_partitions — `docs/figures/F1_partitions.png`
@@ -273,3 +315,27 @@ Every case figure states: "Selected favourable example, chosen retrospectively f
 - **What it does not establish:** At Science Garden W1's wind was the worst forecast on every date of this window; selected for favourable error.
 - **Use in the paper:** Chapter 4, selected case studies. Caption: 'Figure 4.x. Selected favourable regression window across the three primary stations. Selected favourable example, chosen retrospectively for illustration; not representative of all dates.'
 - **Source:** private: _private/thesis_export/case-v2-20261024T220752Z-df6bb0/.
+
+### PF-O (private)
+
+- **What this graph shows:** Per station, three consecutive target dates: observed and forecast wind, MSLP, humidity and rainfall with baseline-failure dates shaded and W1 successes starred; a closest-forecast grid; the W1+X1 score and outcome.
+- **Purpose:** The panel's request for concrete dates where the baselines failed and W1 did better. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.
+- **How it was produced:** Selection v3 Part 2: windows ranked by the number of (variable, date) cells that are baseline-failure dates on which W1 was strictly closer than both baselines, then normalised margin, then baseline-failure cells, then date. Favourable by design.
+- **How to read it:** Shaded = both baselines failed for that variable; ★ = W1 closest there. Every variable and date is shown, including those where W1 was worse. Each date is a separate next-day forecast; a gap in a line is a missing observation.
+- **Actual finding:** W1 success cells (of 12): NAIA 3 of 6 baseline-failure cells, W1+X1 outcomes Hit, False alarm, Correct negative; Sangley Point 4 of 6 baseline-failure cells, W1+X1 outcomes Hit, Correct negative, Correct negative; Science Garden 4 of 6 baseline-failure cells, W1+X1 outcomes Hit, Correct negative, Correct negative.
+- **What it supports:** On specific dates when both baselines failed, W1 was the closest forecast for some variables.
+- **What it does not establish:** Chosen for W1's success; at two of the three stations W1 badly under-forecast the heaviest-rain day of the window; not a performance estimate (see PF-L, PF-M).
+- **Use in the paper:** Chapter 4, same subsection (printed thesis only). Caption: 'Figure 4.x. Selected validation window. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.'
+- **Source:** private: _private/thesis_export/panel-v3-20261025T105850Z-f26ff3/; public counts: runs/panel-v3-20261025T105850Z-f26ff3/panel_v3_results.json.
+
+### PF-P (private)
+
+- **What this graph shows:** The Part 2 common window: all four variables at all three primary stations on the same three dates.
+- **Purpose:** A network-wide view of a period when both baselines failed. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.
+- **How it was produced:** Common-window rule of Part 2: dates in the cohort at all three stations, ranked by total W1 success cells (of 36).
+- **How to read it:** One row per station, one column per variable; shading and stars as in PF-O.
+- **Actual finding:** W1 success cells 10 of 36; baseline-failure cells 21 of 36 (success cells by station: NAIA 3, Sangley Point 3, Science Garden 4).
+- **What it supports:** During a multi-station disturbance, W1 was closer than both failed baselines on a minority of the variable-station-dates.
+- **What it does not establish:** Favourable selection; W1 missed the heavy rainfall of the window at every station.
+- **Use in the paper:** Chapter 4, same subsection (printed thesis only). Caption: 'Figure 4.x. Selected common validation window. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.'
+- **Source:** private: _private/thesis_export/panel-v3-20261025T105850Z-f26ff3/.

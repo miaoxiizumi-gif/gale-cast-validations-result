@@ -43,5 +43,5 @@ package inventory or private case values were used for it.
 
 ## Selection amendments
 
-`spec/CASE_SELECTION_v1.md` (classification case studies) and `spec/CASE_SELECTION_v2_regression.md` (favourable regression case), each
-committed before its search.
+`spec/CASE_SELECTION_v1.md` (classification case studies), `spec/CASE_SELECTION_v2_regression.md` (favourable regression case) and
+`spec/CASE_SELECTION_v3_panel_validation.md` (baseline-failure validation, panel request), each committed before its search.
