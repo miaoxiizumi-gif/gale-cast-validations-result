@@ -92,7 +92,7 @@ returned to the state of commit `5255788` (by `git revert`, history kept), and s
 `PF-L_composite_validation`, in which GALE-CAST Model-W1's MAE is lower than both baselines in every panel. Each panel uses its own set of dates: wind and
 MSLP on the v4 dates (258 station-dates), humidity on the v3 reference comparison dates for humidity (114), rainfall
 on all complete dates (3,407). These dates were chosen for this outcome, so the figure shows that such dates exist; it does
-not show that the model is better in general. PF-F3 reports all complete dates for comparison.
+not show that the model is better in general. Table PE-2 reports all complete dates for comparison.
 
 Group A's case identity was recovered without regenerating predictions: the saved reproduction rows (`a-legacy-20261023T162426Z-b5f446`)
 match the original GALE-CAST Model-W1-branch record `nine_fp_report.json` for all 9 false alarms and 4 misses (station, date and score), and the matrix is
