@@ -54,6 +54,13 @@ Every script creates a new run directory. Never overwrite or delete a run; mark 
   identical to 5255788). Section 8.E now shows only `PF-L_composite_favourable` (2x2; wind and MSLP on the v4 dates n 258, humidity on
   v3 baseline-failure dates n 114, rainfall on all complete dates n 3,407; W1 below both baselines in each panel by selection), labelled
   with each subset and n and the favourable-selection disclosure. Cited run `persist-v4-20261025T134632Z-90d621`.
+- **Panel presentation directives (2026-10-25/26):** `eval/terms.py` renames the model to "GALE-CAST Model-W1" in every public text and
+  figure (code, file names and the eval ID GCV-W1-v1 untouched), shows "baseline-failure" as "large-baseline-error", and fails the build if
+  "favourable/favorable/subset" appears in public text or figures (selection rules are still stated in plain words). Plain-English intros;
+  tables PD-1/PD-2 (section D) and PE-1/PE-2 (section E, with an all-dates comparison table); Port Area and the 19 Luzon stations shown as
+  supplementary training data (Table D1-S). Not done: publishing the private case figures (PAGASA CADS-07 condition 4; needs written
+  permission) and deleting results where persistence beats the model. Spec files keep their original wording (pre-registered records).
+  Figure runs re-rendered at 9b9bc69.
 - **Figure explanations:** every graph (public and private) has a nine-part explanation from `eval/figure_notes.py`.
 
 ## Open items (owner decisions; not decided here)

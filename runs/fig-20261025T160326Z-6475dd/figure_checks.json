@@ -1,0 +1,9 @@
+{
+  "F4_total_equals_wind_cases": true,
+  "F5_timeline_equals_confusion": true,
+  "F6_W1_raw@0.64_sums_to_cases": true,
+  "F6_W1+X1@0.601_sums_to_cases": true,
+  "F6_W1+X1@0.62_sums_to_cases": true,
+  "F6_event_persistence_sums_to_cases": true,
+  "F6_event_climatology@0.0355_sums_to_cases": true
+}

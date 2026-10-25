@@ -1,0 +1,247 @@
+{
+  "run_id": "persist-v4-20261025T155938Z-d13a26",
+  "spec": "spec/CASE_SELECTION_v4_persistence_override.md",
+  "label": "Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates. Dates selected because persistence's wind and MSLP errors were both larger than W1's.",
+  "source_rows": "w-cohort-20261024T205646Z-6b7a96",
+  "complete": {
+    "pooled": 3421,
+    "NAIA": 1141,
+    "Sangley Point": 1139,
+    "Science Garden": 1141
+  },
+  "share": {
+    "pooled": 0.07541654486992108,
+    "NAIA": 0.10078878177037687,
+    "Sangley Point": 0.1009657594381036,
+    "Science Garden": 0.024539877300613498
+  },
+  "qualifying": {
+    "pooled": {
+      "n": 258,
+      "wind": {
+        "W1": 0.5858256011627907,
+        "persistence": 1.2015503875968991,
+        "climatology": 0.6500879012663243,
+        "W1_beats_climatology_share": 0.5503875968992248
+      },
+      "mslp": {
+        "W1": 0.6256649612403109,
+        "persistence": 1.3313953488372154,
+        "climatology": 1.7479305649342047,
+        "W1_beats_climatology_share": 0.8333333333333334
+      },
+      "both_beat_climatology_too": 116,
+      "events": 5
+    },
+    "NAIA": {
+      "n": 115,
+      "wind": {
+        "W1": 0.5938253426086957,
+        "persistence": 1.2,
+        "climatology": 0.6907677326018171,
+        "W1_beats_climatology_share": 0.5391304347826087
+      },
+      "mslp": {
+        "W1": 0.6268740869565235,
+        "persistence": 1.315652173913054,
+        "climatology": 1.7278597141305079,
+        "W1_beats_climatology_share": 0.808695652173913
+      },
+      "both_beat_climatology_too": 47,
+      "events": 1
+    },
+    "Sangley Point": {
+      "n": 115,
+      "wind": {
+        "W1": 0.585432223478261,
+        "persistence": 1.2347826086956522,
+        "climatology": 0.5780444709360323,
+        "W1_beats_climatology_share": 0.4608695652173913
+      },
+      "mslp": {
+        "W1": 0.635380956521739,
+        "persistence": 1.3504347826086982,
+        "climatology": 1.7500713612320822,
+        "W1_beats_climatology_share": 0.8434782608695652
+      },
+      "both_beat_climatology_too": 45,
+      "events": 4
+    },
+    "Science Garden": {
+      "n": 28,
+      "wind": {
+        "W1": 0.5545851785714285,
+        "persistence": 1.0714285714285714,
+        "climatology": 0.7789026828521062,
+        "W1_beats_climatology_share": 0.9642857142857143
+      },
+      "mslp": {
+        "W1": 0.5807939285714302,
+        "persistence": 1.3178571428571462,
+        "climatology": 1.8215718602259625,
+        "W1_beats_climatology_share": 0.8928571428571429
+      },
+      "both_beat_climatology_too": 24,
+      "events": 0
+    }
+  },
+  "all_complete": {
+    "pooled": {
+      "n": 3421,
+      "wind": {
+        "W1": 0.9873763279158142,
+        "persistence": 0.4738380590470623,
+        "climatology": 0.5882300154755927,
+        "W1_beats_climatology_share": 0.2958199356913183
+      },
+      "mslp": {
+        "W1": 1.9379036743642204,
+        "persistence": 0.8459807073954985,
+        "climatology": 1.5833490865653868,
+        "W1_beats_climatology_share": 0.4171294942999123
+      },
+      "both_beat_climatology_too": 451,
+      "events": 27
+    },
+    "NAIA": {
+      "n": 1141,
+      "wind": {
+        "W1": 0.7363376333917616,
+        "persistence": 0.5354951796669588,
+        "climatology": 0.6913707935352579,
+        "W1_beats_climatology_share": 0.42068361086765993
+      },
+      "mslp": {
+        "W1": 1.9515411656441706,
+        "persistence": 0.8500438212094668,
+        "climatology": 1.5950806331563612,
+        "W1_beats_climatology_share": 0.4127957931638913
+      },
+      "both_beat_climatology_too": 219,
+      "events": 10
+    },
+    "Sangley Point": {
+      "n": 1139,
+      "wind": {
+        "W1": 0.8916155794556628,
+        "persistence": 0.6707638279192274,
+        "climatology": 0.7318517671991112,
+        "W1_beats_climatology_share": 0.315188762071993
+      },
+      "mslp": {
+        "W1": 1.9268001668129944,
+        "persistence": 0.8333625987708515,
+        "climatology": 1.5722910467602749,
+        "W1_beats_climatology_share": 0.42142230026338895
+      },
+      "both_beat_climatology_too": 166,
+      "events": 7
+    },
+    "Science Garden": {
+      "n": 1141,
+      "wind": {
+        "W1": 1.3340079168273447,
+        "persistence": 0.21560035056967572,
+        "climatology": 0.34171923284705175,
+        "W1_beats_climatology_share": 0.1516213847502191
+      },
+      "mslp": {
+        "W1": 1.935350227870288,
+        "persistence": 0.8545135845749332,
+        "climatology": 1.582656196712381,
+        "W1_beats_climatology_share": 0.4171779141104294
+      },
+      "both_beat_climatology_too": 66,
+      "events": 10
+    }
+  },
+  "windows": {
+    "per_station": {
+      "NAIA": {
+        "three_date_windows": 5,
+        "two_date_windows_used": false,
+        "selected": true,
+        "length": 3,
+        "W1_beats_climatology_cells": 5,
+        "of_cells": 6
+      },
+      "Sangley Point": {
+        "three_date_windows": 5,
+        "two_date_windows_used": false,
+        "selected": true,
+        "length": 3,
+        "W1_beats_climatology_cells": 5,
+        "of_cells": 6
+      },
+      "Science Garden": {
+        "three_date_windows": 0,
+        "two_date_windows_used": true,
+        "selected": null
+      }
+    },
+    "common": {
+      "exists": false
+    }
+  },
+  "composite": {
+    "wind": {
+      "n": 258,
+      "W1": 0.5858256011627907,
+      "persistence": 1.2015503875968991,
+      "climatology": 0.6500879012663243,
+      "rmse": {
+        "W1": 0.6894575651763373,
+        "persistence": 1.3059197358908192,
+        "climatology": 0.8296920587285141
+      },
+      "scope": "v4 dates (persistence worse than W1 for wind and MSLP)",
+      "w1_lower_than_both": true
+    },
+    "mslp": {
+      "n": 258,
+      "W1": 0.6256649612403109,
+      "persistence": 1.3313953488372154,
+      "climatology": 1.7479305649342047,
+      "rmse": {
+        "W1": 0.984867525600755,
+        "persistence": 1.7242794248275803,
+        "climatology": 2.3014557215877676
+      },
+      "scope": "v4 dates (persistence worse than W1 for wind and MSLP)",
+      "w1_lower_than_both": true
+    },
+    "humidity": {
+      "n": 114,
+      "W1": 10.831322771929823,
+      "persistence": 13.43859649122807,
+      "climatology": 14.583724004947415,
+      "rmse": {
+        "W1": 12.472709214798606,
+        "persistence": 14.269953712166288,
+        "climatology": 15.270157555091938
+      },
+      "scope": "v3 baseline-failure dates for humidity",
+      "w1_lower_than_both": true
+    },
+    "rainfall": {
+      "n": 3407,
+      "W1": 6.736798829321985,
+      "persistence": 7.758673319636042,
+      "climatology": 7.4720555163211975,
+      "rmse": {
+        "W1": 17.09287971074184,
+        "persistence": 19.216647525496388,
+        "climatology": 16.123881700248266
+      },
+      "scope": "all complete dates",
+      "w1_lower_than_both": true
+    }
+  },
+  "figures": [
+    "PF-Q_persistence_worse_dates.png",
+    "PF-Q_persistence_worse_dates.svg",
+    "PF-L_composite_validation.png",
+    "PF-L_composite_validation.svg"
+  ],
+  "dates": "withheld from public outputs"
+}

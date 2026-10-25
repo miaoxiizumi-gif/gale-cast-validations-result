@@ -1,0 +1,5 @@
+step,mae,rmse,fitted_on_evaluation_outcomes
+1. W1 neural output,0.9874551667543092,1.1715888843339592,False
+2. + isotonic MOS per station and season,0.5764363797938159,0.8386652561445055,True
+3. + blend 0.55×model with obs. two days earlier (website value),0.5365441052838261,0.7723157903309997,True
+"Persistence (issue-day obs.), same cases and truth",0.47443762781186094,0.7995032053729956,False

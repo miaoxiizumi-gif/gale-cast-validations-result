@@ -1,0 +1,125 @@
+{
+  "run_id": "pf-20261025T155648Z-d77c51",
+  "figures": [
+    {
+      "figure": "PF-A_website_confusion_matrix",
+      "png": "PF-A_website_confusion_matrix.png",
+      "svg": "PF-A_website_confusion_matrix.svg",
+      "csv": "PF-A_website_confusion_matrix.csv",
+      "evidence_group": "A",
+      "caption": "The GALE-CAST website's binary scorecard (validation_cm3.json), reproduced case by case: 24 hits, 4 misses, 9 false alarms, 3,386 correct negatives. Accuracy is dominated by correct negatives; the all-negative forecast scores 99.18%.",
+      "source_runs": [
+        "reg-prov-20261024T205749Z-ce57af",
+        "w-cohort-20261024T205646Z-6b7a96"
+      ]
+    },
+    {
+      "figure": "PF-B_station_outcomes",
+      "png": "PF-B_station_outcomes.png",
+      "svg": "PF-B_station_outcomes.svg",
+      "csv": "PF-B_station_outcomes.csv",
+      "evidence_group": "A",
+      "caption": "The same 3,423 cases split by primary station. Because X1 averages the three stations, a warning is issued for all three stations on the same date; station results are therefore not independent.",
+      "source_runs": [
+        "reg-prov-20261024T205749Z-ce57af",
+        "w-cohort-20261024T205646Z-6b7a96"
+      ]
+    },
+    {
+      "figure": "PF-C_event_metrics_overall",
+      "png": "PF-C_event_metrics_overall.png",
+      "svg": "PF-C_event_metrics_overall.svg",
+      "csv": "PF-C_event_metrics_overall.csv",
+      "evidence_group": "A+B",
+      "caption": "Precision, recall and F1 with 95% intervals. On both cohorts W1+X1 beats both event baselines on F1 (established). The level depends on the input construction: 24/28 hits with the website's procedure, fewer with training-consistent inputs.",
+      "source_runs": [
+        "b-benchmark-20261023T162436Z-874640",
+        "reg-prov-20261024T205749Z-ce57af",
+        "w-cohort-20261024T205646Z-6b7a96"
+      ]
+    },
+    {
+      "figure": "PF-D_event_metrics_by_station",
+      "png": "PF-D_event_metrics_by_station.png",
+      "svg": "PF-D_event_metrics_by_station.svg",
+      "csv": "PF-D_event_metrics_by_station.csv",
+      "evidence_group": "A",
+      "caption": "The PF-C comparison for each primary station. With 8-10 events per station the intervals are wide.",
+      "source_runs": [
+        "reg-prov-20261024T205749Z-ce57af",
+        "w-cohort-20261024T205646Z-6b7a96"
+      ]
+    },
+    {
+      "figure": "PF-E_precision_recall_curves",
+      "png": "PF-E_precision_recall_curves.png",
+      "svg": "PF-E_precision_recall_curves.svg",
+      "csv": "PF-E_precision_recall_curves.csv",
+      "evidence_group": "A",
+      "caption": "Curves traced from the 3,423 saved W1 scores (not reconstructed from a confusion matrix), with the historical 0.601 point marked.",
+      "source_runs": [
+        "reg-prov-20261024T205749Z-ce57af",
+        "w-cohort-20261024T205646Z-6b7a96"
+      ]
+    },
+    {
+      "figure": "PF-F_wind_mae_rmse",
+      "png": "PF-F_wind_mae_rmse.png",
+      "svg": "PF-F_wind_mae_rmse.svg",
+      "csv": "PF-F_wind_mae_rmse.csv",
+      "evidence_group": "A",
+      "caption": "W1's neural wind output has larger MAE and RMSE than both baselines overall and at every station (established for MAE vs persistence everywhere). W1 does not show wind-forecast superiority.",
+      "source_runs": [
+        "reg-prov-20261024T205749Z-ce57af",
+        "w-cohort-20261024T205646Z-6b7a96"
+      ]
+    },
+    {
+      "figure": "PF-F2_website_regression_provenance",
+      "png": "PF-F2_website_regression_provenance.png",
+      "svg": "PF-F2_website_regression_provenance.svg",
+      "csv": "PF-F2_website_regression_provenance.csv",
+      "evidence_group": "A",
+      "caption": "The website's wind MAE 0.5365 / RMSE 0.7723 / MASE 0.6782 are reproduced exactly only after two post-processing steps fitted on the evaluation period itself. W1's own wind output has MAE 0.987; issue-day persistence on the same cases has MAE 0.474.",
+      "source_runs": [
+        "reg-prov-20261024T205749Z-ce57af",
+        "w-cohort-20261024T205646Z-6b7a96"
+      ]
+    },
+    {
+      "figure": "PF-F3_regression_variables_mae",
+      "png": "PF-F3_regression_variables_mae.png",
+      "svg": "PF-F3_regression_variables_mae.svg",
+      "csv": "PF-F3_regression_variables_mae.csv",
+      "evidence_group": "A",
+      "caption": "Each output in its own unit and panel. W1 has larger MAE than both baselines for wind, pressure and humidity. For rainfall W1's MAE is lower than both baselines (established), but its RMSE (17.1 mm) is above climatology's (16.1 mm) and it under-forecasts on average (bias -3.66 mm): a low forecast lowers MAE on skewed rainfall.",
+      "source_runs": [
+        "reg-prov-20261024T205749Z-ce57af",
+        "w-cohort-20261024T205646Z-6b7a96"
+      ]
+    },
+    {
+      "figure": "PF-G_observed_vs_predicted",
+      "png": "PF-G_observed_vs_predicted.png",
+      "svg": "PF-G_observed_vs_predicted.svg",
+      "csv": "PF-G_observed_vs_predicted.csv",
+      "evidence_group": "A",
+      "caption": "Binned counts replace a scatter so that no individual station-day reading is published. Most wind forecasts sit at 2-3 m/s whatever was observed; humidity forecasts stay near 75-90%; pressure forecasts follow higher pressures but stay too high on low-pressure days; rainfall forecasts sit at 1-5 mm almost regardless of the observed amount (too wet on dry days, too dry on wet days).",
+      "source_runs": [
+        "reg-prov-20261024T205749Z-ce57af",
+        "w-cohort-20261024T205646Z-6b7a96"
+      ]
+    }
+  ],
+  "checks": {
+    "PF-A_matches_website": true,
+    "PF-B_sums_to_total": true,
+    "PF-F2_reproduces_website": true,
+    "PF-G_totals": {
+      "wind": true,
+      "mslp": true,
+      "humidity": true,
+      "rainfall": true
+    }
+  }
+}

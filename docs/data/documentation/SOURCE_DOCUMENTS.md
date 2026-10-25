@@ -11,7 +11,7 @@ contain summaries.
 | `docs/project/FILE_GUIDE.md` | `docs/project-home` @ `e0280de` | local, not pushed |
 | `CODEX_HANDOFF.md`, `docs/PROJECT_STRUCTURE.md`, `docs/MODEL_REGISTRY.md`, `docs/data/DATA_SOURCES.md` | `docs/project-home` @ `e0280de` | local, not pushed |
 | `docs/validation/AUDIT.md`, `HANDOFF.md`, `W1PANEL.md`, `W1STATION.md`, `PHASE4_WIND.md` | `docs/project-home` @ `e0280de` | validation handoffs and audit corrections |
-| `experiments/w1x1/_train_w3.py`, `_w1_recall_floor.py`, `_nine_fp_analysis.py`, `THRESHOLD_CONFIG.md`, `nine_fp_report.json`, `w1_recall_floor_report.json` | `exp/precision-targeting` | W1 recipe, historical scoring and its saved case records |
+| `experiments/w1x1/_train_w3.py`, `_w1_recall_floor.py`, `_nine_fp_analysis.py`, `THRESHOLD_CONFIG.md`, `nine_fp_report.json`, `w1_recall_floor_report.json` | `exp/precision-targeting` | GALE-CAST Model-W1 recipe, historical scoring and its saved case records |
 | `validate_model_multioutput.py`, `validation_cm3.json` | `exp/precision-targeting` @ `1fd1ef9`; `84d9ae3` (website sync) | source of the website scorecard and regression block |
 | `process_weather.py` | `backend-pagasa-privacy` @ `1f2d5dd` | label construction |
 | Commit `1f2d5dd` message | `backend-pagasa-privacy` | records PAGASA data terms CADS-07 Rev.6 condition 4 (no online publication of station readings) |
@@ -38,12 +38,12 @@ See `EVALUATION_METHOD.md` § References (each read from the primary source on 2
 `TECH_STACK.md` reviews the application at GALE-CAST commit `bb056a9` (`requirements.txt`, `requirements-dev.txt`, `Dockerfile`, `app.py`,
 `dashboard.html`, `static/sw.js`, `hosting/vercel.json`, `docker/db-init/schema.sql`, `.github/workflows/tests.yml`) together with
 `docs/PROJECT_STRUCTURE.md` and `docs/handoff/DEPLOYMENT_AND_GITHUB.md`. It was first compiled by Tinenen-cs (commit `8b32465`) and verified
-line by line on the same date. It is a separate implementation inventory; it does not change or re-execute the W1 evaluation, and no live
+line by line on the same date. It is a separate implementation inventory; it does not change or re-execute the GALE-CAST Model-W1 evaluation, and no live
 package inventory or private case values were used for it.
 
 ## Selection amendments
 
-`spec/CASE_SELECTION_v1.md` (classification case studies), `spec/CASE_SELECTION_v2_regression.md` (favourable regression case) and
-`spec/CASE_SELECTION_v3_panel_validation.md` (baseline-failure validation, panel request) and
-`spec/CASE_SELECTION_v4_persistence_override.md` (persistence worse than W1 for wind and MSLP, panel directive), each committed before its
+`spec/CASE_SELECTION_v1.md` (classification case studies), `spec/CASE_SELECTION_v2_regression.md` (regression case chosen for low model error) and
+`spec/CASE_SELECTION_v3_panel_validation.md` (large-baseline-error validation, panel request) and
+`spec/CASE_SELECTION_v4_persistence_override.md` (persistence worse than GALE-CAST Model-W1 for wind and MSLP, panel directive), each committed before its
 search. `spec/FROZEN_PF-L_rainfall.json` locks PF-L's rainfall panel (panel directive).

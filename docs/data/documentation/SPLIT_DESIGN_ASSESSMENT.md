@@ -10,7 +10,7 @@
   document states why these dates were chosen. No record shows that the panel approved this historical split.
 - Port Area and supplementary rows were used for training regardless of date: 746 Port Area rows and
   22,306 supplementary rows are dated inside the evaluation period.
-- The evaluation period was later used to compare W1 with other trained variants, to adopt X1 and to choose the threshold rule
+- The evaluation period was later used to compare GALE-CAST Model-W1 with other trained variants, to adopt X1 and to choose the threshold rule
   (0.601 adopted after the max-F1 rule's 0.62 had been scored on it). It is therefore not an independent test.
 
 ## Facts checked for this assessment

@@ -1,5 +1,5 @@
 {
-  "figure": "PF-L_baseline_failure_mae",
+  "figure": "PF-L_large_error_dates_mae",
   "panel": "rainfall",
   "group_shown": "all_complete",
   "mandate": "Thesis panel directive, 2026-10-25: PF-L's rainfall panel displays 'All complete dates' only; locked against future rebuilds.",

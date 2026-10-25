@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="648pt" height="460.8pt" viewBox="0 0 648 460.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-25T23:56:15.402878</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.9.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 460.8 
+L 648 460.8 
+L 648 0 
+L 0 0 
+z
+" style="fill: #fcfcfb"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 84.24 322.56 
+L 330.48 322.56 
+L 330.48 82.944 
+L 84.24 82.944 
+z
+" style="fill: #fcfcfb"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1"/>
+     <g id="text_1">
+      <text style="fill: #52514e; font: 9.5px 'DejaVu Sans'" transform="translate(125.038878 333.278516)">Warning</text>
+      <text style="fill: #52514e; font: 9.5px 'DejaVu Sans'" transform="translate(113.988448 343.916438)">(X1 ≥ 0.601)</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_2"/>
+     <g id="text_2">
+      <text style="fill: #52514e; font: 9.5px 'DejaVu Sans'; text-anchor: middle" x="267.6888" y="333.278516" transform="rotate(-0 267.6888 333.278516)">No warning</text>
+     </g>
+    </g>
+    <g id="text_3">
+     <text style="fill: #0b0b0b; font: 9.5px 'DejaVu Sans'; text-anchor: middle" x="207.36" y="357.110656" transform="rotate(-0 207.36 357.110656)">GALE-CAST Model-W1+X1 decision</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_3"/>
+     <g id="text_4">
+      <text style="fill: #52514e; font: 9.5px 'DejaVu Sans'" transform="translate(53.523984 143.058228)">Event</text>
+      <text style="fill: #52514e; font: 9.5px 'DejaVu Sans'" transform="translate(30.306875 153.69615)">(label = 1)</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_4"/>
+     <g id="text_5">
+      <text style="fill: #52514e; font: 9.5px 'DejaVu Sans'; text-anchor: end" x="80.74" y="267.463338" transform="rotate(-0 80.74 267.463338)">No event</text>
+     </g>
+    </g>
+    <g id="text_6">
+     <text style="fill: #0b0b0b; font: 9.5px 'DejaVu Sans'; text-anchor: middle" x="24.331172" y="202.752" transform="rotate(-90 24.331172 202.752)">Study-label outcome</text>
+    </g>
+   </g>
+   <g id="patch_3">
+    <path d="M 84.24 202.752 
+L 204.8976 202.752 
+L 204.8976 85.34016 
+L 84.24 85.34016 
+z
+" clip-path="url(#p78215b3cde)" style="fill: #2a78d6; stroke: #2a78d6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 207.36 202.752 
+L 328.0176 202.752 
+L 328.0176 85.34016 
+L 207.36 85.34016 
+z
+" clip-path="url(#p78215b3cde)" style="fill: #c9ddf6; stroke: #c9ddf6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 84.24 322.56 
+L 204.8976 322.56 
+L 204.8976 205.14816 
+L 84.24 205.14816 
+z
+" clip-path="url(#p78215b3cde)" style="fill: #c9ddf6; stroke: #c9ddf6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 207.36 322.56 
+L 328.0176 322.56 
+L 328.0176 205.14816 
+L 207.36 205.14816 
+z
+" clip-path="url(#p78215b3cde)" style="fill: #eef4fc; stroke: #eef4fc; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_7">
+    <text style="fill: #ffffff; font: 700 22px 'DejaVu Sans'; text-anchor: middle" x="144.5688" y="141.730145" transform="rotate(-0 144.5688 141.730145)">24</text>
+   </g>
+   <g id="text_8">
+    <text style="fill: #ffffff; font: 9px 'DejaVu Sans'; text-anchor: middle" x="144.5688" y="171.689197" transform="rotate(-0 144.5688 171.689197)">Hits (TP)</text>
+   </g>
+   <g id="text_9">
+    <text style="fill: #0b0b0b; font: 700 22px 'DejaVu Sans'; text-anchor: middle" x="267.6888" y="141.730145" transform="rotate(-0 267.6888 141.730145)">4</text>
+   </g>
+   <g id="text_10">
+    <text style="fill: #0b0b0b; font: 9px 'DejaVu Sans'; text-anchor: middle" x="267.6888" y="171.689197" transform="rotate(-0 267.6888 171.689197)">Misses (FN)</text>
+   </g>
+   <g id="text_11">
+    <text style="fill: #0b0b0b; font: 700 22px 'DejaVu Sans'; text-anchor: middle" x="144.5688" y="261.538145" transform="rotate(-0 144.5688 261.538145)">9</text>
+   </g>
+   <g id="text_12">
+    <text style="fill: #0b0b0b; font: 9px 'DejaVu Sans'; text-anchor: middle" x="144.5688" y="291.497197" transform="rotate(-0 144.5688 291.497197)">False alarms (FP)</text>
+   </g>
+   <g id="text_13">
+    <text style="fill: #0b0b0b; font: 700 22px 'DejaVu Sans'; text-anchor: middle" x="267.6888" y="261.538145" transform="rotate(-0 267.6888 261.538145)">3,386</text>
+   </g>
+   <g id="text_14">
+    <text style="fill: #0b0b0b; font: 9px 'DejaVu Sans'; text-anchor: middle" x="267.6888" y="291.497197" transform="rotate(-0 267.6888 291.497197)">Correct negatives (TN)</text>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="text_15">
+    <text style="fill: #0b0b0b; font: 9.5px 'DejaVu Sans'; text-anchor: start" x="362.88" y="90.162516" transform="rotate(-0 362.88 90.162516)">Cases</text>
+   </g>
+   <g id="text_16">
+    <text style="font: 600 9.5px 'DejaVu Sans'; text-anchor: end" x="635.04" y="90.162516" transform="rotate(-0 635.04 90.162516)">3,423</text>
+   </g>
+   <g id="text_17">
+    <text style="fill: #0b0b0b; font: 9.5px 'DejaVu Sans'; text-anchor: start" x="362.88" y="115.322196" transform="rotate(-0 362.88 115.322196)">Events (all pressure falls)</text>
+   </g>
+   <g id="text_18">
+    <text style="font: 600 9.5px 'DejaVu Sans'; text-anchor: end" x="635.04" y="115.322196" transform="rotate(-0 635.04 115.322196)">28</text>
+   </g>
+   <g id="text_19">
+    <text style="fill: #0b0b0b; font: 9.5px 'DejaVu Sans'; text-anchor: start" x="362.88" y="140.481876" transform="rotate(-0 362.88 140.481876)">Accuracy</text>
+   </g>
+   <g id="text_20">
+    <text style="font: 600 9.5px 'DejaVu Sans'; text-anchor: end" x="635.04" y="140.481876" transform="rotate(-0 635.04 140.481876)">99.62%</text>
+   </g>
+   <g id="text_21">
+    <text style="fill: #52514e; font: 9.5px 'DejaVu Sans'; text-anchor: start" x="362.88" y="165.641556" transform="rotate(-0 362.88 165.641556)">  always 'no event' would score</text>
+   </g>
+   <g id="text_22">
+    <text style="font: 600 9.5px 'DejaVu Sans'; text-anchor: end" x="635.04" y="165.641556" transform="rotate(-0 635.04 165.641556)">99.18%</text>
+   </g>
+   <g id="text_23">
+    <text style="fill: #0b0b0b; font: 9.5px 'DejaVu Sans'; text-anchor: start" x="362.88" y="190.801236" transform="rotate(-0 362.88 190.801236)">Precision</text>
+   </g>
+   <g id="text_24">
+    <text style="font: 600 9.5px 'DejaVu Sans'; text-anchor: end" x="635.04" y="190.801236" transform="rotate(-0 635.04 190.801236)">72.73%</text>
+   </g>
+   <g id="text_25">
+    <text style="fill: #0b0b0b; font: 9.5px 'DejaVu Sans'; text-anchor: start" x="362.88" y="215.960916" transform="rotate(-0 362.88 215.960916)">Recall</text>
+   </g>
+   <g id="text_26">
+    <text style="font: 600 9.5px 'DejaVu Sans'; text-anchor: end" x="635.04" y="215.960916" transform="rotate(-0 635.04 215.960916)">85.71%</text>
+   </g>
+   <g id="text_27">
+    <text style="fill: #0b0b0b; font: 9.5px 'DejaVu Sans'; text-anchor: start" x="362.88" y="241.120596" transform="rotate(-0 362.88 241.120596)">F1</text>
+   </g>
+   <g id="text_28">
+    <text style="font: 600 9.5px 'DejaVu Sans'; text-anchor: end" x="635.04" y="241.120596" transform="rotate(-0 635.04 241.120596)">0.787</text>
+   </g>
+   <g id="text_29">
+    <text style="fill: #0b0b0b; font: 9.5px 'DejaVu Sans'; text-anchor: start" x="362.88" y="266.280276" transform="rotate(-0 362.88 266.280276)">PR-AUC (X1 scores)</text>
+   </g>
+   <g id="text_30">
+    <text style="font: 600 9.5px 'DejaVu Sans'; text-anchor: end" x="635.04" y="266.280276" transform="rotate(-0 635.04 266.280276)">0.8302</text>
+   </g>
+   <g id="text_31">
+    <text style="fill: #52514e; font: 9.5px 'DejaVu Sans'; text-anchor: start" x="362.88" y="291.439956" transform="rotate(-0 362.88 291.439956)">  no-skill PR-AUC (prevalence)</text>
+   </g>
+   <g id="text_32">
+    <text style="font: 600 9.5px 'DejaVu Sans'; text-anchor: end" x="635.04" y="291.439956" transform="rotate(-0 635.04 291.439956)">0.0082</text>
+   </g>
+  </g>
+  <g id="text_33">
+   <text style="fill: #0b0b0b; font: 700 12px 'DejaVu Sans'; text-anchor: start" x="6.48" y="11.422125" transform="rotate(-0 6.48 11.422125)">PF-A. The website's historical GALE-CAST Model-W1 scorecard, exactly as shown</text>
+  </g>
+  <g id="text_34">
+   <text style="fill: #52514e; font: 9px 'DejaVu Sans'; text-anchor: start" x="6.48" y="27.574594" transform="rotate(-0 6.48 27.574594)">Evidence A: website historical scorecard cases (overall evidence)</text>
+  </g>
+  <g id="text_35">
+   <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(6.48 403.299787)">Model: deployed GALE-CAST Model-W1 (SHA-256 f2db5aa9…9d14b0), historical scoring procedure (_w1_recall_floor.py: pooled scaled_weather inputs, 32-day</text>
+   <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(6.48 412.383094)">windows); X1 = same-date mean of the three stations' scores; warning if X1 ≥ 0.601 (threshold unchanged).</text>
+   <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(6.48 421.26615)">Cases: the website's 3,423 next-day windows, NAIA, Sangley Point and Science Garden (1,141 each); target dates 2021-11-16 to 2024-12-30; lead +1 day.</text>
+   <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(6.48 430.149206)">Study label: wind ≥ 10.8 m/s OR same-station 24-h MSLP fall ≥ 3 hPa (processed values, as on the website); all 28 positives are pressure falls, 0</text>
+   <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(6.48 439.032263)">wind-triggered.</text>
+   <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(6.48 447.915319)">Identity: all 9 false alarms and 4 misses match the original GALE-CAST Model-W1-branch record nine_fp_report.json by station, date and score.</text>
+   <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(6.48 456.998625)">Retrospective: the threshold rule and X1 were adopted after test-period results were seen; not an independent test.</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p78215b3cde">
+   <rect x="84.24" y="82.944" width="246.24" height="239.616"/>
+  </clipPath>
+ </defs>
+</svg>

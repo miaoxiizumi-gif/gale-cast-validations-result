@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-10-25T05:02:15.582609</dc:date>
+    <dc:date>2026-10-26T00:03:34.815986</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -71,7 +71,7 @@ L 163.541189 151.704
 L 163.541189 79.83864 
 L 60.48 79.83864 
 z
-" clip-path="url(#p8f81ddf5f2)" style="fill: #2a78d6; stroke: #2a78d6; stroke-linejoin: miter"/>
+" clip-path="url(#p9ecf8f31fd)" style="fill: #2a78d6; stroke: #2a78d6; stroke-linejoin: miter"/>
    </g>
    <g id="patch_4">
     <path d="M 166.728649 151.704 
@@ -79,7 +79,7 @@ L 269.789838 151.704
 L 269.789838 79.83864 
 L 166.728649 79.83864 
 z
-" clip-path="url(#p8f81ddf5f2)" style="fill: #c9ddf6; stroke: #c9ddf6; stroke-linejoin: miter"/>
+" clip-path="url(#p9ecf8f31fd)" style="fill: #c9ddf6; stroke: #c9ddf6; stroke-linejoin: miter"/>
    </g>
    <g id="patch_5">
     <path d="M 60.48 225.792 
@@ -87,7 +87,7 @@ L 163.541189 225.792
 L 163.541189 153.92664 
 L 60.48 153.92664 
 z
-" clip-path="url(#p8f81ddf5f2)" style="fill: #c9ddf6; stroke: #c9ddf6; stroke-linejoin: miter"/>
+" clip-path="url(#p9ecf8f31fd)" style="fill: #c9ddf6; stroke: #c9ddf6; stroke-linejoin: miter"/>
    </g>
    <g id="patch_6">
     <path d="M 166.728649 225.792 
@@ -95,7 +95,7 @@ L 269.789838 225.792
 L 269.789838 153.92664 
 L 166.728649 153.92664 
 z
-" clip-path="url(#p8f81ddf5f2)" style="fill: #eef4fc; stroke: #eef4fc; stroke-linejoin: miter"/>
+" clip-path="url(#p9ecf8f31fd)" style="fill: #eef4fc; stroke: #eef4fc; stroke-linejoin: miter"/>
    </g>
    <g id="text_5">
     <text style="fill: #ffffff; font: 700 17px 'DejaVu Sans'; text-anchor: middle" x="111.479351" y="115.646537" transform="rotate(-0 111.479351 115.646537)">9</text>
@@ -168,7 +168,7 @@ L 450.412541 151.704
 L 450.412541 79.83864 
 L 347.351351 79.83864 
 z
-" clip-path="url(#pfc7e0ddcfc)" style="fill: #2a78d6; stroke: #2a78d6; stroke-linejoin: miter"/>
+" clip-path="url(#p743e6a4725)" style="fill: #2a78d6; stroke: #2a78d6; stroke-linejoin: miter"/>
    </g>
    <g id="patch_9">
     <path d="M 453.6 151.704 
@@ -176,7 +176,7 @@ L 556.661189 151.704
 L 556.661189 79.83864 
 L 453.6 79.83864 
 z
-" clip-path="url(#pfc7e0ddcfc)" style="fill: #c9ddf6; stroke: #c9ddf6; stroke-linejoin: miter"/>
+" clip-path="url(#p743e6a4725)" style="fill: #c9ddf6; stroke: #c9ddf6; stroke-linejoin: miter"/>
    </g>
    <g id="patch_10">
     <path d="M 347.351351 225.792 
@@ -184,7 +184,7 @@ L 450.412541 225.792
 L 450.412541 153.92664 
 L 347.351351 153.92664 
 z
-" clip-path="url(#pfc7e0ddcfc)" style="fill: #c9ddf6; stroke: #c9ddf6; stroke-linejoin: miter"/>
+" clip-path="url(#p743e6a4725)" style="fill: #c9ddf6; stroke: #c9ddf6; stroke-linejoin: miter"/>
    </g>
    <g id="patch_11">
     <path d="M 453.6 225.792 
@@ -192,7 +192,7 @@ L 556.661189 225.792
 L 556.661189 153.92664 
 L 453.6 153.92664 
 z
-" clip-path="url(#pfc7e0ddcfc)" style="fill: #eef4fc; stroke: #eef4fc; stroke-linejoin: miter"/>
+" clip-path="url(#p743e6a4725)" style="fill: #eef4fc; stroke: #eef4fc; stroke-linejoin: miter"/>
    </g>
    <g id="text_18">
     <text style="fill: #ffffff; font: 700 17px 'DejaVu Sans'; text-anchor: middle" x="398.350703" y="115.646537" transform="rotate(-0 398.350703 115.646537)">7</text>
@@ -265,7 +265,7 @@ L 737.283892 151.704
 L 737.283892 79.83864 
 L 634.222703 79.83864 
 z
-" clip-path="url(#p33f9f4d85d)" style="fill: #2a78d6; stroke: #2a78d6; stroke-linejoin: miter"/>
+" clip-path="url(#pbf9581f77d)" style="fill: #2a78d6; stroke: #2a78d6; stroke-linejoin: miter"/>
    </g>
    <g id="patch_14">
     <path d="M 740.471351 151.704 
@@ -273,7 +273,7 @@ L 843.532541 151.704
 L 843.532541 79.83864 
 L 740.471351 79.83864 
 z
-" clip-path="url(#p33f9f4d85d)" style="fill: #c9ddf6; stroke: #c9ddf6; stroke-linejoin: miter"/>
+" clip-path="url(#pbf9581f77d)" style="fill: #c9ddf6; stroke: #c9ddf6; stroke-linejoin: miter"/>
    </g>
    <g id="patch_15">
     <path d="M 634.222703 225.792 
@@ -281,7 +281,7 @@ L 737.283892 225.792
 L 737.283892 153.92664 
 L 634.222703 153.92664 
 z
-" clip-path="url(#p33f9f4d85d)" style="fill: #c9ddf6; stroke: #c9ddf6; stroke-linejoin: miter"/>
+" clip-path="url(#pbf9581f77d)" style="fill: #c9ddf6; stroke: #c9ddf6; stroke-linejoin: miter"/>
    </g>
    <g id="patch_16">
     <path d="M 740.471351 225.792 
@@ -289,7 +289,7 @@ L 843.532541 225.792
 L 843.532541 153.92664 
 L 740.471351 153.92664 
 z
-" clip-path="url(#p33f9f4d85d)" style="fill: #eef4fc; stroke: #eef4fc; stroke-linejoin: miter"/>
+" clip-path="url(#pbf9581f77d)" style="fill: #eef4fc; stroke: #eef4fc; stroke-linejoin: miter"/>
    </g>
    <g id="text_31">
     <text style="fill: #ffffff; font: 700 17px 'DejaVu Sans'; text-anchor: middle" x="685.222054" y="115.646537" transform="rotate(-0 685.222054 115.646537)">8</text>
@@ -316,7 +316,8 @@ z
     <text style="fill: #0b0b0b; font: 7.8px 'DejaVu Sans'; text-anchor: middle" x="791.470703" y="209.422313" transform="rotate(-0 791.470703 209.422313)">Correct negatives (TN)</text>
    </g>
    <g id="text_39">
-    <text style="font: 600 10px 'DejaVu Sans'; text-anchor: start" x="634.222703" y="71.616" transform="rotate(-0 634.222703 71.616)">Science Garden (n = 1,141; 10 events)</text>
+    <text style="font: 600 10px 'DejaVu Sans'" transform="translate(634.222703 60.418187)">Science Garden (n = 1,141; 10</text>
+    <text style="font: 600 10px 'DejaVu Sans'" transform="translate(634.222703 71.616)">events)</text>
    </g>
   </g>
   <g id="text_40">
@@ -326,8 +327,8 @@ z
    <text style="fill: #52514e; font: 9px 'DejaVu Sans'; text-anchor: start" x="8.64" y="22.714594" transform="rotate(-0 8.64 22.714594)">Evidence A: website historical scorecard cases (overall evidence)</text>
   </g>
   <g id="text_42">
-   <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(8.64 304.923094)">Model: deployed W1 (SHA-256 f2db5aa9…9d14b0), historical scoring procedure (_w1_recall_floor.py: pooled scaled_weather inputs, 32-day windows); X1 =</text>
-   <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(8.64 314.0064)">same-date mean of the three stations' scores; warning if X1 ≥ 0.601 (threshold unchanged).</text>
+   <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(8.64 304.923094)">Model: deployed GALE-CAST Model-W1 (SHA-256 f2db5aa9…9d14b0), historical scoring procedure (_w1_recall_floor.py: pooled scaled_weather inputs, 32-day</text>
+   <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(8.64 314.0064)">windows); X1 = same-date mean of the three stations' scores; warning if X1 ≥ 0.601 (threshold unchanged).</text>
    <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(8.64 322.889456)">Cases: the website's 3,423 next-day windows, NAIA, Sangley Point and Science Garden (1,141 each); target dates 2021-11-16 to 2024-12-30; lead +1 day.</text>
    <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(8.64 331.772513)">Study label: wind ≥ 10.8 m/s OR same-station 24-h MSLP fall ≥ 3 hPa (processed values, as on the website); all 28 positives are pressure falls, 0</text>
    <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(8.64 340.655569)">wind-triggered.</text>
@@ -335,13 +336,13 @@ z
   </g>
  </g>
  <defs>
-  <clipPath id="p8f81ddf5f2">
+  <clipPath id="p9ecf8f31fd">
    <rect x="60.48" y="77.616" width="212.497297" height="148.176"/>
   </clipPath>
-  <clipPath id="pfc7e0ddcfc">
+  <clipPath id="p743e6a4725">
    <rect x="347.351351" y="77.616" width="212.497297" height="148.176"/>
   </clipPath>
-  <clipPath id="p33f9f4d85d">
+  <clipPath id="pbf9581f77d">
    <rect x="634.222703" y="77.616" width="212.497297" height="148.176"/>
   </clipPath>
  </defs>

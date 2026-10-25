@@ -1,0 +1,6 @@
+partition,start,end,role
+Primary 3 stations: training,2015-01-01,2020-10-14,train
+Primary 3 stations: tuning / early stopping,2020-10-15,2021-10-14,tune
+Primary 3 stations: legacy TEST = benchmark period,2021-10-15,2024-12-31,test
+Port Area: training (all dates),2015-01-01,2023-10-30,train
+Supplementary 19 stations: training (all dates),2015-01-01,2024-12-30,train

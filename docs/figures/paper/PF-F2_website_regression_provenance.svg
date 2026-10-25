@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-10-25T05:02:17.481428</dc:date>
+    <dc:date>2026-10-26T00:03:39.342893</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -42,16 +42,16 @@ z
      <g id="line2d_1">
       <path d="M 316.8 272.16 
 L 316.8 77.76 
-" clip-path="url(#p4062828d8c)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
+" clip-path="url(#p5f5a9af97e)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
      </g>
      <g id="line2d_2">
       <defs>
-       <path id="m6cc0e708cd" d="M 0 0 
+       <path id="m0e5476fab1" d="M 0 0 
 L 0 3.5 
 " style="stroke: #52514e; stroke-width: 0.8"/>
       </defs>
       <g>
-       <use xlink:href="#m6cc0e708cd" x="316.8" y="272.16" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
+       <use xlink:href="#m0e5476fab1" x="316.8" y="272.16" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_1">
@@ -62,11 +62,11 @@ L 0 3.5
      <g id="line2d_3">
       <path d="M 379.067586 272.16 
 L 379.067586 77.76 
-" clip-path="url(#p4062828d8c)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
+" clip-path="url(#p5f5a9af97e)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
      </g>
      <g id="line2d_4">
       <g>
-       <use xlink:href="#m6cc0e708cd" x="379.067586" y="272.16" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
+       <use xlink:href="#m0e5476fab1" x="379.067586" y="272.16" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_2">
@@ -77,11 +77,11 @@ L 379.067586 77.76
      <g id="line2d_5">
       <path d="M 441.335172 272.16 
 L 441.335172 77.76 
-" clip-path="url(#p4062828d8c)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
+" clip-path="url(#p5f5a9af97e)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
      </g>
      <g id="line2d_6">
       <g>
-       <use xlink:href="#m6cc0e708cd" x="441.335172" y="272.16" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
+       <use xlink:href="#m0e5476fab1" x="441.335172" y="272.16" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_3">
@@ -92,11 +92,11 @@ L 441.335172 77.76
      <g id="line2d_7">
       <path d="M 503.602759 272.16 
 L 503.602759 77.76 
-" clip-path="url(#p4062828d8c)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
+" clip-path="url(#p5f5a9af97e)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
      </g>
      <g id="line2d_8">
       <g>
-       <use xlink:href="#m6cc0e708cd" x="503.602759" y="272.16" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
+       <use xlink:href="#m0e5476fab1" x="503.602759" y="272.16" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_4">
@@ -107,11 +107,11 @@ L 503.602759 77.76
      <g id="line2d_9">
       <path d="M 565.870345 272.16 
 L 565.870345 77.76 
-" clip-path="url(#p4062828d8c)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
+" clip-path="url(#p5f5a9af97e)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
      </g>
      <g id="line2d_10">
       <g>
-       <use xlink:href="#m6cc0e708cd" x="565.870345" y="272.16" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
+       <use xlink:href="#m0e5476fab1" x="565.870345" y="272.16" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_5">
@@ -122,11 +122,11 @@ L 565.870345 77.76
      <g id="line2d_11">
       <path d="M 628.137931 272.16 
 L 628.137931 77.76 
-" clip-path="url(#p4062828d8c)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
+" clip-path="url(#p5f5a9af97e)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
      </g>
      <g id="line2d_12">
       <g>
-       <use xlink:href="#m6cc0e708cd" x="628.137931" y="272.16" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
+       <use xlink:href="#m0e5476fab1" x="628.137931" y="272.16" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_6">
@@ -137,11 +137,11 @@ L 628.137931 77.76
      <g id="line2d_13">
       <path d="M 690.405517 272.16 
 L 690.405517 77.76 
-" clip-path="url(#p4062828d8c)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
+" clip-path="url(#p5f5a9af97e)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
      </g>
      <g id="line2d_14">
       <g>
-       <use xlink:href="#m6cc0e708cd" x="690.405517" y="272.16" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
+       <use xlink:href="#m0e5476fab1" x="690.405517" y="272.16" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_7">
@@ -152,11 +152,11 @@ L 690.405517 77.76
      <g id="line2d_15">
       <path d="M 752.673103 272.16 
 L 752.673103 77.76 
-" clip-path="url(#p4062828d8c)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
+" clip-path="url(#p5f5a9af97e)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
      </g>
      <g id="line2d_16">
       <g>
-       <use xlink:href="#m6cc0e708cd" x="752.673103" y="272.16" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
+       <use xlink:href="#m0e5476fab1" x="752.673103" y="272.16" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_8">
@@ -172,31 +172,32 @@ L 752.673103 77.76
      <g id="line2d_17">
       <path d="M 316.8 100.286504 
 L 768.24 100.286504 
-" clip-path="url(#p4062828d8c)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
+" clip-path="url(#p5f5a9af97e)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
      </g>
      <g id="line2d_18">
       <defs>
-       <path id="md402b3ba1f" d="M 0 0 
+       <path id="m30fd16da78" d="M 0 0 
 L -3.5 0 
 " style="stroke: #52514e; stroke-width: 0.8"/>
       </defs>
       <g>
-       <use xlink:href="#md402b3ba1f" x="316.8" y="100.286504" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
+       <use xlink:href="#m30fd16da78" x="316.8" y="100.286504" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_10">
-      <text style="fill: #52514e; font: 8.5px 'DejaVu Sans'; text-anchor: end" x="309.8" y="103.51584" transform="rotate(-0 309.8 103.51584)">1. W1 neural output</text>
+      <text style="fill: #52514e; font: 8.5px 'DejaVu Sans'" transform="translate(251.076953 99.402637)">1. GALE-CAST</text>
+      <text style="fill: #52514e; font: 8.5px 'DejaVu Sans'" transform="translate(207.231562 108.920778)">Model-W1 neural output</text>
      </g>
     </g>
     <g id="ytick_2">
      <g id="line2d_19">
       <path d="M 316.8 150.068835 
 L 768.24 150.068835 
-" clip-path="url(#p4062828d8c)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
+" clip-path="url(#p5f5a9af97e)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
      </g>
      <g id="line2d_20">
       <g>
-       <use xlink:href="#md402b3ba1f" x="316.8" y="150.068835" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
+       <use xlink:href="#m30fd16da78" x="316.8" y="150.068835" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_11">
@@ -207,11 +208,11 @@ L 768.24 150.068835
      <g id="line2d_21">
       <path d="M 316.8 199.851165 
 L 768.24 199.851165 
-" clip-path="url(#p4062828d8c)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
+" clip-path="url(#p5f5a9af97e)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
      </g>
      <g id="line2d_22">
       <g>
-       <use xlink:href="#md402b3ba1f" x="316.8" y="199.851165" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
+       <use xlink:href="#m30fd16da78" x="316.8" y="199.851165" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_12">
@@ -222,11 +223,11 @@ L 768.24 199.851165
      <g id="line2d_23">
       <path d="M 316.8 249.633496 
 L 768.24 249.633496 
-" clip-path="url(#p4062828d8c)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
+" clip-path="url(#p5f5a9af97e)" style="fill: none; stroke: #e4e3df; stroke-width: 0.6; stroke-linecap: square"/>
      </g>
      <g id="line2d_24">
       <g>
-       <use xlink:href="#md402b3ba1f" x="316.8" y="249.633496" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
+       <use xlink:href="#m30fd16da78" x="316.8" y="249.633496" style="fill: #52514e; stroke: #52514e; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_13">
@@ -240,7 +241,7 @@ L 624.232249 113.976645
 L 624.232249 86.596364 
 L 316.8 86.596364 
 z
-" clip-path="url(#p4062828d8c)" style="fill: #2a78d6"/>
+" clip-path="url(#p5f5a9af97e)" style="fill: #2a78d6"/>
    </g>
    <g id="patch_4">
     <path d="M 316.8 163.758976 
@@ -248,7 +249,7 @@ L 496.26651 163.758976
 L 496.26651 136.378694 
 L 316.8 136.378694 
 z
-" clip-path="url(#p4062828d8c)" style="fill: #7aa9e6"/>
+" clip-path="url(#p5f5a9af97e)" style="fill: #7aa9e6"/>
    </g>
    <g id="patch_5">
     <path d="M 316.8 213.541306 
@@ -256,7 +257,7 @@ L 483.846532 213.541306
 L 483.846532 186.161024 
 L 316.8 186.161024 
 z
-" clip-path="url(#p4062828d8c)" style="fill: #a9c8f0"/>
+" clip-path="url(#p5f5a9af97e)" style="fill: #a9c8f0"/>
    </g>
    <g id="patch_6">
     <path d="M 316.8 263.323636 
@@ -264,7 +265,7 @@ L 464.510429 263.323636
 L 464.510429 235.943355 
 L 316.8 235.943355 
 z
-" clip-path="url(#p4062828d8c)" style="fill: #eb6834"/>
+" clip-path="url(#p5f5a9af97e)" style="fill: #eb6834"/>
    </g>
    <g id="patch_7">
     <path d="M 316.8 272.16 
@@ -293,11 +294,11 @@ L 768.24 272.16
    <text style="fill: #0b0b0b; font: 700 12px 'DejaVu Sans'; text-anchor: start" x="7.92" y="11.062125" transform="rotate(-0 7.92 11.062125)">PF-F2. Where the website's wind MAE of 0.5365 m/s comes from</text>
   </g>
   <g id="text_19">
-   <text style="fill: #52514e; font: 9px 'DejaVu Sans'; text-anchor: start" x="7.92" y="24.334594" transform="rotate(-0 7.92 24.334594)">Regression provenance (validate_model_multioutput.py at W1 commit 1fd1ef9), reproduced exactly; not a W1 neural result</text>
+   <text style="fill: #52514e; font: 9px 'DejaVu Sans'; text-anchor: start" x="7.92" y="24.334594" transform="rotate(-0 7.92 24.334594)">Regression provenance (validate_model_multioutput.py at GALE-CAST Model-W1 commit 1fd1ef9), reproduced exactly; not a GALE-CAST Model-W1 neural result</text>
   </g>
   <g id="text_20">
-   <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(7.92 331.659787)">Model: deployed W1 (SHA-256 f2db5aa9…9d14b0), historical scoring procedure (_w1_recall_floor.py: pooled scaled_weather inputs, 32-day windows); X1 =</text>
-   <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(7.92 340.743094)">same-date mean of the three stations' scores; warning if X1 ≥ 0.601 (threshold unchanged).</text>
+   <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(7.92 331.659787)">Model: deployed GALE-CAST Model-W1 (SHA-256 f2db5aa9…9d14b0), historical scoring procedure (_w1_recall_floor.py: pooled scaled_weather inputs, 32-day</text>
+   <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(7.92 340.743094)">windows); X1 = same-date mean of the three stations' scores; warning if X1 ≥ 0.601 (threshold unchanged).</text>
    <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(7.92 349.62615)">Truth: processed_weather wind of the target day (forward-filled), as used by the website script. MOS: linear + isotonic, per station × season (Jun-Nov</text>
    <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(7.92 358.709456)">/ Dec-May), 8-fold TimeSeriesSplit over evaluation rows; 399 rows calibrated by a fallback fitted on later evaluation rows. Blend weight chosen by</text>
    <text style="fill: #52514e; font: 7.2px 'DejaVu Sans'" transform="translate(7.92 367.592512)">5-fold TimeSeriesSplit MAE on evaluation rows; its partner is the observation two days before the target (script indexing).</text>
@@ -306,7 +307,7 @@ L 768.24 272.16
   </g>
  </g>
  <defs>
-  <clipPath id="p4062828d8c">
+  <clipPath id="p5f5a9af97e">
    <rect x="316.8" y="77.76" width="451.44" height="194.4"/>
   </clipPath>
  </defs>

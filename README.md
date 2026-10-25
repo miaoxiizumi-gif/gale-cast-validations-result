@@ -1,6 +1,6 @@
-# GALE-CAST W1: retrospective forecast verification and paper evidence
+# GALE-CAST Model-W1: retrospective forecast verification and paper evidence
 
-Evidence for the thesis *GALE-CAST*, about the frozen, deployed model **W1** (`gale_cast_model_multioutput.keras`, SHA-256
+Evidence for the thesis *GALE-CAST*, about the frozen, deployed model **GALE-CAST Model-W1** (`gale_cast_model_multioutput.keras`, SHA-256
 `f2db5aa9…9d14b0`). Nothing was retrained, recalibrated or changed in production.
 
 - **Website:** https://miaoxiizumi-gif.github.io/gale-cast-validations-result/
@@ -12,11 +12,11 @@ Evidence for the thesis *GALE-CAST*, about the frozen, deployed model **W1** (`g
 |---|---|---|
 | **A. Website historical scorecard** | the 3,423 cases behind the website matrix, identified case by case | TN 3386, FP 9, FN 4, TP 24 at X1 ≥ 0.601; F1 0.787 vs event persistence 0.250 and event climatology 0.078 (difference vs persistence established) |
 | **B. Training-consistent benchmark** | 3,520 cases, inputs scaled as in training | 16 of 27 events, 8 false alarms |
-| **D. Baseline-failure validation (panel request)** | every date on which both persistence and climatology failed (W1 not used to choose), every event onset, then favourable example windows | onsets: W1+X1 warned of 17 of 21 (persistence and climatology 0 and 0); humidity MAE 10.83 vs 13.44 / 14.58 %; wind and rainfall not better; not representative of all dates |
-| **E. Persistence-worse dates (panel directive)** | station-dates on which persistence's wind and MSLP errors were both larger than W1's (favourable selection) | 258 of 3,421 (7.5%); W1 < persistence there by construction; on all dates persistence is better |
-| **C. Selected illustrative case studies** | three-day windows chosen retrospectively for illustration: set 1 around detected events; set 2 with relatively high wind and favourable W1 wind error (disclosed) | private figures only (PAGASA terms); not representative |
+| **D. Large-baseline-error validation (panel request)** | every date on which both persistence and climatology failed (GALE-CAST Model-W1 not used to choose), every event onset, then example windows where GALE-CAST Model-W1 did well | onsets: GALE-CAST Model-W1+X1 warned of 17 of 21 (persistence and climatology 0 and 0); humidity MAE 10.83 vs 13.44 / 14.58 %; wind and rainfall not better; not representative of all dates |
+| **E. Persistence-worse dates (panel directive)** | station-dates on which persistence's wind and MSLP errors were both larger than GALE-CAST Model-W1's (dates selected for low GALE-CAST Model-W1 error) | 258 of 3,421 (7.5%); GALE-CAST Model-W1 < persistence there by construction; on all dates persistence is better |
+| **C. Selected illustrative case studies** | three-day windows chosen retrospectively for illustration: set 1 around detected events; set 2 with relatively high wind, selected for low GALE-CAST Model-W1 wind error (disclosed) | private figures only (PAGASA terms); not representative |
 
-W1 ranks pressure-fall days well, but its neural wind, pressure and humidity forecasts are less accurate than persistence on the same
+GALE-CAST Model-W1 ranks pressure-fall days well, but its neural wind, pressure and humidity forecasts are less accurate than persistence on the same
 cases, its scores are not calibrated probabilities, and every evaluation-period event is a pressure fall rather than gale-force wind.
 
 ## Documents
@@ -24,7 +24,7 @@ cases, its scores are not calibrated probabilities, and every evaluation-period 
 | Document | Content |
 |---|---|
 | [`documentation/EVALUATION_METHOD.md`](documentation/EVALUATION_METHOD.md) | method, baselines, metrics, references |
-| [`documentation/MODEL_AND_DATA_SUMMARY.md`](documentation/MODEL_AND_DATA_SUMMARY.md) | W1 identity, split, station groups, data status, regression provenance |
+| [`documentation/MODEL_AND_DATA_SUMMARY.md`](documentation/MODEL_AND_DATA_SUMMARY.md) | GALE-CAST Model-W1 identity, split, station groups, data status, regression provenance |
 | [`documentation/FIGURE_GUIDE.md`](documentation/FIGURE_GUIDE.md) | every figure, its cohort, source run and interpretation |
 | [`documentation/PAPER_REVISION_LEDGER.md`](documentation/PAPER_REVISION_LEDGER.md) | exact find/replace corrections for Chapters 1-5 |
 | [`documentation/SPLIT_DESIGN_ASSESSMENT.md`](documentation/SPLIT_DESIGN_ASSESSMENT.md) | documented split facts and a labelled present-day assessment |

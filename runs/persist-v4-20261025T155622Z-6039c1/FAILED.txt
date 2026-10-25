@@ -1,0 +1,1 @@
+Superseded: figures and text re-rendered at commit 43685fb (panel naming and wording directives, 2026-10-25); numbers identical.

@@ -1,0 +1,52 @@
+{
+  "run_id": "case-20261025T155448Z-fb3d42",
+  "criteria": "spec/CASE_SELECTION_v1.md",
+  "source_rows_run": "w-cohort-20261024T205646Z-6b7a96",
+  "candidates": 24,
+  "eligible": 22,
+  "fail_E1": 0,
+  "fail_E2": 2,
+  "fail_E3": 0,
+  "public_display": "private only (PAGASA CADS-07 Rev.6 condition 4); figures in _private/thesis_export/",
+  "common_candidate_dates": 5,
+  "per_station": {
+    "NAIA": {
+      "eligible_candidates": 9,
+      "P1_correct_decisions_in_window": 3,
+      "trigger": "pressure fall",
+      "outcomes": [
+        "Hit",
+        "Hit",
+        "Correct negative"
+      ],
+      "event_persistence_on_event_day": "warning"
+    },
+    "Sangley Point": {
+      "eligible_candidates": 5,
+      "P1_correct_decisions_in_window": 3,
+      "trigger": "pressure fall",
+      "outcomes": [
+        "Correct negative",
+        "Hit",
+        "Correct negative"
+      ],
+      "event_persistence_on_event_day": "no warning"
+    },
+    "Science Garden": {
+      "eligible_candidates": 8,
+      "P1_correct_decisions_in_window": 3,
+      "trigger": "pressure fall",
+      "outcomes": [
+        "Correct negative",
+        "Hit",
+        "Correct negative"
+      ],
+      "event_persistence_on_event_day": "no warning"
+    }
+  },
+  "common": {
+    "selected": true,
+    "sum_P1": 9
+  },
+  "dates": "withheld from public outputs; recorded in _private/runs/<run>/PRIVATE_selection_summary.json"
+}

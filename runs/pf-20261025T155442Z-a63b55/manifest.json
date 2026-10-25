@@ -1,0 +1,58 @@
+{
+  "run_id": "pf-20261025T155442Z-a63b55",
+  "written_utc": "2026-10-25T15:54:46+00:00",
+  "source_repo_head": "1f2d5dda889c0cf14144ccd2ddc1c60c2a02b915",
+  "workspace_head": "d3bba185cbdc65e6b495c954e3687336fd20d321+uncommitted-eval-changes",
+  "frozen_artifacts_sha256": {
+    "gale_cast_model_multioutput.keras": "f2db5aa93226225405914094a0855ac725734a0e2c1a2331e3ba69a8fd9d14b0",
+    "scaler_X_normal_mo.save": "c6ea01cbc9724907703439d2f89e7bdc758a3e17ba05716ab819287f88dfab9a",
+    "scaler_X_anomaly_mo.save": "d424175a99eeb9b10f106b2264ee9918ce1f374df29eb83b3b3a2a5820cef8f6",
+    "scaler_y_regression_mo.save": "98dd17a012611d3fde29ac2a81daa784c74e02ed8de518a42885db33c04b9ec8",
+    "galecast_thresholds.json": "476a5d0574a03ea4753fa395273da13832763de77582a585ce833a7723f3c13f"
+  },
+  "eval_code_sha256_lf": {
+    "benchmark.py": "aaceba62f0345d2f11f00e7bd213ff3e4cba75f70481e845119880267a7a6390",
+    "build_docs.py": "6462fe5fc3fdc3199e2a7f90b306e19c538429e20e82a8b10a0e229d63de9d98",
+    "build_site.py": "5e21e10e03fe36811934c40632562770499a8cb3fb0a3549882d8c0348b6052e",
+    "case_panel_v3.py": "b78334d2869931a8cd17c377e3067df14cd94fc69a8989d7705ec352f74abbec",
+    "case_persistence_v4.py": "465d5cf0722dfd376f24c28791f02d3aa80d98b4d6fb624a369d187435ddcb63",
+    "case_regression.py": "9365c959c759425271b9e44d290ad49bbd2151e2900ddf9c551e2ad524b8a682",
+    "case_studies.py": "d082f1a3c3871a047f59e8186576ed28439c9e1ee3b6e4ca63d1af1a199ab231",
+    "cohort_a_legacy.py": "3d01e9c5dc53b828545b8342ffdd7a502ab7b537734bd3b46e9db1b99648d8cd",
+    "cohort_b.py": "d2cc185610032125bd0b8936078358828428fee7c255fb7e8889fc6575207a38",
+    "common.py": "690fbfb90ad41a446255b0258da5c3c62fc41edd478005ef9c453cf139789d8f",
+    "content.py": "2d5540ca69a8adc4812c124cba47beff041bd74cb0e0e907d9a54e5211ed1635",
+    "diag_inputs.py": "152c0a908aa72526f0aeeafddaa74a9f8f9cd3f7042ffc15bd2fcd391947f0be",
+    "diag_insample.py": "49f1406a8dbc38c6bcabe3e46a7cce47a3a30cf6f5a6f244e8c956bcaf5bb6f4",
+    "figstyle.py": "c7c78b30545dec3b2c9f96bea934a4d6b636ac6ae5eab6a1157e6b7a49b3307e",
+    "figure_notes.py": "4537db6ed1f1d4149525fc35ae398116e426e5cd9f12d3b716a638611cb8290d",
+    "figures.py": "e4a6faa99df0fbdb4b319d1f42d74eb708ea806775ab181982aeeeaee580189d",
+    "metrics.py": "7d240838c46a0c281a65c3e0372e91f1b21e6ffeb68f0f0a7896ec3e0a085ed8",
+    "paper_figures.py": "1bf0fd07d8e092ef716cd7116330e92b69baa08ba2345b3df084e6a2ad4309ce",
+    "paper_ledger.py": "73bb06dfe04772a4448e4f19fad51a5b6a06fd17f72d569ddbf51a7c85381ed5",
+    "regression_provenance.py": "6e82f67421d937d5a425739aadb26ddc1f2a0994ecd75b4d9e711c1dbbb70f73",
+    "split_facts.py": "b76ef98849871ef58b12b1fe8bc1a3eda830bbcfd92fb82aad0b1d58c11af910",
+    "stage1_identity.py": "7a5cf5b09e58fc5b7396588ec8d81adea6228118deecba05b71086749d4d6977",
+    "stage2_partitions.py": "cc4db7b73504d1fa53f47cbe3b02b072a825631d78ca1d88e55a3dc7ac01278b",
+    "stage2b_supplementary.py": "14a8a3f69ee33d7add97671dd2ae9e1e048109ae1342e5db917c3c836830d201",
+    "tech_stack.py": "72f74b36e4cf001aa8dcc035618d934c8df95c47aa45b5363f167a8902181fae",
+    "terms.py": "b755c23f309f310a268b0ad71ffdf13bf5a48004eef4087ebb0ab1cc443b510a",
+    "variants.py": "96c0086109f94d7481a6f5710740a33bdddbe124c5dbfae27db6c0da4fc6d59f",
+    "website_cohort.py": "df3186c07f17cf7fb023a706c4d9e1b003547fedc10bf1490ec1cf573818bb4d"
+  },
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "tensorflow": "2.16.1",
+    "keras": "3.13.2",
+    "numpy": "1.26.4",
+    "pandas": "2.2.2",
+    "scikit_learn": "1.7.2"
+  },
+  "stage": "paper figures (amendment A2)",
+  "inputs": [
+    "w-cohort-20261024T205646Z-6b7a96",
+    "reg-prov-20261024T205749Z-ce57af",
+    "b-benchmark-20261023T162436Z-874640"
+  ]
+}

@@ -1,0 +1,1 @@
+Superseded: long axis labels, table cells and star markers fixed at the next commit. Numbers identical.
