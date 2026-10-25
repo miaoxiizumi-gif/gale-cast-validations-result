@@ -23,7 +23,9 @@ pre{background:var(--soft);padding:12px;border-radius:8px;overflow-x:auto;font-s
 .card.good{border-left:4px solid var(--ok)}.card.bad{border-left:4px solid var(--bad)}.tag.sel{color:var(--warn);border-color:var(--warn);font-weight:600}
 .groups{display:grid;gap:6px;margin:12px 0;font-size:.92rem}.selected{border:2px dashed var(--warn);border-radius:10px;padding:4px 16px;background:var(--panel)}
 q{font-style:italic}q::before,q::after{content:'"'}
+.difference-gap{margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:6px;background:var(--soft)}
+.difference-gap h4{margin:0 0 8px}.difference-gap p{font-size:.9rem}.difference-gap td{font-variant-numeric:tabular-nums}
 .figure-explanations{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:12px;margin-top:14px}
 .figure-explanation{padding:12px 14px;background:var(--soft);border-left:3px solid var(--accent);border-radius:6px}
-.figure-explanation h4{font-size:.95rem;margin:0 0 6px}.figure-explanation p{font-size:.94rem;line-height:1.65;margin:0}
+.figure-explanation h4{font-size:.95rem;margin:0 0 6px}.figure-explanation p{font-size:.94rem;line-height:1.65;margin:0}.figure-explanation p+p{margin-top:10px}
 .fignotes{margin-top:10px;border-top:1px solid var(--line);padding-top:8px;font-size:.88rem;color:var(--ink)}.fignotes p{margin:4px 0}.privfig{border:1px solid var(--line);border-radius:8px;padding:6px 14px;margin:12px 0;background:var(--soft)}.selbanner{font-size:1.02rem;border-left:4px solid var(--warn);padding:6px 10px;background:var(--soft)}

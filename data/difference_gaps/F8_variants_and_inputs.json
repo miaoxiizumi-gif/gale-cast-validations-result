@@ -1,0 +1,48 @@
+{
+  "figure": "F8_variants_and_inputs",
+  "formula": "GALE-CAST Model-W1 metric minus reference metric",
+  "note": "Gaps describe the deployed model dots and the two wind-MAE reference lines in the right panel. Other saved variants and the PR-AUC panel are contextual comparisons.",
+  "rounding": "Scores and errors are displayed to six decimal places; counts are integers. Values are calculated before rounding from saved decimal exports. Exact rational gaps are included in the downloads.",
+  "rows": [
+    {
+      "context": "S-TRAIN | 2021-10-15 to 2024-12-31",
+      "metric": "Wind speed MAE",
+      "unit": "m/s",
+      "n": 3520,
+      "aggregation": "summary",
+      "model": "1.0210015133700587",
+      "persistence": "0.46732954545454547",
+      "climatology": "0.584124970631096",
+      "gap_persistence": "0.55367196791551323",
+      "gap_climatology": "0.4368765427389627",
+      "model_fraction": "10210015133700587/10000000000000000",
+      "persistence_fraction": "46732954545454547/100000000000000000",
+      "climatology_fraction": "73015621328887/125000000000000",
+      "gap_persistence_fraction": "55367196791551323/100000000000000000",
+      "gap_climatology_fraction": "4368765427389627/10000000000000000"
+    },
+    {
+      "context": "S-LEGACY | 2021-10-15 to 2024-12-31",
+      "metric": "Wind speed MAE",
+      "unit": "m/s",
+      "n": 3520,
+      "aggregation": "summary",
+      "model": "0.9821918879042972",
+      "persistence": "0.46732954545454547",
+      "climatology": "0.584124970631096",
+      "gap_persistence": "0.51486234244975173",
+      "gap_climatology": "0.3980669172732012",
+      "model_fraction": "2455479719760743/2500000000000000",
+      "persistence_fraction": "46732954545454547/100000000000000000",
+      "climatology_fraction": "73015621328887/125000000000000",
+      "gap_persistence_fraction": "51486234244975173/100000000000000000",
+      "gap_climatology_fraction": "995167293183003/2500000000000000"
+    }
+  ],
+  "daily": [],
+  "omitted_incomplete_cells": [],
+  "source_csv": "data/F8_variants_and_inputs.csv",
+  "source_records": [
+    "runs/b-benchmark-20261023T162436Z-874640/benchmark_results.json"
+  ]
+}

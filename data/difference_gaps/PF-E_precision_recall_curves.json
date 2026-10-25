@@ -1,0 +1,48 @@
+{
+  "figure": "PF-E_precision_recall_curves",
+  "formula": "GALE-CAST Model-W1 metric minus reference metric",
+  "note": "These are operating-point precision and recall comparisons from the same saved cohort. Climatology uses its saved tuning-year warning threshold and is additional context, not the dashed prevalence line. No persistence PR-AUC is inferred from its single plotted point.",
+  "rounding": "Scores and errors are displayed to six decimal places; counts are integers. Values are calculated before rounding from saved decimal exports. Exact rational gaps are included in the downloads.",
+  "rows": [
+    {
+      "context": "A | operating threshold 0.601 | 2021-11-16 to 2024-12-30",
+      "metric": "Precision",
+      "unit": "score (0-1)",
+      "n": 3423,
+      "aggregation": "summary",
+      "model": "0.7272727272727273",
+      "persistence": "0.25",
+      "climatology": "0.043010752688172046",
+      "gap_persistence": "0.4772727272727273",
+      "gap_climatology": "0.684261974584555254",
+      "model_fraction": "7272727272727273/10000000000000000",
+      "persistence_fraction": "1/4",
+      "climatology_fraction": "21505376344086023/500000000000000000",
+      "gap_persistence_fraction": "4772727272727273/10000000000000000",
+      "gap_climatology_fraction": "342130987292277627/500000000000000000"
+    },
+    {
+      "context": "A | operating threshold 0.601 | 2021-11-16 to 2024-12-30",
+      "metric": "Recall",
+      "unit": "score (0-1)",
+      "n": 3423,
+      "aggregation": "summary",
+      "model": "0.8571428571428571",
+      "persistence": "0.25",
+      "climatology": "0.42857142857142855",
+      "gap_persistence": "0.6071428571428571",
+      "gap_climatology": "0.42857142857142855",
+      "model_fraction": "8571428571428571/10000000000000000",
+      "persistence_fraction": "1/4",
+      "climatology_fraction": "8571428571428571/20000000000000000",
+      "gap_persistence_fraction": "6071428571428571/10000000000000000",
+      "gap_climatology_fraction": "8571428571428571/20000000000000000"
+    }
+  ],
+  "daily": [],
+  "omitted_incomplete_cells": [],
+  "source_csv": "figures/paper/PF-E_precision_recall_curves.csv",
+  "source_records": [
+    "runs/w-cohort-20261024T205646Z-6b7a96/website_cohort_results.json"
+  ]
+}
