@@ -224,9 +224,9 @@ def notes(ctx: dict) -> dict:
         read="Black diamonds are observations; blue W1, orange persistence, green climatology. In the score panel the dashed line is the 0.601 warning threshold. Each date is a separate next-day forecast.",
         finding="Outcomes (day before, event, day after): " + "; ".join(f"{s}: {', '.join(v['outcomes'])}" for s, v in c1.items()) + ". All events were pressure-triggered. W1's wind error was smaller than both baselines on 2 of 3 NAIA dates (not the event day), on 0 of 3 Sangley Point dates and on 1 of 3 Science Garden dates.",
         supports="W1+X1 warned on the event days and stayed quiet on the neighbouring non-event days in these windows.",
-        limits="Selected for correct decisions; a classification success is not a regression success (W1's wind was often the worst forecast); three dates cannot show general superiority.",
-        paper="Chapter 4, new subsection 'Selected illustrative case studies' (printed thesis only). Caption: 'Figure 4.x. Selected illustrative case: next-day forecasts for three consecutive target dates around a correctly detected pressure-fall event. " + SELECTED + "'",
-        source=f"private: _private/thesis_export/{ctx['run_case1']}/; public summary: runs/{ctx['run_case1']}/case_selection_summary.json.")
+        limits="Selected for correct decisions; a classification success is not a regression success (the wind errors vary across the three forecasts); three dates cannot show general superiority.",
+        paper="Chapter 4, new subsection 'Selected illustrative case studies' (thesis and panel-review site). Caption: 'Figure 4.x. Selected illustrative case: next-day forecasts for three consecutive target dates around a correctly detected pressure-fall event. " + SELECTED + "'",
+        source=f"panel-review PNG/SVG/CSV: docs/figures/paper/; source archive: _private/thesis_export/{ctx['run_case1']}/; public summary: runs/{ctx['run_case1']}/case_selection_summary.json.")
     N["PF-I"] = dict(
         shows="The three primary stations on the same three target dates: wind, 24-hour MSLP change and the W1+X1 score/outcome per station.",
         purpose="An overall view of one event across the network. " + SELECTED,
@@ -236,7 +236,7 @@ def notes(ctx: dict) -> dict:
         supports="X1 warned all three stations on the event date and none on the neighbouring days.",
         limits="Same as PF-H; X1 gives one shared decision, so the three rows are not independent.",
         paper="Chapter 4, selected case studies. Caption: 'Figure 4.x. Selected common window across the three primary stations. " + SELECTED + "'",
-        source=f"private: _private/thesis_export/{ctx['run_case1']}/.")
+        source=f"panel-review PNG/SVG/CSV: docs/figures/paper/; source archive: _private/thesis_export/{ctx['run_case1']}/.")
     N["PF-J"] = dict(
         shows="Per station, three consecutive target dates with relatively high observed wind: observed and forecast wind, absolute wind and MSLP errors, a 'closest forecast' grid for wind/MSLP/humidity/rainfall, 24-hour MSLP change, and the W1+X1 outcome.",
         purpose="The panel's request: an example with stronger observed weather where W1's numbers were good. " + SELECTED + " Chosen because W1's wind error was smaller than both baselines (selected for low model error).",
@@ -246,7 +246,7 @@ def notes(ctx: dict) -> dict:
         supports="On selected dates with relatively strong wind, W1's wind forecast can be closer than both references.",
         limits="Chosen for low W1 wind error; does not hold for pressure in these windows; Science Garden's '90th percentile' is only 2 m/s and its window has 1 wind win, a miss and a false alarm; overall W1 wind error is larger than persistence (PF-F).",
         paper="Chapter 4, selected case studies (separate from PF-H). Caption: 'Figure 4.x. Selected regression example: three consecutive next-day wind forecasts during relatively strong wind. " + SELECTED + " Selected for low model wind error.'",
-        source=f"private: _private/thesis_export/{ctx['run_case2']}/; public counts: runs/{ctx['run_case2']}/case_selection_v2_summary.json.")
+        source=f"panel-review PNG/SVG/CSV: docs/figures/paper/; source archive: _private/thesis_export/{ctx['run_case2']}/; public counts: runs/{ctx['run_case2']}/case_selection_v2_summary.json.")
     N["PF-K"] = dict(
         shows="The selection-v2 common window: wind, absolute wind error and W1+X1 outcome for all three stations on the same dates.",
         purpose="A network-wide view of dates chosen for low model error. " + SELECTED,
@@ -254,9 +254,9 @@ def notes(ctx: dict) -> dict:
         read="One row per station; shorter error bars are better.",
         finding=f"W1 wind beat both baselines on {ctx['case2']['common']['station_dates_with_wind_win_of_9'] if ctx['case2'].get('common') else 0} of 9 station-dates.",
         supports="On these dates W1's wind was the closest forecast more often than not at NAIA and Sangley Point.",
-        limits="At Science Garden W1's wind was the worst forecast on every date of this window; selected for low model error.",
+        limits="At Science Garden the reference forecasts had smaller wind errors on these three dates; selected for low model error.",
         paper="Chapter 4, selected case studies. Caption: 'Figure 4.x. Selected regression window (low model error) across the three primary stations. " + SELECTED + "'",
-        source=f"private: _private/thesis_export/{ctx['run_case2']}/.")
+        source=f"panel-review PNG/SVG/CSV: docs/figures/paper/; source archive: _private/thesis_export/{ctx['run_case2']}/.")
     N.update(panel_notes(ctx))
     N.update(persistence_notes(ctx))
     return N
@@ -334,9 +334,9 @@ def persistence_notes(ctx: dict) -> dict:
                 + ". No common window qualifies at all three stations.",
         supports="On these dates W1's wind and MSLP were closer than persistence's, and mostly closer than climatology's.",
         limits="Chosen for W1's success; Science Garden has no qualifying window; not a performance estimate (see PF-Q, PF-F).",
-        paper="Chapter 4, same subsection (printed thesis only). Caption: 'Figure 4.x. Selected window where persistence was worse than the "
+        paper="Chapter 4, same subsection (thesis and panel-review site). Caption: 'Figure 4.x. Selected window where persistence was worse than the "
               "model for wind and MSLP. " + PERSIST + "'",
-        source=f"private: _private/thesis_export/{run}/; public counts: runs/{run}/persistence_v4_results.json.")
+        source=f"panel-review PNG/SVG/CSV: docs/figures/paper/; source archive: _private/thesis_export/{run}/; public counts: runs/{run}/persistence_v4_results.json.")
     return N
 
 
@@ -440,10 +440,10 @@ def panel_notes(ctx: dict) -> dict:
                                                        f"baseline-failure cells, W1+X1 outcomes {', '.join(v.get('outcomes', []))}"
                                                        for s, v in p2["per_station"].items()) + ".",
         supports="On specific dates when both baselines failed, W1 was the closest forecast for some variables.",
-        limits="Chosen for W1's success; at two of the three stations W1 badly under-forecast the heaviest-rain day of the window; not a "
+        limits="Chosen for W1's success; at two of the three stations the rainfall estimate was below the observation on the heaviest-rain day of the window; not a "
                "performance estimate (see PF-L, PF-M).",
-        paper="Chapter 4, same subsection (printed thesis only). Caption: 'Figure 4.x. Selected validation window. " + PANEL + "'",
-        source=f"private: _private/thesis_export/{run}/; public counts: runs/{run}/panel_v3_results.json.")
+        paper="Chapter 4, same subsection (thesis and panel-review site). Caption: 'Figure 4.x. Selected validation window. " + PANEL + "'",
+        source=f"panel-review PNG/SVG/CSV: docs/figures/paper/; source archive: _private/thesis_export/{run}/; public counts: runs/{run}/panel_v3_results.json.")
     N["PF-P"] = dict(
         shows="The Part 2 common window: all four variables at all three primary stations on the same three dates.",
         purpose="A network-wide view of a period when both baselines failed. " + PANEL,
@@ -453,9 +453,9 @@ def panel_notes(ctx: dict) -> dict:
                  "of 36 (success cells by station: " + ", ".join(f"{s} {n}" for s, n in p2["common"]["by_station_success"].items()) + ")."
                  ) if p2.get("common") else "No common window qualified.",
         supports="During a multi-station disturbance, W1 was closer than both failed baselines on a minority of the variable-station-dates.",
-        limits="Chosen because the model did well; W1 missed the heavy rainfall of the window at every station.",
-        paper="Chapter 4, same subsection (printed thesis only). Caption: 'Figure 4.x. Selected common validation window. " + PANEL + "'",
-        source=f"private: _private/thesis_export/{run}/.")
+        limits="Chosen because the model did well; The rainfall estimates were below the heavy-rain observations at all three stations.",
+        paper="Chapter 4, same subsection (thesis and panel-review site). Caption: 'Figure 4.x. Selected common validation window. " + PANEL + "'",
+        source=f"panel-review PNG/SVG/CSV: docs/figures/paper/; source archive: _private/thesis_export/{run}/.")
     return N
 
 

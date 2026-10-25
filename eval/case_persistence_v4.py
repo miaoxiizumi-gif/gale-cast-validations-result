@@ -99,7 +99,7 @@ def window_fig(W, cA, q, s, dates, qual_dates, title, out, name, run):
     S.footer(fig, ["Shaded (wind and MSLP panels) = qualifying date: |persistence error| > |W1 error| for both wind and MSLP (spec/CASE_SELECTION_v4_persistence_override.md). "
                    "★ = W1 also closer than climatology there. W1 beats persistence on shaded dates by construction. Each date is its own next-day forecast issued after the "
                    "previous day's observation; not a +1/+2/+3-day forecast from one origin. A gap in a line = PAGASA observation missing (not imputed). W1 = saved neural-only "
-                   f"output; persistence = issue-day observation; climatology = station × month mean 2015-2020. Observations: PAGASA; not for online publication. Run {run.name}."],
+                   f"output; persistence = issue-day observation; climatology = station × month mean 2015-2020. Observations: PAGASA; panel review export. Run {run.name}."],
              width=230)
     return S.save(fig, out, name)
 

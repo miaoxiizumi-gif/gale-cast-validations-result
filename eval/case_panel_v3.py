@@ -424,7 +424,7 @@ def main():
                        "day's observation; the three dates are not a +1/+2/+3-day forecast from one origin. A gap in a line = PAGASA observation missing (not imputed). "
                        "W1 = saved neural-only output; persistence = issue-day "
                        "observation; climatology = station × month mean 2015-2020. "
-                       f"W1 success cells {int(top['succ'])} of 12; baseline-failure cells {int(top['fails'])} of 12. Observations: PAGASA; not for online publication. Run {run.name}."],
+                       f"W1 success cells {int(top['succ'])} of 12; baseline-failure cells {int(top['fails'])} of 12. Observations: PAGASA; panel review export. Run {run.name}."],
                  width=200)
         priv_sum["figures"] += S.save(fig, exp, f"PF-O_panel_window_{s.replace(' ', '_')}")
 
@@ -449,7 +449,7 @@ def main():
                     axs[i][j].set_title(f"{s}: {'MSLP' if v == 'mslp' else v}", loc="left", pad=14)
             S.title(fig, f"PF-P. All three primary stations: baseline-failure validation window around {d:%d %B %Y}", LABEL)
             S.footer(fig, [f"Common-window rule: Part 2 of spec/CASE_SELECTION_v3_panel_validation.md. W1 success cells {int(top['succ'])} of 36; "
-                           f"baseline-failure cells {int(top['fails'])} of 36. Shading and ★ as in PF-O; a gap in a line = PAGASA observation missing (not imputed). Observations: PAGASA; not for online publication. Run {run.name}."], width=200)
+                           f"baseline-failure cells {int(top['fails'])} of 36. Shading and ★ as in PF-O; a gap in a line = PAGASA observation missing (not imputed). Observations: PAGASA; panel review export. Run {run.name}."], width=200)
             priv_sum["figures"] += S.save(fig, exp, "PF-P_panel_common_window")
 
     # public figures (aggregates only)

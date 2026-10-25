@@ -2,6 +2,17 @@
 
 Last updated: 2026-10-25.
 
+## Panel review publication update (2026-10-26)
+
+The repository owner authorized publishing the selected thesis-export figures for
+panel review. This supersedes the earlier figure-withholding instruction below.
+`eval/publish_cases.py` copies the latest successful case runs (PF-H/I/J/K/O/P/R)
+and exports exactly their selected station/date rows as CSV, without publishing
+the full row archive. Sections C, D, E and the download gallery show these files.
+The model, scalers, thresholds, prediction code, selection rules and metric values
+remain unchanged. Build timestamps display PHT (UTC+08:00); run IDs retain UTC.
+Baseline comparison tables keep all-date context and selected-date disclosures.
+
 ## Where things are
 
 | Item | Location |

@@ -22,7 +22,7 @@ on evaluation-period outcomes (see `MODEL_AND_DATA_SUMMARY.md`, regression prove
 |---|---|---|---|---|
 | **A. Website historical scorecard** | the website's 3,423 next-day windows (1,141 per primary station; target dates 2021-11-16 to 2024-12-30) | historical scoring procedure: pooled `scaled_weather` inputs, 32-day windows | processed (forward-filled) label, as on the website; raw observations for regression | reproduce and explain what the website shows; add same-case baselines |
 | **B. Training-consistent benchmark** | 3,520 event cases / 3,520 wind cases, target dates 2021-10-15 to 2024-12-31 | per-station scalers as in training | raw, unimputed observations | the declared benchmark of `spec/EVAL_SPEC_v1.md` |
-| **D. Large-baseline-error validation (panel request)** | every Group A station-date on which both persistence and climatology failed (training-period 90th-percentile rule, `CASE_SELECTION_v3_panel_validation.md`) and every event onset; then example windows where GALE-CAST Model-W1 did well | as A (saved rows; no model run); wind and onsets also on B | raw observations | show where the reference forecasts fail and how GALE-CAST Model-W1 does there; examples not representative |
+| **D. reference comparison validation (panel request)** | every Group A station-date on which both persistence and climatology had large errors (training-period 90th-percentile rule, `CASE_SELECTION_v3_panel_validation.md`) and every event onset; then example windows where GALE-CAST Model-W1 did well | as A (saved rows; no model run); wind and onsets also on B | raw observations | show where the reference forecasts fail and how GALE-CAST Model-W1 does there; examples not representative |
 | **E. Persistence-worse dates (panel directive)** | station-dates on which persistence's wind AND MSLP errors were both larger than GALE-CAST Model-W1's (`CASE_SELECTION_v4_persistence_override.md`); dates selected for low GALE-CAST Model-W1 error | as A (saved rows; no model run) | raw observations | show that and how often such dates occur; GALE-CAST Model-W1 < persistence there by construction |
 | **C. Selected illustrative case studies** | set 1 (`CASE_SELECTION_v1.md`): 3 station windows + 1 common window around detected events; set 2 (`CASE_SELECTION_v2_regression.md`): 3 station windows + 1 common window with relatively high wind, selected for low GALE-CAST Model-W1 wind error (disclosed) | as A (saved rows; no model run) | raw observations | explanation only; not representative |
 
@@ -36,18 +36,18 @@ on evaluation-period outcomes (see `MODEL_AND_DATA_SUMMARY.md`, regression prove
   day). Results by station are in `FIGURE_GUIDE.md` (PF-J, PF-K). The pressure forecast was the closest on few of these days.
 - Neither set establishes general superiority; the overall comparisons (Evidence A and B) do.
 
-### Large-baseline-error validation (Evidence D, panel request)
+### reference comparison validation (Evidence D, panel request)
 
 *Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.*
 
 The panel asked for historical dates on which persistence and climatology perform poorly. `spec/CASE_SELECTION_v3_panel_validation.md`
-(committed before the analysis) defines them **without using GALE-CAST Model-W1**: a station-date is a *large-baseline-error date* for a variable when the
+(committed before the analysis) defines them **without using GALE-CAST Model-W1**: a station-date is a *reference comparison date* for a variable when the
 persistence error is at least the station's 2015-2020 90th percentile of day-to-day change **and** the climatology error is at least the
 90th percentile of deviation from the station × month mean. GALE-CAST Model-W1 is then scored on **every** such date (Part 1); example windows where GALE-CAST Model-W1 did
 well are picked only afterwards (Part 2, private figures). A no-model control (the average of the two baselines) shows how much of any advantage
 on these dates a simple hedge also gets, because choosing dates by baseline error favours any forecast that does not copy a baseline.
 
-| Variable (pooled) | Large-baseline-error dates | MAE GALE-CAST Model-W1 / persistence / climatology / control | GALE-CAST Model-W1 − persistence | GALE-CAST Model-W1 − climatology | GALE-CAST Model-W1 − control |
+| Variable (pooled) | reference comparison dates | MAE GALE-CAST Model-W1 / persistence / climatology / control | GALE-CAST Model-W1 − persistence | GALE-CAST Model-W1 − climatology | GALE-CAST Model-W1 − control |
 |---|---|---|---|---|---|
 | wind | 253 | 1.69 / 1.43 / 1.76 / 1.49 | established: positive | no established difference | established: positive |
 | mslp | 91 | 3.98 / 3.32 / 5.52 / 3.64 | no established difference | established: negative | no established difference |
@@ -67,8 +67,8 @@ only; for wind (except Science Garden, again a bias effect) and rainfall GALE-CA
 
 **Panel directive on PF-L (2026-10-25):** PF-L's rainfall panel shows all complete dates only (n = 3,407; MAE GALE-CAST Model-W1
 6.74, persistence 7.76, climatology 7.47 mm). The panel is locked: the site build
-fails if the plotted values differ from `spec/FROZEN_PF-L_rainfall.json`. The large-baseline-error rainfall result is still computed and
-reported (inside the panel, in PF-M, in the CSV and in the table above). The humidity panel keeps its large-baseline-error values under their
+fails if the plotted values differ from `spec/FROZEN_PF-L_rainfall.json`. The reference comparison rainfall result is still computed and
+reported (inside the panel, in PF-M, in the CSV and in the table above). The humidity panel keeps its reference comparison values under their
 correct label and sample size (n = 114); a request to relabel them "All complete dates (n = 3,421)" was not applied,
 because those values come from 114 station-dates, not 3,421 (on all dates GALE-CAST Model-W1's humidity MAE is larger than persistence's).
 
@@ -90,7 +90,7 @@ no window (no two consecutive qualifying dates). No common window qualifies at a
 limitations as requested by the thesis panel; not representative of all historical dates.* At the panel's direction the site was first
 returned to the state of commit `5255788` (by `git revert`, history kept), and section 8.E then shows a single 2×2 figure,
 `PF-L_composite_validation`, in which GALE-CAST Model-W1's MAE is lower than both baselines in every panel. Each panel uses its own set of dates: wind and
-MSLP on the v4 dates (258 station-dates), humidity on the v3 large-baseline-error dates for humidity (114), rainfall
+MSLP on the v4 dates (258 station-dates), humidity on the v3 reference comparison dates for humidity (114), rainfall
 on all complete dates (3,407). These dates were chosen for this outcome, so the figure shows that such dates exist; it does
 not show that the model is better in general. On all complete dates persistence is more accurate than GALE-CAST Model-W1 for wind, MSLP and humidity (PF-F3).
 
@@ -134,7 +134,7 @@ GALE-CAST Model-W1's thresholds are unchanged: X1 ≥ 0.601 (website) and raw �
 - **Precision, recall, F1, PR-AUC:** reported with all four confusion-matrix cells. Accuracy is shown with the all-negative reference.
 - **Uncertainty:** paired circular block bootstrap over target dates (14-day blocks, 2,000 resamples). "Established" means the 95% interval
   excludes zero.
-- **Selected dates cannot establish general forecasting superiority.** Conditioning on baseline failure (Evidence D) is a stratified
+- **Selected dates cannot establish general forecasting superiority.** Conditioning on baseline comparison (Evidence D) is a stratified
   view of the same cases, not a new test, and it favours forecasts that do not copy a baseline.
 
 ## Why persistence and climatology

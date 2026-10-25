@@ -155,7 +155,7 @@ def main():
         S.footer(fig, [CS.TIMING, CS.PROC, CS.BASE,
                        f"Station: {s} (primary). n = 3 station-days. Relatively higher wind = observed wind ≥ the station's training-period 90th percentile "
                        f"({p90[s]:.1f} m/s) on at least one date. Tier {int(top['tier'])} ({'contains a detected event' if top['tier'] == 1 else 'no detected event in the window'}). "
-                       f"Pressure, humidity and rainfall were not used to select. Observations: PAGASA; not for online publication. Run {run.name}."], width=190)
+                       f"Pressure, humidity and rainfall were not used to select. Observations: PAGASA; panel review export. Run {run.name}."], width=190)
         figs += S.save(fig, exp, f"PF-J_regression_case_{s.replace(' ', '_')}")
 
     # common window
@@ -183,7 +183,7 @@ def main():
         axs[0][1].legend(loc="upper left", fontsize=7.5, ncol=3)
         S.title(fig, f"PF-K. All three primary stations: selected regression window (low model error) around {d:%d %B %Y}", LABEL)
         S.footer(fig, [CS.TIMING, CS.PROC, CS.BASE, f"Stations: NAIA, Sangley Point, Science Garden. n = 9 station-days. "
-                       f"Common-window rule: spec/CASE_SELECTION_v2_regression.md. Observations: PAGASA; not for online publication. Run {run.name}."], width=190)
+                       f"Common-window rule: spec/CASE_SELECTION_v2_regression.md. Observations: PAGASA; panel review export. Run {run.name}."], width=190)
         figs += S.save(fig, exp, "PF-K_regression_common_window")
     plt.close("all")
     summ["figures"] = figs

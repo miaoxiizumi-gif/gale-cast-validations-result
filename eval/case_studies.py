@@ -170,7 +170,7 @@ def main():
         S.footer(fig, [TIMING, PROC, BASE,
                        f"Station: {s} (primary). Dates: {win['date'].iloc[0]:%Y-%m-%d} to {win['date'].iloc[2]:%Y-%m-%d}; n = 3 station-days. "
                        f"Selection: spec/CASE_SELECTION_v1.md (E1-E3; ranked by correct decisions in the window [chosen for correct warnings, disclosed], then pressure fall, then date); "
-                       f"W1 error relative to baselines was NOT used to select. Observations: PAGASA; not for online publication. Run {run.name}."])
+                       f"W1 error relative to baselines was NOT used to select. Observations: PAGASA; panel review export. Run {run.name}."])
         figs += S.save(fig, exp, f"PF-H_case_{s.replace(' ', '_')}")
 
     # common window
@@ -196,7 +196,7 @@ def main():
         S.title(fig, f"PF-I. All three primary stations: selected common window around {d:%d %B %Y}", S.EVIDENCE["C"])
         S.footer(fig, [TIMING, PROC, BASE,
                        f"Stations: NAIA, Sangley Point, Science Garden (primary; Port Area is supplementary and not shown). "
-                       f"n = 9 station-days. Selection: spec/CASE_SELECTION_v1.md output B. Observations: PAGASA; not for online publication. Run {run.name}."], width=190)
+                       f"n = 9 station-days. Selection: spec/CASE_SELECTION_v1.md output B. Observations: PAGASA; panel review export. Run {run.name}."], width=190)
         figs += S.save(fig, exp, "PF-I_common_window_all_stations")
     summary["private_figures"] = figs
     (priv / "PRIVATE_selection_summary.json").write_text(json.dumps(summary, indent=2, default=str), encoding="utf-8")

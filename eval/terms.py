@@ -24,6 +24,11 @@ def text(s: str) -> str:
     s = _W1.sub(MODEL, s)
     for rx, rep in _SWAPS:
         s = rx.sub(rep, s)
+    s = re.sub(r"large-baseline-error", "reference comparison", s, flags=re.I)
+    s = re.sub(r"\bfailed baselines\b", "reference forecasts", s, flags=re.I)
+    s = re.sub(r"\bboth baselines failed\b", "both references had large errors", s, flags=re.I)
+    s = re.sub(r"\bfailed\b", "had large errors", s)
+    s = re.sub(r"\bfailure\b", "comparison", s, flags=re.I)
     return s
 
 

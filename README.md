@@ -12,9 +12,9 @@ Evidence for the thesis *GALE-CAST*, about the frozen, deployed model **GALE-CAS
 |---|---|---|
 | **A. Website historical scorecard** | the 3,423 cases behind the website matrix, identified case by case | TN 3386, FP 9, FN 4, TP 24 at X1 ≥ 0.601; F1 0.787 vs event persistence 0.250 and event climatology 0.078 (difference vs persistence established) |
 | **B. Training-consistent benchmark** | 3,520 cases, inputs scaled as in training | 16 of 27 events, 8 false alarms |
-| **D. Large-baseline-error validation (panel request)** | every date on which both persistence and climatology failed (GALE-CAST Model-W1 not used to choose), every event onset, then example windows where GALE-CAST Model-W1 did well | onsets: GALE-CAST Model-W1+X1 warned of 17 of 21 (persistence and climatology 0 and 0); humidity MAE 10.83 vs 13.44 / 14.58 %; wind and rainfall not better; not representative of all dates |
+| **D. reference comparison validation (panel request)** | every date on which both persistence and climatology had large errors (GALE-CAST Model-W1 not used to choose), every event onset, then example windows where GALE-CAST Model-W1 did well | onsets: GALE-CAST Model-W1+X1 warned of 17 of 21 (persistence and climatology 0 and 0); humidity MAE 10.83 vs 13.44 / 14.58 %; wind and rainfall not better; not representative of all dates |
 | **E. Persistence-worse dates (panel directive)** | station-dates on which persistence's wind and MSLP errors were both larger than GALE-CAST Model-W1's (dates selected for low GALE-CAST Model-W1 error) | 258 of 3,421 (7.5%); GALE-CAST Model-W1 < persistence there by construction; on all dates persistence is better |
-| **C. Selected illustrative case studies** | three-day windows chosen retrospectively for illustration: set 1 around detected events; set 2 with relatively high wind, selected for low GALE-CAST Model-W1 wind error (disclosed) | private figures only (PAGASA terms); not representative |
+| **C. Selected illustrative case studies** | three-day windows chosen retrospectively for illustration: set 1 around detected events; set 2 with relatively high wind, selected for low GALE-CAST Model-W1 wind error (disclosed) | downloadable selected figures; not representative |
 
 GALE-CAST Model-W1 ranks pressure-fall days well, but its neural wind, pressure and humidity forecasts are less accurate than persistence on the same
 cases, its scores are not calibrated probabilities, and every evaluation-period event is a pressure fall rather than gale-force wind.
@@ -35,9 +35,8 @@ cases, its scores are not calibrated probabilities, and every evaluation-period 
 
 ## Layout
 
-`spec/` declarations · `eval/` code · `runs/<stage>-<UTC>-<hex>/` aggregate outputs and manifests (failed runs kept, marked `FAILED.txt`) ·
-`docs/` GitHub Pages site · `documentation/` the documents above. Row-level observations, predictions, case figures and chapter text stay
-in the git-ignored `_private/` folder.
+`spec/` declarations · `eval/` code · `runs/<stage>-<UTC>-<hex>/` aggregate outputs and manifests (had large errors runs kept, marked `FAILED.txt`) ·
+`docs/` GitHub Pages site · `documentation/` the documents above. The full row archive and chapter text stay in the git-ignored `_private/` folder. Selected case figures and their plotted rows are published for panel review.
 
 ## Credits
 

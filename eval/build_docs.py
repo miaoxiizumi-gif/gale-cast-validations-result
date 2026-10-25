@@ -493,15 +493,15 @@ PF-Q (Evidence E, run `{ph['run_case4']}`, `spec/CASE_SELECTION_v4_persistence_o
 
 """ + "\n".join(FN.markdown(f"{i} — `docs/figures/{i}.png`", NOTES[i]) for i in legacy) + f"""
 
-## Selected illustrative case studies (private figures)
+## Selected illustrative case studies (panel review downloads)
 
-These figures plot individual PAGASA station-day readings. PAGASA's data terms (CADS-07 Rev.6, condition 4, as recorded in the source project)
-forbid publishing station readings online and no permission was found, so they exist **only** in the private thesis-export folder
-(`_private/thesis_export/`, with a local `INDEX.md`). They are not available for download here. Exact dates are withheld from public files.
+Selected station and common-window plots are published for panel review at
+`docs/figures/paper/`, with PNG, SVG and CSV downloads in the site's case-study
+and figure-download sections. The source archive remains in `_private/thesis_export/`.
 
 Every case figure states: "{FN.SELECTED}" Each date shows a separate next-day forecast, not a +1/+2/+3-day forecast from one origin.
 
-""" + "\n".join(FN.markdown(f"{i} (private)", NOTES[i]) for i in ("PF-H", "PF-I", "PF-J", "PF-K", "PF-O", "PF-P", "PF-R")))
+""" + "\n".join(FN.markdown(f"{i} (panel review)", NOTES[i]) for i in ("PF-H", "PF-I", "PF-J", "PF-K", "PF-O", "PF-P", "PF-R")))
     write_private_index(X)
 
     # ------------------------------------------------------------ PAPER_REVISION_LEDGER.md
@@ -592,7 +592,7 @@ Evidence for the thesis *GALE-CAST*, about the frozen, deployed model **W1** (`g
 | **B. Training-consistent benchmark** | {ph['b_cases']} cases, inputs scaled as in training | {ph['b_tp']} of {ph['b_events']} events, {ph['b_fp']} false alarms |
 | **D. Baseline-failure validation (panel request)** | every date on which both persistence and climatology failed (W1 not used to choose), every event onset, then example windows where W1 did well | onsets: W1+X1 warned of {ph['v3_on_A_x1']} of {ph['v3_on_A']} (persistence and climatology {ph['v3_on_A_pe']} and {ph['v3_on_A_cl']}); humidity MAE {ph['v3_humidity_w1']} vs {ph['v3_humidity_pe']} / {ph['v3_humidity_cl']} %; wind and rainfall not better; not representative of all dates |
 | **E. Persistence-worse dates (panel directive)** | station-dates on which persistence's wind and MSLP errors were both larger than W1's (dates selected for low W1 error) | {ph['v4_n']} of {ph['v4_total']} ({ph['v4_share']}%); W1 < persistence there by construction; on all dates persistence is better |
-| **C. Selected illustrative case studies** | three-day windows chosen retrospectively for illustration: set 1 around detected events; set 2 with relatively high wind, selected for low W1 wind error (disclosed) | private figures only (PAGASA terms); not representative |
+| **C. Selected illustrative case studies** | three-day windows chosen retrospectively for illustration: set 1 around detected events; set 2 with relatively high wind, selected for low W1 wind error (disclosed) | downloadable selected figures; not representative |
 
 W1 ranks pressure-fall days well, but its neural wind, pressure and humidity forecasts are less accurate than persistence on the same
 cases, its scores are not calibrated probabilities, and every evaluation-period event is a pressure fall rather than gale-force wind.
@@ -614,8 +614,7 @@ cases, its scores are not calibrated probabilities, and every evaluation-period 
 ## Layout
 
 `spec/` declarations · `eval/` code · `runs/<stage>-<UTC>-<hex>/` aggregate outputs and manifests (failed runs kept, marked `FAILED.txt`) ·
-`docs/` GitHub Pages site · `documentation/` the documents above. Row-level observations, predictions, case figures and chapter text stay
-in the git-ignored `_private/` folder.
+`docs/` GitHub Pages site · `documentation/` the documents above. The full row archive and chapter text stay in the git-ignored `_private/` folder. Selected case figures and their plotted rows are published for panel review.
 
 ## Credits
 

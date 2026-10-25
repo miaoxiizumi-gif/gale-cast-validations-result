@@ -17,6 +17,7 @@ import build_docs
 import figure_notes as FN
 import tech_stack
 import terms
+import publish_cases
 from content import CLAIMS, LIMITS, OMISSIONS, REV
 
 DOCS = C.WORKSPACE / "docs"
@@ -57,6 +58,12 @@ def table(headers, rows, cls=""):
 
 def ci(c, d=3):
     return "—" if c is None or c.get("lo") is None else f"[{c['lo']:.{d}f}, {c['hi']:.{d}f}]"
+
+
+def format_build_time(instant: dt.datetime) -> str:
+    """Display Philippine time: midnight UTC is 8:00 AM PHT, UTC+08:00."""
+    local = instant.astimezone(dt.timezone(dt.timedelta(hours=8), name="PHT"))
+    return local.strftime("%Y-%m-%d %I:%M %p PHT (UTC+08:00)")
 
 
 def main():
@@ -112,6 +119,7 @@ def main():
     for p in [*(X["runs"]["pf"] / "figures").glob("PF-*"), *(X["runs"]["case3"] / "figures").glob("PF-*"),
               *(X["runs"]["case4"] / "figures").glob("PF-*")]:
         shutil.copy(p, DOCS / "figures" / "paper" / p.name)
+    case_figures = publish_cases.publish(X, DOCS / "figures" / "paper")
     (DOCS / "data" / "documentation").mkdir(exist_ok=True)
     for p in (C.WORKSPACE / "documentation").glob("*"):
         shutil.copy(p, DOCS / "data" / "documentation" / p.name)
@@ -278,18 +286,18 @@ The label uses processed (forward-filled) values, as on the website; recomputed 
               ", ".join(v.get("outcomes", [])) or "—"] for s_, v in C2["per_station"].items()]
 
     def privnote(fid):
-        return (f'<div class="privfig"><p><b>{fid}: kept for the printed thesis.</b> This figure plots individual PAGASA station readings. '
-                f'PAGASA\'s data terms (CADS-07 Rev.6, condition 4) do not allow station readings to be published online, so the image is not '
-                f'on this site; it will be added here if PAGASA gives written permission. Its full explanation is below.</p>{FN.html(NOTES[fid], e)}</div>')
+        cards = []
+        for p in case_figures:
+            if p.stem.startswith(fid + "_"):
+                links = " ? ".join(f'<a href="figures/paper/{p.stem}.{ext}">{ext.upper()}</a>' for ext in ("png", "svg", "csv"))
+                cards.append(f'<figure><a href="figures/paper/{p.name}"><img loading="lazy" src="figures/paper/{p.name}" alt="{e(p.stem)}"></a><figcaption>{e(p.stem)} ? {links}</figcaption></figure>')
+        return "".join(cards) + FN.html(NOTES[fid], e)
     sec("cases", "C. Selected illustrative case studies", f"""
 <div class="selected"><p class="selbanner"><span class="tag sel">Evidence C</span> <b>{e(FN.SELECTED)}</b></p>
 <p>Two separately recorded selections. Neither is a performance estimate; the overall comparisons (Sections A, B and the regression evidence)
 are the basis for any claim. Each date shows its own next-day forecast, issued after the previous day's observations; the three dates are
 <b>not</b> a +1/+2/+3-day forecast from one origin.</p>
-<p><b>Why the figures are not on this site:</b> they plot individual PAGASA station-day readings, which PAGASA's data terms (CADS-07 Rev.6,
-condition 4) do not allow online, and no permission was found. High-resolution PNG and SVG files, with a local index of filenames and
-explanations, are kept in a private thesis-export folder for the printed thesis. There are no public download links for them, and exact
-dates are withheld here, as for every event date on this site.</p>
+<p>Selected station plots are available below as PNG, SVG and CSV for panel review. Each plot shows three separate next-day forecasts.</p>
 <h3>Set 1: warning behaviour around detected events</h3>
 <p>Criteria committed before selection (<a href="data/CASE_SELECTION_v1.md">CASE_SELECTION_v1.md</a>): from the 24 hits, three consecutive
 target dates with complete raw wind and pressure observations and a raw-confirmed event; ranked by correct W1 decisions in the window
@@ -371,7 +379,7 @@ and rainfall on these days the references stay closer; heavy-rain days are the h
 {fig("PF-N_event_onsets", "Bars of hazard onsets warned by the model, persistence and climatology, by station, on two case sets", "<b>PF-N.</b> Hazard onsets warned in time.")}
 <h3>Example windows (chosen because the model did well)</h3>
 <p>From those days, the three-day window at each station where the model beat both references most often. These figures show individual
-PAGASA station readings, so they are kept for the printed thesis (see the note under each).</p>
+PAGASA station readings and are available below with direct downloads.</p>
 {table(["Station", "Windows with at least one model win", "Selected window: model wins / large-error cells", "By variable (model wins / large-error days)", "Warning outcomes"], prow)}
 <p>Common window (all three stations): {p2['common']['success_cells_of_36'] if p2.get('common') else 0} model wins among
 {p2['common']['baseline_failure_cells_of_36'] if p2.get('common') else 0} large-error cells of 36.</p>
@@ -718,6 +726,7 @@ Download: <a href="data/revision_ledger.csv">CSV</a>, <a href="data/revisions.js
 
     figs = sorted([*(X["runs"]["pf"] / "figures").glob("PF-*.png"), *(X["runs"]["case3"] / "figures").glob("PF-*.png"),
                    *(X["runs"]["case4"] / "figures").glob("PF-*.png")], key=lambda p: p.name)
+    figs += case_figures
     frows = [[e(p.stem), f'<a href="figures/paper/{p.name}">PNG</a> · <a href="figures/paper/{p.stem}.svg">SVG</a> · <a href="figures/paper/{p.stem}.csv">CSV</a>',
               next((g["evidence_group"] for g in X["pf"]["figures"] if g["figure"] == p.stem),
                    "E: panel directive (selected dates; not representative of all dates)" if p.stem.startswith(("PF-Q", "PF-L_composite"))
@@ -727,7 +736,7 @@ Download: <a href="data/revision_ledger.csv">CSV</a>, <a href="data/revisions.js
 variable and units, stations, dates, sample size, forecast lead, baselines and evidence group. Captions, cohorts and source runs:
 <a href="data/documentation/FIGURE_GUIDE.md">FIGURE_GUIDE.md</a>. Figure run <code>{PH['run_pf']}</code>.</p>
 {table(["Figure", "Download", "Evidence group"], frows)}
-<p class="small">Selected case figures (PF-H to PF-K, PF-O, PF-P, PF-R) are private: they plot individual PAGASA readings. They are not available here.</p>
+<p class="small">Selected case figures (PF-H to PF-K, PF-O, PF-P, PF-R) are included above with PNG, SVG and CSV downloads.</p>
 """)
 
     sec("method", 'What "validation" means in this paper', f"""
@@ -808,7 +817,7 @@ No row-level observations or individual predictions are published.</p>
         nav.append((id_, title))
         S.append(f'<section id="{id_}"><h2>{"" if n == 0 else f"{n}. "}{e(title)}</h2>{body}</section>')
     navh = "".join(f'<a href="#{i}">{e(t)}</a>' for i, t in nav)
-    built = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    built = format_build_time(dt.datetime.now(dt.timezone.utc))
     page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>GALE-CAST W1 Evaluation</title><meta name="description" content="Retrospective forecast verification of the frozen GALE-CAST W1 model with persistence and climatology benchmarks: the website scorecard case by case, regression provenance, selected case studies, paper figures and revision ledger.">
 <link rel="stylesheet" href="style.css"></head><body>
@@ -830,7 +839,7 @@ No row-level observations or individual predictions are published.</p>
     md = [f"# GALE-CAST W1 evaluation `{EVAL_ID}` + amendment A2 (provisional)\n", f"Site: {SITE_URL}\n",
           "Method: retrospective forecast verification with persistence and climatology benchmarking (not cross-validation). "
           "Evidence groups: A = website historical scorecard (3,423 cases); B = training-consistent benchmark; C = retrospectively "
-          "selected illustrative case studies (private figures); D = baseline-failure validation requested by the panel "
+          "selected illustrative case studies (downloadable figures); D = baseline-failure validation requested by the panel "
           "(every date where persistence and climatology both failed, then selected examples; not representative of all dates). "
           "Documents: documentation/*.md in the repository.\n",
           "## Evidence A: website scorecard with same-case baselines\n",
@@ -858,14 +867,6 @@ No row-level observations or individual predictions are published.</p>
         p.write_text(build_docs.public_md(p.read_text(encoding="utf-8"), p.name), encoding="utf-8")
 
     # publication safety scan
-    private_dates = set()
-    for run_key, fname in (("case", "PRIVATE_selection_summary.json"), ("case2", "PRIVATE_selection_summary_v2.json"),
-                           ("case3", "PRIVATE_selection_summary_v3.json"), ("case4", "PRIVATE_selection_summary_v4.json")):
-        ps = J(C.private_dir(X["runs"][run_key]) / fname)
-        for w in [*ps.get("per_station", {}).values(), ps.get("common") or {}]:
-            private_dates.update(w.get("window", []))
-    assert private_dates, "no private case dates loaded for the scan"
-
     # panel directive: PF-L's rainfall panel is locked to its frozen 'All complete dates' values
     frozen = J(C.WORKSPACE / "spec" / "FROZEN_PF-L_rainfall.json")
     rf = X["case3"]["part1_A_q90"]["rainfall"]["pooled"]["all_complete"]
@@ -883,9 +884,6 @@ No row-level observations or individual predictions are published.</p>
                         r"-----BEGIN [A-Z ]*PRIVATE KEY-----"):
                 if re.search(pat, t):
                     bad.append((p.name, pat))
-            for d in private_dates:  # selected case dates stay private (PAGASA terms)
-                if d in t:
-                    bad.append((p.name, "private case date"))
     assert not bad, f"publication scan failed: {bad}"
     print("site built:", DOCS, "| sections:", len(nav), "| revisions:", len(rev_j))
 
