@@ -54,6 +54,9 @@ Every script creates a new run directory. Never overwrite or delete a run; mark 
   climatology, 95% intervals; equal to PF-F3 to 3e-7), file `PF-L_benchmark_all_dates`, locked by `spec/FROZEN_PF-L_metrics.json` (all
   four variables; replaces the rainfall-only lock). Baseline-failure MAE moved to PF-M's note and the section D table. Cited runs
   `panel-v3-20261025T125659Z-284767`, `persist-v4-20261025T125716Z-da9c34`.
+- **Section 8 (Evidence E) layout, 2026-10-25:** the text table was replaced by PF-Q as a four-panel chart card (A qualifying dates;
+  B/C wind and MSLP MAE on them; D how often W1 also beat climatology); window summary moved to PF-Q's note. Cited run
+  `persist-v4-20261025T131837Z-ed43f5`.
 - **Figure explanations:** every graph (public and private) has a nine-part explanation from `eval/figure_notes.py`.
 
 ## Open items (owner decisions; not decided here)
