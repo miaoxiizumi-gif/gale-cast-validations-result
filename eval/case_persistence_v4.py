@@ -106,7 +106,7 @@ def window_fig(W, cA, q, s, dates, qual_dates, title, out, name, run):
 
 def fig_Q(P: dict, out, run) -> list[str]:
     fig, axs = plt.subplots(1, 3, figsize=(15, 6))
-    fig.subplots_adjust(left=0.06, right=0.99, top=0.8, bottom=0.27, wspace=0.3)
+    fig.subplots_adjust(left=0.06, right=0.99, top=0.78, bottom=0.27, wspace=0.3)
     x = np.arange(len(SCOPES))
     ax = axs[0]
     ax.bar(x, [P["qualifying"][s]["n"] for s in SCOPES], color=S.W1C, width=0.55)
@@ -128,7 +128,7 @@ def fig_Q(P: dict, out, run) -> list[str]:
         ax.set_title(f"{'Wind' if v == 'wind' else 'MSLP'}: error on qualifying dates", loc="left")
     axs[1].legend(loc="upper left", fontsize=7.5, ncol=3)
     S.title(fig, "PF-Q. Dates on which persistence was worse than W1 for both wind and MSLP: how many, and errors on them",
-            "Evidence E (panel directive). " + LABEL + " W1 < persistence on these dates holds by construction; climatology is not used to select.")
+            "Evidence E (panel directive). " + LABEL + " W1 < persistence here by construction.")
     S.footer(fig, ["Qualifying station-date: |persistence error| > |W1 error| for wind AND for MSLP (strict). Share = qualifying / station-dates with complete wind and MSLP. "
                    "W1 = saved neural-only next-day output (website scorecard cohort, target dates 2021-11-16 to 2024-12-30); persistence = issue-day observation; "
                    f"climatology = station × month mean 2015-2020; truth = raw PAGASA observations. Spec: spec/CASE_SELECTION_v4_persistence_override.md. Run {run.name}."], width=200)

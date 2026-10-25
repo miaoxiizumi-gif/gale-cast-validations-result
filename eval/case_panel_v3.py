@@ -108,6 +108,7 @@ class Scorer:
         ok = den > 0
         mae = {m: np.where(ok, (w @ c[f"e_{m}"].abs().values) / np.where(ok, den, 1), np.nan) for m in METHODS}
         out["ci"] = {}
+        out["ci_mae"] = {m: M.ci(list(mae[m])) for m in METHODS}
         for b in ("persistence", "climatology", "control"):
             k = f"dmae_W1_{b}"
             ci = M.ci(list(mae["W1"] - mae[b]))
@@ -177,47 +178,38 @@ MCOL = {"W1": S.W1C, "persistence": S.PERC, "climatology": S.CLIMC, "control": "
 MNAME = {"W1": "W1", "persistence": "Persistence", "climatology": "Climatology", "control": "Control: mean of the two baselines"}
 
 
-# Panel directive (2026-10-25): PF-L's rainfall panel shows 'All complete dates' only. Locked: build_site.py checks the plotted values
-# against spec/FROZEN_PF-L_rainfall.json. The baseline-failure rainfall result is still computed and reported (PF-M, CSV, notes).
-PFL_GROUPS = {"wind": ("all_complete", "baseline_failure"), "mslp": ("all_complete", "baseline_failure"),
-              "humidity": ("all_complete", "baseline_failure"), "rainfall": ("all_complete",)}
-GROUP_LABEL = {"all_complete": "All complete\ndates", "baseline_failure": "Baseline-failure\ndates"}
+# Panel directive (2026-10-25, revised): every PF-L panel (the panel's "Figure 8E") shows all complete dates, W1 vs persistence vs
+# climatology. Locked: build_site.py checks the plotted values against spec/FROZEN_PF-L_metrics.json. Baseline-failure results are in PF-M.
+PFL_NAME = "PF-L_benchmark_all_dates"
+PFL_TITLE = {"wind": "Wind speed (m/s)", "mslp": "Mean sea-level pressure (hPa)", "humidity": "Relative humidity (%)", "rainfall": "Daily rainfall (mm)"}
+PFL_METHODS = ("W1", "persistence", "climatology")
 
 
 def fig_L(P1: dict, T: dict, out, run) -> list[str]:
-    fig, axs = plt.subplots(1, 4, figsize=(15, 6.2))
-    fig.subplots_adjust(left=0.05, right=0.99, top=0.84, bottom=0.25, wspace=0.32)
-    for ax, (v, (_, unit)) in zip(axs, VARS.items()):
-        r = P1[v]["pooled"]
-        groups = [(GROUP_LABEL[g], r[g]) for g in PFL_GROUPS[v]]
-        x = np.arange(len(groups))
-        if len(groups) == 1:
-            ax.set_xlim(-0.75, 0.75)
-            b = r["baseline_failure"]
-            ax.text(0.02, 0.97, f"Shown: all complete dates only\n(panel directive). Baseline-failure\nrainfall dates (n = {b['n']}): W1 "
-                    f"{b['point']['W1']['mae']:.1f} vs\npersistence {b['point']['persistence']['mae']:.1f}, climatology "
-                    f"{b['point']['climatology']['mae']:.1f} mm\n(see PF-M).", transform=ax.transAxes, ha="left", va="top", fontsize=6.8, color=S.INK2)
-        for k, m in enumerate(METHODS):
-            vals = [g["point"][m]["mae"] if g["n"] else np.nan for _, g in groups]
-            xs = x + (k - 1.5) * 0.2
-            ax.bar(xs, vals, width=0.19, color=MCOL[m], label=MNAME[m], hatch="//" if m == "control" else None,
-                   edgecolor=S.SURF if m != "control" else "#5d5c58", linewidth=0.4)
-            for xi, val in zip(xs, vals):
-                ax.text(xi, val, f"{val:.2f}" if val < 10 else f"{val:.1f}", ha="center", va="bottom", fontsize=6.6, rotation=90)
-        ax.set_xticks(x, [f"{lab}\n(n = {g['n']:,})" for lab, g in groups], fontsize=8)
-        ax.set_ylabel(f"MAE, {unit}")
-        ax.set_ylim(0, ax.get_ylim()[1] * (1.28 if len(groups) > 1 else 2.1))
-        ax.set_title(v.replace("mslp", "MSLP").capitalize() if v != "mslp" else "MSLP", loc="left")
-    axs[0].legend(loc="upper left", fontsize=7.2, ncol=1)
-    S.title(fig, "PF-L. Next-day error on dates where both baselines failed, compared with all dates (pooled, three primary stations)",
-            "Evidence D (panel request). " + LABEL + " Dates chosen only by baseline error; W1 is scored on every such date.")
-    S.footer(fig, ["Baseline-failure date (per station and variable): |persistence error| ≥ the station's 2015-2020 90th percentile of day-to-day change AND "
-                   "|climatology error| ≥ the 90th percentile of deviation from the station × month mean. Persistence = issue-day observation; climatology = "
-                   "station × month mean 2015-01-01 to 2020-10-14; control = their average (no model). W1 = saved neural-only next-day output (website scorecard cohort, "
-                   f"target dates 2021-11-16 to 2024-12-30). Truth: raw PAGASA observations. Lower is better. Rainfall panel: all complete dates only, by panel "
-                   f"directive (locked; spec/FROZEN_PF-L_rainfall.json). Spec: spec/CASE_SELECTION_v3_panel_validation.md. Run {run.name}."],
-             width=200)
-    return S.save(fig, out, "PF-L_baseline_failure_mae")
+    fig, axs = plt.subplots(1, 4, figsize=(15, 5.8))
+    fig.subplots_adjust(left=0.05, right=0.99, top=0.8, bottom=0.25, wspace=0.34)
+    x = np.arange(len(PFL_METHODS))
+    for ax, v in zip(axs, VARS):
+        r = P1[v]["pooled"]["all_complete"]
+        vals = [r["point"][m]["mae"] for m in PFL_METHODS]
+        lo = [r["point"][m]["mae"] - r["ci_mae"][m]["lo"] for m in PFL_METHODS]
+        hi = [r["ci_mae"][m]["hi"] - r["point"][m]["mae"] for m in PFL_METHODS]
+        ax.bar(x, vals, width=0.62, color=[MCOL[m] for m in PFL_METHODS])
+        ax.errorbar(x, vals, yerr=[lo, hi], fmt="none", ecolor=S.INK, elinewidth=1, capsize=3)
+        for xi, val, h in zip(x, vals, hi):
+            ax.text(xi + 0.08, val + h, f"{val:.2f}", ha="left", va="bottom", fontsize=8)
+        ax.set_xticks(x, [MNAME[m] for m in PFL_METHODS], fontsize=8.5)
+        ax.set_ylabel("MAE (lower is better)")
+        ax.set_ylim(0, max(v_ + h for v_, h in zip(vals, hi)) * 1.18)
+        ax.set_title(f"{PFL_TITLE[v]} · n = {r['n']:,}", loc="left")
+    S.title(fig, "PF-L. Next-day error of W1, persistence and climatology on all complete dates (pooled, three primary stations)",
+            "Evidence A cases (overall evidence). Panel directive 2026-10-25: all four panels show all complete dates; values locked in "
+            "spec/FROZEN_PF-L_metrics.json. Results on dates where both baselines failed: PF-M.")
+    S.footer(fig, ["W1 = saved neural-only next-day output of the deployed model (website scorecard cohort, NAIA / Sangley Point / Science Garden, target dates "
+                   "2021-11-16 to 2024-12-30); persistence = issue-day observation; climatology = station × month mean 2015-01-01 to 2020-10-14. Truth: raw PAGASA "
+                   "observations; a case is used when observation, W1, persistence and climatology all exist. Error bars: 95% paired circular block bootstrap over "
+                   f"target dates (14-day blocks, 2,000 resamples). Run {run.name}."], width=200)
+    return S.save(fig, out, PFL_NAME)
 
 
 def fig_M(P1: dict, out, run) -> list[str]:
@@ -460,9 +452,13 @@ def main():
             for grp in ("all_complete", "baseline_failure", "non_failure"):
                 r = P1[v][s][grp]
                 if r["n"]:
-                    rows.append({"variable": v, "scope": s, "group": grp, "shown_in_PF-L": s == "pooled" and grp in PFL_GROUPS[v], "n": r["n"], **{f"mae_{m}": r["point"][m]["mae"] for m in METHODS},
+                    rows.append({"variable": v, "scope": s, "group": grp, "n": r["n"], **{f"mae_{m}": r["point"][m]["mae"] for m in METHODS},
                                  **{f"rmse_{m}": r["point"][m]["rmse"] for m in METHODS}, "w1_beats_both_share": r["w1_beats_both_share"]})
-    pd.DataFrame(rows).to_csv(figdir / "PF-L_baseline_failure_mae.csv", index=False)
+    pd.DataFrame(rows).to_csv(run / "mae_by_group_and_station.csv", index=False)
+    pd.DataFrame([{"variable": v, "unit": VARS[v][1], "n": P1[v]["pooled"]["all_complete"]["n"], "method": m,
+                   "mae": P1[v]["pooled"]["all_complete"]["point"][m]["mae"], "rmse": P1[v]["pooled"]["all_complete"]["point"][m]["rmse"],
+                   "mae_ci_lo": P1[v]["pooled"]["all_complete"]["ci_mae"][m]["lo"], "mae_ci_hi": P1[v]["pooled"]["all_complete"]["ci_mae"][m]["hi"]}
+                  for v in VARS for m in PFL_METHODS]).to_csv(figdir / f"{PFL_NAME}.csv", index=False)
     pd.DataFrame([{"variable": v, "scope": s, "n": P1[v][s]["baseline_failure"]["n"], "comparison": b,
                    "dmae": P1[v][s]["baseline_failure"]["point"].get(f"dmae_W1_{b}"),
                    "lo": P1[v][s]["baseline_failure"].get("ci", {}).get(f"dmae_W1_{b}", {}).get("lo"),

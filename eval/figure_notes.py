@@ -338,45 +338,46 @@ def panel_notes(ctx: dict) -> dict:
     B = D["part1_B_wind_q90"]["pooled"]["baseline_failure"]
     p2 = D["part2"]
     N = {}
-    N["PF-L_baseline_failure_mae"] = dict(
-        shows="For each next-day output (wind, MSLP, humidity, rainfall), the MAE of W1, persistence, climatology and a no-model control "
-              "(average of the two baselines) on all complete dates and on the dates where both baselines failed; pooled over the three primary stations. "
-              f"The rainfall panel shows all complete dates only (n = {al('rainfall')['n']:,}), by panel directive; its baseline-failure result is "
-              "printed inside the panel and plotted in PF-M.",
-        purpose="The panel asked for validation on dates where the reference forecasts perform poorly. " + PANEL +
-                " Panel directive (2026-10-25): rainfall shown for all complete dates only; this panel is locked against spec/FROZEN_PF-L_rainfall.json.",
-        produced=f"Selection v3 Part 1 (spec/CASE_SELECTION_v3_panel_validation.md, committed before the analysis): {BF_RULE}. W1 is scored on every "
-                 "such date, whether it did well or not. Saved Evidence A rows (W1 neural-only output; no model run); raw PAGASA truth.",
-        read="Shorter bars are better. Compare the four bars within a group; units differ between panels. The left group is the ordinary "
-             "picture, the right group the baseline-failure dates only. Rainfall has one group (all complete dates).",
-        finding=f"Rainfall, all complete dates (n = {al('rainfall')['n']:,}): W1 {mae(al('rainfall'), 'W1'):.2f} vs persistence "
-                f"{mae(al('rainfall'), 'persistence'):.2f}, climatology {mae(al('rainfall'), 'climatology'):.2f} mm. On baseline-failure dates: " + "; ".join(
-            f"{VNAME[v][0]} n = {bf(v)['n']}, W1 {mae(bf(v), 'W1'):.2f} vs persistence {mae(bf(v), 'persistence'):.2f}, climatology "
-            f"{mae(bf(v), 'climatology'):.2f}, control {mae(bf(v), 'control'):.2f} {VNAME[v][1]}" for v in P) +
-            ". On all dates W1's MAE is larger than persistence's for wind, MSLP and humidity and smaller for rainfall.",
-        supports="Where both baselines failed, W1's humidity error was smaller than both baselines and the control, and its MSLP error was "
-                 "smaller than climatology's (not persistence's).",
-        limits=f"Choosing dates by baseline error favours any forecast that does not follow persistence or climatology; the control shows how much "
-               f"of that a no-model hedge also gets. W1's humidity forecasts run {hum_bias:+.1f} percentage points high on average, so dates with "
-               f"sudden humidity rises favour it; on humidity falls (n = {hum_fall['n']}) W1 is worse ({mae(hum_fall, 'W1'):.1f} vs persistence "
-               f"{mae(hum_fall, 'persistence'):.1f} %). On heavy-rain baseline-failure dates W1 under-forecasts and has the largest error. These "
-               f"dates are {bf('wind')['n']} of {al('wind')['n']} wind cases; they do not change the overall result.",
-        paper="Chapter 4, new subsection 'Validation on dates where the reference forecasts failed (panel request)'. Caption: 'Figure 4.x. Next-day "
-              "MAE on all dates and on dates where both persistence and climatology failed (training-period 90th-percentile rule), three primary "
-              "stations, 2021-11-16 to 2024-12-30. " + PANEL + "'",
-        source=f"figures/paper/PF-L_baseline_failure_mae.csv; run {run}; spec/CASE_SELECTION_v3_panel_validation.md.")
+    N["PF-L_benchmark_all_dates"] = dict(
+        shows="For each next-day output (wind speed, MSLP, relative humidity, daily rainfall), the MAE of W1, persistence and climatology on all "
+              "complete dates, pooled over the three primary stations, with 95% intervals. The panel refers to this figure as Figure 8E.",
+        purpose="The panel's revised directive (2026-10-25): every panel shows the full set of complete dates, so all four variables are compared "
+                "on the same footing and no subset is mixed in. The values are locked in spec/FROZEN_PF-L_metrics.json.",
+        produced="Saved Evidence A rows (W1 neural-only output; no model run); raw PAGASA truth; a case is used when observation, W1, persistence and "
+                 "climatology all exist. Paired circular block bootstrap over target dates (14-day blocks, 2,000 resamples) for the intervals. "
+                 "The build fails if these values change.",
+        read="Shorter bars are better; compare the three bars within a panel (units differ between panels). Overlapping intervals do not by "
+             "themselves decide a difference; the paired differences are in the finding below.",
+        finding="; ".join(f"{VNAME[v][0]} (n = {al(v)['n']:,}): W1 {mae(al(v), 'W1'):.2f} vs persistence {mae(al(v), 'persistence'):.2f}, "
+                          f"climatology {mae(al(v), 'climatology'):.2f} {VNAME[v][1]} (vs persistence {verdict(al(v), 'persistence')}; vs "
+                          f"climatology {verdict(al(v), 'climatology')})" for v in P) + ".",
+        supports="W1's next-day rainfall error is smaller than both references on all dates. For wind, MSLP and humidity, persistence is the "
+                 "more accurate next-day forecast.",
+        limits="The same numbers as PF-F3 (Evidence A), shown again so the panel's Figure 8E stands alone. Rainfall RMSE is not lower than "
+               "climatology's (PF-F3 note), and W1 under-forecasts heavy rain. Results on dates where both baselines failed are in PF-M; dates "
+               "where persistence was worse than W1 for wind and MSLP are in PF-Q.",
+        paper="Chapter 4 (Figure 8E in the panel's numbering). Caption: 'Figure 4.x. Next-day MAE of the deployed model, persistence and "
+              "climatology on all complete dates, three primary stations, 2021-11-16 to 2024-12-30, with 95% block-bootstrap intervals.'",
+        source=f"figures/paper/PF-L_benchmark_all_dates.csv; run {run}; spec/FROZEN_PF-L_metrics.json.")
     N["PF-M_baseline_failure_differences"] = dict(
         shows="On baseline-failure dates only: W1's MAE minus persistence's, climatology's and the control's, per station and pooled, with 95% intervals.",
         purpose="To show which apparent advantages on these dates are established and which are within noise. " + PANEL,
-        produced="Paired circular block bootstrap over target dates (14-day blocks, 2,000 resamples, seed 20261025) on the PF-L dates.",
+        produced=f"Selection v3 Part 1 (spec/CASE_SELECTION_v3_panel_validation.md, committed before the analysis): {BF_RULE}. W1 is scored on "
+                 "every such date. Paired circular block bootstrap over target dates (14-day blocks, 2,000 resamples, seed 20261025).",
         read="Left of the zero line = W1's error smaller. A difference is established only if its whole interval is on one side of zero. "
              "n is the number of baseline-failure station-dates.",
         finding="Pooled: " + "; ".join(f"{VNAME[v][0]}: vs persistence {verdict(bf(v), 'persistence')}, vs climatology "
                                        f"{verdict(bf(v), 'climatology')}, vs control {verdict(bf(v), 'control')}" for v in P) +
-                ". Established smaller than both baselines at: " + (", ".join(wins) or "none") + ".",
+                ". Established smaller than both baselines at: " + (", ".join(wins) or "none") + ". MAE on these dates (pooled): " + "; ".join(
+            f"{VNAME[v][0]} n = {bf(v)['n']}, W1 {mae(bf(v), 'W1'):.2f} vs persistence {mae(bf(v), 'persistence'):.2f}, climatology "
+            f"{mae(bf(v), 'climatology'):.2f}, control {mae(bf(v), 'control'):.2f} {VNAME[v][1]}" for v in P) + ".",
         supports="W1 adds value over both baselines for humidity on dates when humidity jumped, and over climatology for pressure on dates "
                  "with large pressure changes; Science Garden is the one station where W1's wind is better on these dates.",
-        limits=f"Science Garden's wind advantage comes from W1's high wind level there (bias {sg_bias:+.2f} m/s on all dates): almost all of its "
+        limits=f"Choosing dates by baseline error favours any forecast that does not follow persistence or climatology; the control shows how much "
+               f"of that a no-model hedge also gets. W1's humidity forecasts run {hum_bias:+.1f} percentage points high on average, so dates with "
+               f"sudden humidity rises favour it; on humidity falls (n = {hum_fall['n']}) W1 is worse ({mae(hum_fall, 'W1'):.1f} vs persistence "
+               f"{mae(hum_fall, 'persistence'):.1f} %). On heavy-rain baseline-failure dates W1 under-forecasts and has the largest error. "
+               f"Science Garden's wind advantage comes from W1's high wind level there (bias {sg_bias:+.2f} m/s on all dates): almost all of its "
                f"baseline-failure dates are wind rises. On large MSLP falls (n = {pf_fall['n']}) W1 is not established better than persistence. "
                f"Training-consistent inputs (Evidence B) give the same wind picture: n = {B['n']}, W1 {mae(B, 'W1'):.2f} vs persistence "
                f"{mae(B, 'persistence'):.2f}, climatology {mae(B, 'climatology'):.2f} m/s.",
