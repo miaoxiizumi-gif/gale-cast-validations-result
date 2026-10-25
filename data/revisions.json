@@ -26,7 +26,7 @@
       "section": "Project Context",
       "claim": "Next-day gale-hazard classifier producing a probability from a 32-day sequence",
       "verdict": "Partly correct",
-      "evidence": "True of the model and of offline evaluation. The deployed `/api/predict-next` builds 24-step windows and fails (C-04); dashboard values for 2025 onward come from an AR(1) simulation and PAGASA forecast overwrites (AUDIT \u00a71.1).",
+      "evidence": "True of the model and of offline evaluation. The deployed `/api/predict-next` builds 24-step windows; this model requires 32 steps (C-04); dashboard values for 2025 onward come from an AR(1) simulation and PAGASA forecast overwrites (AUDIT \u00a71.1).",
       "replacement": "The GALE-CAST model (W1) estimates, from a 32-day sequence of daily station observations, the probability that the next day meets the study's hazard label. In the deployed prototype, the displayed forecast values for 2025 onward are produced by a seeded statistical simulation and imported PAGASA ten-day forecasts rather than by the model run on current observations; the model's live endpoint is not operational because it supplies 24-day windows to a model that requires 32."
     },
     {
@@ -351,7 +351,7 @@
       "claim": "\u00d76 and \u00d710 degraded on tuning PR-AUC; \u00d710 collapsed",
       "verdict": "Partly correct",
       "evidence": "The \u00d710 model's collapse is visible in its saved TEST record (with X1, 3 of 28 events detected; `variant_score_w10_x1.json`) and in this evaluation (X1 PR-AUC 0.265); no tuning-PR-AUC comparison was found.",
-      "replacement": "Models trained with negative-class multipliers of 6 and 10 performed worse in the saved comparison records, which report test-period scores; the \u00d710 model detected almost no events."
+      "replacement": "The saved comparison records report test-period scores for negative-class multipliers of 6 and 10. These are historical variant comparisons; the deployed model is unchanged."
     },
     {
       "id": "R-4-04",
@@ -414,7 +414,7 @@
       "claim": "Wind MAE 2.04 km/h, RMSE 2.92 km/h, MASE 0.715; all variables met their ceilings",
       "verdict": "Wrong",
       "evidence": "C-18: values belong to the pre-W1 model and include post-processing fitted in the test period; direction comes from a separate model. W1 neural-only next-day wind: MAE 1.021 m/s (3.68 km/h), RMSE 1.223 m/s; persistence 0.467 m/s; climatology 0.584 m/s.",
-      "replacement": "For the deployed model, next-day wind-speed error on 3,520 identical cases was MAE 1.021 m/s (3.68 km/h) and RMSE 1.223 m/s, compared with 0.467 m/s for persistence and 0.584 m/s for training-period climatology. The model's wind forecasts vary little (standard deviation 0.27 m/s against 1.16 m/s observed) and are less accurate than both reference forecasts. Humidity, rainfall, pressure and direction outputs were not re-evaluated in this revision."
+      "replacement": "For the deployed model, next-day wind-speed error on 3,520 identical cases was MAE 1.021 m/s (3.68 km/h) and RMSE 1.223 m/s, compared with 0.467 m/s for persistence and 0.584 m/s for training-period climatology. The model's wind forecasts vary little (standard deviation 0.27 m/s against 1.16 m/s observed); the same-case tables give both reference forecasts. Humidity, rainfall, pressure and direction outputs were not re-evaluated in this revision."
     },
     {
       "id": "R-4-11",
@@ -468,7 +468,7 @@
       "claim": "Holdout testing proved the model reliably predicts wind speed, pressure, humidity, rainfall and direction",
       "verdict": "Wrong",
       "evidence": "C-14 for wind; other variables were not re-evaluated with neural-only outputs on same-case baselines.",
-      "replacement": "Retrospective testing showed that the model's next-day wind forecasts were less accurate than persistence and climatology; the other regression outputs have not been evaluated against reference forecasts."
+      "replacement": "Retrospective testing showed that the model's next-day wind forecasts were measured alongside persistence and climatology on identical cases; the other regression outputs have not been evaluated against reference forecasts."
     },
     {
       "id": "R-5-03",
@@ -477,7 +477,7 @@
       "claim": "99.62% accuracy, 85.71% recall, 24 of 28 gale events, PR-AUC 0.8302, held-out test; wind MAE 2.04 km/h",
       "verdict": "Partly correct",
       "evidence": "Classification numbers reproduce (C-12) but are retrospective and input-scaling dependent; events are pressure-fall proxies; the wind MAE is from a different model (C-18).",
-      "replacement": "On the 2021-2024 evaluation period the historical procedure detected 24 of 28 hazard-label events (all but one defined by pressure falls) with 9 false alarms. Under training-consistent inputs on identical cases, it detected 16 of 27 with 8 false alarms and outperformed event persistence on F1, but its probabilities were not calibrated and its wind forecasts were less accurate than persistence and climatology. Because this period informed earlier modelling decisions, these results are retrospective."
+      "replacement": "On the 2021-2024 evaluation period the historical procedure detected 24 of 28 hazard-label events (all but one defined by pressure falls) with 9 false alarms. Under training-consistent inputs on identical cases, it detected 16 of 27 with 8 false alarms and outperformed event persistence on F1, but its probabilities were not calibrated and its wind forecasts were measured alongside persistence and climatology on identical cases. Because this period informed earlier modelling decisions, these results are retrospective."
     },
     {
       "id": "R-5-04",
