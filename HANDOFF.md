@@ -2,6 +2,28 @@
 
 Last updated: 2026-10-26.
 
+## Difference gaps and expanded explanations (2026-10-26)
+
+This supersedes the sentence-count limits in the earlier explanation update.
+Every active figure has comprehensive paper and plain-English explanations with
+purpose, chart reading, saved results, practical interpretation and claim scope.
+Station-window cards additionally identify their exact target dates and common
+record counts in the paper explanation.
+
+`eval/difference_gaps.py` calculates signed model-minus-reference differences
+directly from saved decimal exports and result records. Every displayed comparator
+card has its Difference Gap block immediately below its image. Case-window MAE
+uses identical complete dates for all three methods, with daily absolute-error
+gaps and omitted incomplete cells listed explicitly. Classification-score gaps,
+numerical-error gaps and warning-count gaps retain their separate units and sign
+interpretations. These reporting calculations do not fit baselines or run inference.
+
+Gap CSV/JSON files in `docs/data/difference_gaps/` include exact rational arithmetic
+records and source links. The audit checks gap placement, arithmetic, same-date
+case means and agreement with the original paired-difference plot. PF-G remains
+the only Section 5 figure, and the model, scalers, thresholds, prediction logic,
+raw plotted assets and original result values remain unchanged.
+
 ## Figure explanation update (2026-10-26)
 
 All active figure cards now include a formal Paper Explanation and a Plain

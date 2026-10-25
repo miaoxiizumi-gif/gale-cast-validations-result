@@ -471,8 +471,11 @@ evaluation on observations from 2025 onward.
     write("FIGURE_GUIDE.md", f"""
 # Figure guide
 
-Every active figure has a **Paper Explanation** (one or two formal sentences) and a **Plain English Explanation** (two or three simple sentences).
+Every active figure has a comprehensive **Paper Explanation** and **Plain English Explanation**, with no sentence-count limit.
 These use the chapter drafts' evaluation terminology and describe the saved results for the specific graph.
+Comparator figure cards also show signed Difference Gaps directly under the graph: model metric minus reference metric.
+The tables state their units, date groups and matching case counts. Full-precision arithmetic records and exact rational gaps are
+available in the site's `data/difference_gaps/` CSV and JSON downloads. Error gaps and score gaps have different sign interpretations.
 The nine-part technical notes follow (what it shows, purpose, how it was produced, how to read it, actual finding, what it
 supports, scope and context, use in the paper, source). The text is generated from `eval/figure_notes.py`, the single source used
 by the website too. Numbers are filled from the saved runs.

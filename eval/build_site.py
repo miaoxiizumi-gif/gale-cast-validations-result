@@ -19,6 +19,7 @@ import tech_stack
 import terms
 import site_policy
 import publish_cases
+import difference_gaps
 from content import CLAIMS, LIMITS, OMISSIONS, REV
 
 DOCS = C.WORKSPACE / "docs"
@@ -123,6 +124,7 @@ def main():
         if p.suffix not in (".png", ".svg") or site_policy.published_figure(p.stem):
             shutil.copy(p, DOCS / "figures" / "paper" / p.name)
     case_figures = publish_cases.publish(X, DOCS / "figures" / "paper")
+    gaps = difference_gaps.prepare(X, DOCS)
     (DOCS / "data" / "documentation").mkdir(exist_ok=True)
     for p in (C.WORKSPACE / "documentation").glob("*"):
         shutil.copy(p, DOCS / "data" / "documentation" / p.name)
@@ -241,12 +243,12 @@ Status: <b>provisional</b>; chapter corrections are proposals, not applied edits
     NOTES = X["NOTES"]
 
     def fig(name, alt, cap):
-        return (f'<figure><img src="figures/paper/{name}.png" alt="{e(alt)}" loading="lazy"><figcaption>{cap} '
+        return (f'<figure><img src="figures/paper/{name}.png" alt="{e(alt)}" loading="lazy">{difference_gaps.html(name, gaps, e)}<figcaption>{cap} '
                 f'Download: <a href="figures/paper/{name}.png">PNG (300 DPI)</a> · <a href="figures/paper/{name}.svg">SVG</a> · '
                 f'<a href="figures/paper/{name}.csv">CSV</a>.</figcaption>{FN.html(NOTES[name], e)}</figure>')
 
     def figL(name, alt, data):
-        return (f'<figure><img src="figures/{name}.png" alt="{e(alt)}" loading="lazy"><figcaption><b>{e(name.split("_")[0])}.</b> '
+        return (f'<figure><img src="figures/{name}.png" alt="{e(alt)}" loading="lazy">{difference_gaps.html(name, gaps, e)}<figcaption><b>{e(name.split("_")[0])}.</b> '
                 f'Data: <a href="data/{data}">CSV</a>.</figcaption>{FN.html(NOTES[name], e)}</figure>')
 
     # Evidence A ----------------------------------------------------------------
@@ -291,7 +293,7 @@ The label uses processed (forward-filled) values, as on the website; recomputed 
         for p in case_figures:
             if p.stem.startswith(fid + "_"):
                 links = " &middot; ".join(f'<a href="figures/paper/{p.stem}.{ext}">{ext.upper()}</a>' for ext in ("png", "svg", "csv"))
-                cards.append(f'<figure><a href="figures/paper/{p.name}"><img loading="lazy" src="figures/paper/{p.name}" alt="{e(p.stem)}"></a><figcaption>{e(p.stem)} &middot; {links}</figcaption>{FN.explanation_html(NOTES[fid], e)}</figure>')
+                cards.append(f'<figure><a href="figures/paper/{p.name}"><img loading="lazy" src="figures/paper/{p.name}" alt="{e(p.stem)}"></a>{difference_gaps.html(p.stem, gaps, e)}<figcaption>{e(p.stem)} &middot; {links}</figcaption>{FN.explanation_html(NOTES[fid], e, paper_context=difference_gaps.case_context(p.stem, gaps))}</figure>')
         return "".join(cards) + FN.html(NOTES[fid], e, include_explanations=False)
     sec("cases", "C. Selected illustrative case studies", f"""
 <div class="selected"><p class="selbanner"><span class="tag sel">Evidence C</span> <b>{e(FN.SELECTED)}</b></p>
@@ -706,6 +708,9 @@ Download: <a href="data/revision_ledger.csv">CSV</a>, <a href="data/revisions.js
                    "C: selected illustrative case studies" if p.stem.startswith(("PF-H", "PF-I", "PF-J", "PF-K")) else
                    "E: panel directive (selected dates; not representative of all dates)" if p.stem.startswith(("PF-Q", "PF-R", "PF-L_composite"))
                    else "D: baseline-failure validation (panel request; not representative of all dates)")] for p in figs]
+    for p, row in zip(figs, frows):
+        if p.stem in gaps:
+            row[1] += f' ? <a href="data/difference_gaps/{p.stem}.csv">Gap CSV</a>'
     sec("figures", "Figures for the paper (downloads)", f"""
 <p>Individually downloadable figures, PNG at 300 DPI and SVG, with the CSV of the plotted numbers. Each figure states its model and processing,
 variable and units, stations, dates, sample size, forecast lead, baselines and evidence group. Captions, cohorts and source runs:
@@ -888,9 +893,11 @@ pre{background:var(--soft);padding:12px;border-radius:8px;overflow-x:auto;font-s
 .card.good{border-left:4px solid var(--ok)}.card.bad{border-left:4px solid var(--bad)}.tag.sel{color:var(--warn);border-color:var(--warn);font-weight:600}
 .groups{display:grid;gap:6px;margin:12px 0;font-size:.92rem}.selected{border:2px dashed var(--warn);border-radius:10px;padding:4px 16px;background:var(--panel)}
 q{font-style:italic}q::before,q::after{content:'"'}
+.difference-gap{margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:6px;background:var(--soft)}
+.difference-gap h4{margin:0 0 8px}.difference-gap p{font-size:.9rem}.difference-gap td{font-variant-numeric:tabular-nums}
 .figure-explanations{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:12px;margin-top:14px}
 .figure-explanation{padding:12px 14px;background:var(--soft);border-left:3px solid var(--accent);border-radius:6px}
-.figure-explanation h4{font-size:.95rem;margin:0 0 6px}.figure-explanation p{font-size:.94rem;line-height:1.65;margin:0}
+.figure-explanation h4{font-size:.95rem;margin:0 0 6px}.figure-explanation p{font-size:.94rem;line-height:1.65;margin:0}.figure-explanation p+p{margin-top:10px}
 .fignotes{margin-top:10px;border-top:1px solid var(--line);padding-top:8px;font-size:.88rem;color:var(--ink)}.fignotes p{margin:4px 0}.privfig{border:1px solid var(--line);border-radius:8px;padding:6px 14px;margin:12px 0;background:var(--soft)}.selbanner{font-size:1.02rem;border-left:4px solid var(--warn);padding:6px 10px;background:var(--soft)}
 """
 

@@ -1,0 +1,28 @@
+{
+  "figures": [
+    "PF-C_event_metrics_overall",
+    "PF-D_event_metrics_by_station",
+    "PF-E_precision_recall_curves",
+    "PF-H_case_NAIA",
+    "PF-H_case_Sangley_Point",
+    "PF-H_case_Science_Garden",
+    "PF-I_common_window_all_stations",
+    "PF-J_regression_case_NAIA",
+    "PF-J_regression_case_Sangley_Point",
+    "PF-J_regression_case_Science_Garden",
+    "PF-K_regression_common_window",
+    "PF-L_composite_validation",
+    "PF-L_large_error_dates_mae",
+    "PF-M_large_error_dates_differences",
+    "PF-N_event_onsets",
+    "PF-O_panel_window_NAIA",
+    "PF-O_panel_window_Sangley_Point",
+    "PF-O_panel_window_Science_Garden",
+    "PF-P_panel_common_window",
+    "PF-Q_persistence_worse_dates",
+    "PF-R_persistence_window_NAIA",
+    "PF-R_persistence_window_Sangley_Point",
+    "F8_variants_and_inputs"
+  ],
+  "formula": "GALE-CAST Model-W1 minus reference"
+}

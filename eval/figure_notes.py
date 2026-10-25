@@ -449,11 +449,12 @@ def panel_notes(ctx: dict) -> dict:
     return N
 
 
-def explanation_html(n: dict, esc) -> str:
+def explanation_html(n: dict, esc, *, paper_context: str = '') -> str:
     """Two distinct callouts, also used inside each station figure card."""
     cards = "".join(
         f'<aside class="figure-explanation {kind}" aria-label="{esc(label)}">'
-        f'<h4>{esc(label)}</h4><p>{esc(n[key])}</p></aside>'
+        f'<h4>{esc(label)}</h4>' + "".join(f'<p>{esc(paragraph)}</p>' for paragraph in
+            (n[key] + ('\n\n' + paper_context if paper_context and key == 'paper_explanation' else '')).split("\n\n")) + "</aside>"
         for (key, label), kind in zip(EXPLANATION_FIELDS, ("paper-explanation", "plain-explanation")))
     return f'<div class="figure-explanations">{cards}</div>'
 
@@ -466,4 +467,5 @@ def html(n: dict, esc, *, include_explanations: bool = True) -> str:
 
 def markdown(name: str, n: dict) -> str:
     fields = [*EXPLANATION_FIELDS, *FIELDS]
-    return f"### {name}\n\n" + "\n".join(f"- **{lab}:** {n[k]}" for k, lab in fields) + "\n"
+    rows = ["- **" + lab + ":** " + n[k].replace("\n\n", "\n\n  ") for k, lab in fields]
+    return f"### {name}\n\n" + "\n".join(rows) + "\n"

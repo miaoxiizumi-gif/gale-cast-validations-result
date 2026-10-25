@@ -1,0 +1,17 @@
+context,metric,unit,n,aggregation,model,persistence,climatology,gap_persistence,gap_climatology,model_fraction,persistence_fraction,climatology_fraction,gap_persistence_fraction,gap_climatology_fraction
+A | pooled | 2021-11-16 to 2024-12-30,Onsets warned,count,21,summary,17,0,0,17,17,17,0,0,17,17
+A | pooled | 2021-11-16 to 2024-12-30,Non-event false alarms,count,3395,summary,9,21,0,-12,9,9,21,0,-12,9
+A | NAIA | 2021-11-16 to 2024-12-30,Onsets warned,count,7,summary,6,0,0,6,6,6,0,0,6,6
+A | NAIA | 2021-11-16 to 2024-12-30,Non-event false alarms,count,1131,summary,2,7,0,-5,2,2,7,0,-5,2
+A | Sangley Point | 2021-11-16 to 2024-12-30,Onsets warned,count,6,summary,5,0,0,5,5,5,0,0,5,5
+A | Sangley Point | 2021-11-16 to 2024-12-30,Non-event false alarms,count,1133,summary,4,6,0,-2,4,4,6,0,-2,4
+A | Science Garden | 2021-11-16 to 2024-12-30,Onsets warned,count,8,summary,6,0,0,6,6,6,0,0,6,6
+A | Science Garden | 2021-11-16 to 2024-12-30,Non-event false alarms,count,1131,summary,3,8,0,-5,3,3,8,0,-5,3
+B | pooled | 2021-10-15 to 2024-12-31,Onsets warned,count,21,summary,11,0,7,11,4,11,0,7,11,4
+B | pooled | 2021-10-15 to 2024-12-31,Non-event false alarms,count,3493,summary,8,20,317,-12,-309,8,20,317,-12,-309
+B | NAIA | 2021-10-15 to 2024-12-31,Onsets warned,count,7,summary,4,0,2,4,2,4,0,2,4,2
+B | NAIA | 2021-10-15 to 2024-12-31,Non-event false alarms,count,1164,summary,2,7,106,-5,-104,2,7,106,-5,-104
+B | Sangley Point | 2021-10-15 to 2024-12-31,Onsets warned,count,6,summary,4,0,2,4,2,4,0,2,4,2
+B | Sangley Point | 2021-10-15 to 2024-12-31,Non-event false alarms,count,1165,summary,3,5,105,-2,-102,3,5,105,-2,-102
+B | Science Garden | 2021-10-15 to 2024-12-31,Onsets warned,count,8,summary,3,0,3,3,0,3,0,3,3,0
+B | Science Garden | 2021-10-15 to 2024-12-31,Non-event false alarms,count,1164,summary,3,8,106,-5,-103,3,8,106,-5,-103
