@@ -141,6 +141,8 @@ COMPOSITE_LABEL = ("Selected favorable validation example chosen to demonstrate 
                    "not representative of all historical dates.")
 COMPOSITE_SCOPE = {"wind": "v4 dates (persistence worse than W1 for wind and MSLP)", "mslp": "v4 dates (persistence worse than W1 for wind and MSLP)",
                    "humidity": "v3 baseline-failure dates for humidity", "rainfall": "all complete dates"}
+COMPOSITE_SHORT = {"wind": "v4 dates (persistence worse than W1)", "mslp": "v4 dates (persistence worse than W1)",
+                   "humidity": "v3 baseline-failure dates", "rainfall": "all complete dates"}
 COMPOSITE_TITLE = {"wind": "Wind speed (m/s)", "mslp": "Mean sea-level pressure (hPa)", "humidity": "Relative humidity (%)", "rainfall": "Daily rainfall (mm)"}
 M3 = ("W1", "persistence", "climatology")
 
@@ -172,7 +174,7 @@ def fig_composite(CP: dict, P: dict, out, run) -> list[str]:
         ax.set_xticks(x, [S.METHOD[m][0] for m in M3], fontsize=9)
         ax.set_ylabel("MAE (lower is better)")
         ax.set_ylim(0, max(vals) * 1.18)
-        ax.set_title(f"{COMPOSITE_TITLE[v]}\nSubset: {r['scope']} · n = {r['n']:,}", loc="left", fontsize=9.5)
+        ax.set_title(f"{COMPOSITE_TITLE[v]}\nSubset: {COMPOSITE_SHORT[v]} · n = {r['n']:,}", loc="left", fontsize=9.5)
     S.title(fig, "PF-L composite. Next-day error of W1, persistence and climatology on four favourably selected subsets",
             COMPOSITE_LABEL + " Each panel uses a different subset; the subsets were chosen so that W1's error is lower than both baselines.", width=150)
     S.footer(fig, ["Wind and MSLP: station-dates on which persistence's error exceeded W1's for both wind and MSLP (spec/CASE_SELECTION_v4_persistence_override.md; "
