@@ -2,6 +2,22 @@
 
 Last updated: 2026-10-26.
 
+## Figure explanation update (2026-10-26)
+
+All active figure cards now include a formal Paper Explanation and a Plain
+English Explanation. `eval/figure_explanations.py` supplies one or two formal
+sentences and two or three simple sentences for each active figure family;
+`eval/figure_notes.py` renders them in the cards and figure guide. Each station
+plot has its own two callouts inside its figure card, followed by shared technical
+notes for the group. The presentation audit checks every individual card.
+
+All five chapter PDFs in the owner's `GALE-CAST_PAPERS_CHAPTERS` folder were
+extracted and reviewed for terminology. Private extracts and source hashes are
+in `_private/chapter_caption_review/`. The captions use the drafts' confusion
+matrix and regression-verification vocabulary while retaining the saved results,
+pressure-fall event definitions and retrospective case-selection descriptions.
+No model, prediction, scoring, plot data or publication-exclusion rules changed.
+
 ## Section 5 presentation update (2026-10-26)
 
 Section 5.2 was removed from the site template. PF-G is the only figure in the

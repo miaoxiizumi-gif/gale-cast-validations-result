@@ -2,9 +2,16 @@
 thesis-export index. Numbers are filled from saved run outputs through `ctx`, except the PF-H day counts (W1 closer than both
 baselines on 2/0/1 of 3 dates), which were tallied from the private case rows and can be checked in _private/thesis_export/INDEX.md.
 
-Fields: shows, purpose, produced, read, finding, supports, limits, paper (chapter/section + clean caption), source.
+Active records include paper_explanation and plain_explanation, followed by the
+technical fields: shows, purpose, produced, read, finding, supports, limits,
+paper (chapter/section + clean caption), source.
 """
 from __future__ import annotations
+
+import figure_explanations
+
+EXPLANATION_FIELDS = [("paper_explanation", "Paper Explanation"),
+                      ("plain_explanation", "Plain English Explanation")]
 
 FIELDS = [("shows", "What this graph shows"), ("purpose", "Purpose"), ("produced", "How it was produced"),
           ("read", "How to read it"), ("finding", "Actual finding"), ("supports", "What it supports"),
@@ -259,6 +266,7 @@ def notes(ctx: dict) -> dict:
         source=f"panel-review PNG/SVG/CSV: docs/figures/paper/; source archive: _private/thesis_export/{ctx['run_case2']}/.")
     N.update(panel_notes(ctx))
     N.update(persistence_notes(ctx))
+    figure_explanations.attach(N, ctx)
     return N
 
 
@@ -441,10 +449,21 @@ def panel_notes(ctx: dict) -> dict:
     return N
 
 
-def html(n: dict, esc) -> str:
+def explanation_html(n: dict, esc) -> str:
+    """Two distinct callouts, also used inside each station figure card."""
+    cards = "".join(
+        f'<aside class="figure-explanation {kind}" aria-label="{esc(label)}">'
+        f'<h4>{esc(label)}</h4><p>{esc(n[key])}</p></aside>'
+        for (key, label), kind in zip(EXPLANATION_FIELDS, ("paper-explanation", "plain-explanation")))
+    return f'<div class="figure-explanations">{cards}</div>'
+
+
+def html(n: dict, esc, *, include_explanations: bool = True) -> str:
     rows = "".join(f'<p><b>{esc(lab)}:</b> {esc(n[k])}</p>' for k, lab in FIELDS)
-    return f'<div class="fignotes">{rows}</div>'
+    intro = explanation_html(n, esc) if include_explanations else ""
+    return intro + f'<div class="fignotes">{rows}</div>'
 
 
 def markdown(name: str, n: dict) -> str:
-    return f"### {name}\n\n" + "\n".join(f"- **{lab}:** {n[k]}" for k, lab in FIELDS) + "\n"
+    fields = [*EXPLANATION_FIELDS, *FIELDS]
+    return f"### {name}\n\n" + "\n".join(f"- **{lab}:** {n[k]}" for k, lab in fields) + "\n"

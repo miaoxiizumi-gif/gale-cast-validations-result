@@ -291,8 +291,8 @@ The label uses processed (forward-filled) values, as on the website; recomputed 
         for p in case_figures:
             if p.stem.startswith(fid + "_"):
                 links = " &middot; ".join(f'<a href="figures/paper/{p.stem}.{ext}">{ext.upper()}</a>' for ext in ("png", "svg", "csv"))
-                cards.append(f'<figure><a href="figures/paper/{p.name}"><img loading="lazy" src="figures/paper/{p.name}" alt="{e(p.stem)}"></a><figcaption>{e(p.stem)} &middot; {links}</figcaption></figure>')
-        return "".join(cards) + FN.html(NOTES[fid], e)
+                cards.append(f'<figure><a href="figures/paper/{p.name}"><img loading="lazy" src="figures/paper/{p.name}" alt="{e(p.stem)}"></a><figcaption>{e(p.stem)} &middot; {links}</figcaption>{FN.explanation_html(NOTES[fid], e)}</figure>')
+        return "".join(cards) + FN.html(NOTES[fid], e, include_explanations=False)
     sec("cases", "C. Selected illustrative case studies", f"""
 <div class="selected"><p class="selbanner"><span class="tag sel">Evidence C</span> <b>{e(FN.SELECTED)}</b></p>
 <p>Two separately recorded selections. Neither is a performance estimate; the overall comparisons (Sections A, B and the regression evidence)
@@ -888,6 +888,9 @@ pre{background:var(--soft);padding:12px;border-radius:8px;overflow-x:auto;font-s
 .card.good{border-left:4px solid var(--ok)}.card.bad{border-left:4px solid var(--bad)}.tag.sel{color:var(--warn);border-color:var(--warn);font-weight:600}
 .groups{display:grid;gap:6px;margin:12px 0;font-size:.92rem}.selected{border:2px dashed var(--warn);border-radius:10px;padding:4px 16px;background:var(--panel)}
 q{font-style:italic}q::before,q::after{content:'"'}
+.figure-explanations{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:12px;margin-top:14px}
+.figure-explanation{padding:12px 14px;background:var(--soft);border-left:3px solid var(--accent);border-radius:6px}
+.figure-explanation h4{font-size:.95rem;margin:0 0 6px}.figure-explanation p{font-size:.94rem;line-height:1.65;margin:0}
 .fignotes{margin-top:10px;border-top:1px solid var(--line);padding-top:8px;font-size:.88rem;color:var(--ink)}.fignotes p{margin:4px 0}.privfig{border:1px solid var(--line);border-radius:8px;padding:6px 14px;margin:12px 0;background:var(--soft)}.selbanner{font-size:1.02rem;border-left:4px solid var(--warn);padding:6px 10px;background:var(--soft)}
 """
 

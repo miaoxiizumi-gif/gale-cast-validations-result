@@ -33,6 +33,51 @@ class Visible(HTMLParser):
             self.parts.append(data)
 
 
+class FigureCallouts(HTMLParser):
+    """Inventory explanations inside each individual card, including station plots."""
+    def __init__(self):
+        super().__init__()
+        self.cards, self.current = [], None
+        self.field, self.paragraph = None, False
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if tag == 'figure':
+            self.current = {'image': None, 'paper': [], 'plain': [], 'counts': {'paper': 0, 'plain': 0}}
+        if self.current is None:
+            return
+        if tag == 'img':
+            self.current['image'] = attrs.get('src')
+        if tag == 'aside':
+            classes = attrs.get('class', '').split()
+            self.field = next((name for name in ('paper', 'plain') if name + '-explanation' in classes), None)
+            if self.field:
+                self.current['counts'][self.field] += 1
+        if tag == 'p' and self.field:
+            self.paragraph = True
+
+    def handle_endtag(self, tag):
+        if tag == 'p':
+            self.paragraph = False
+        if tag == 'aside':
+            self.field = None
+        if tag == 'figure':
+            self.cards.append(self.current)
+            self.current = None
+
+    def handle_data(self, data):
+        if self.current is not None and self.field and self.paragraph:
+            self.current[self.field].append(data)
+
+
+def check_explanations(paper, plain, source):
+    for text, minimum, maximum in ((paper, 1, 2), (plain, 2, 3)):
+        sentences = re.split(r'(?<=[.!?])\s+', text.strip())
+        assert minimum <= len(sentences) <= maximum, (source, len(sentences))
+        assert terms.MODEL in text, f'{source}: full model name missing'
+        check_text(text, source)
+
+
 JUDGMENT = re.compile(
     r'\b(?:worse|worst|underperform\w*|fails|failing|failure)\b|'
     r'less accurate than|no improvement over|largest error|'
@@ -66,6 +111,12 @@ def main():
     assert images == ['figures/paper/PF-G_observed_vs_predicted.png'], images
     assert result_section[1].count('<figure>') == 1, 'Extra figure card in Section 5'
     assert result_section[1].count('class="fignotes"') == 1, 'Extra figure notes in Section 5'
+    callouts = FigureCallouts()
+    callouts.feed(html)
+    assert len(callouts.cards) == 26, len(callouts.cards)
+    for card in callouts.cards:
+        assert card['counts'] == {'paper': 1, 'plain': 1}, card
+        check_explanations(''.join(card['paper']), ''.join(card['plain']), card['image'])
     guide = (docs / 'data' / 'documentation' / 'FIGURE_GUIDE.md').read_text(encoding='utf-8')
     for name in site_policy.REMOVED_FIGURES:
         assert not list((docs / 'figures').rglob(name + '.png')), name
@@ -82,13 +133,16 @@ def main():
     for name, note in context['NOTES'].items():
         for field, value in note.items():
             check_text(terms.text(value), f'{name}.{field}')
+        if site_policy.published_figure(name):
+            check_explanations(note['paper_explanation'], note['plain_explanation'], name)
     cases = list((docs / 'figures' / 'paper').glob('PF-[HIJKOPR]_*.png'))
     assert len(cases) == 14, len(cases)
     for png in cases:
         assert png.with_suffix('.svg').exists(), png
         assert png.with_suffix('.csv').exists(), png
     print(f'PASS: rendered HTML, {len(figures)} SVGs, all figure notes, '
-          f'{len(cases)} case download sets, {len(page.links)} links and unique IDs.')
+          f'{len(cases)} case download sets, {len(page.links)} links and unique IDs; '
+          f'both explanation callouts in all {len(callouts.cards)} figure cards.')
 
 
 if __name__ == '__main__':

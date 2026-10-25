@@ -471,8 +471,10 @@ evaluation on observations from 2025 onward.
     write("FIGURE_GUIDE.md", f"""
 # Figure guide
 
-Every figure has the same nine-part explanation (what it shows, purpose, how it was produced, how to read it, actual finding, what it
-supports, what it does not establish, use in the paper, source). The text is generated from `eval/figure_notes.py`, the single source used
+Every active figure has a **Paper Explanation** (one or two formal sentences) and a **Plain English Explanation** (two or three simple sentences).
+These use the chapter drafts' evaluation terminology and describe the saved results for the specific graph.
+The nine-part technical notes follow (what it shows, purpose, how it was produced, how to read it, actual finding, what it
+supports, scope and context, use in the paper, source). The text is generated from `eval/figure_notes.py`, the single source used
 by the website too. Numbers are filled from the saved runs.
 
 How to read numerical errors: {FN.ERRORS}
