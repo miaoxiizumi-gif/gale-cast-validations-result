@@ -50,6 +50,10 @@ Every script creates a new run directory. Never overwrite or delete a run; mark 
   `persist-v4-20261025T123741Z-877a24`: 258/3,421 station-dates (7.5%) have persistence worse than W1 for both wind and MSLP (by
   construction W1 < persistence there); windows NAIA and Sangley Point (dates private), none at Science Garden, no common window. PF-Q
   public, PF-R private. v3 rerun `panel-v3-20261025T123722Z-e37b1b` (new PF-L). Ledger P-39 extended.
+- **Revert + section 8.E composite (2026-10-25, panel directive):** commits 2e1741e..7db28cb undone by `git revert` (481b2f6; tree
+  identical to 5255788). Section 8.E now shows only `PF-L_composite_favourable` (2x2; wind and MSLP on the v4 dates n 258, humidity on
+  v3 baseline-failure dates n 114, rainfall on all complete dates n 3,407; W1 below both baselines in each panel by selection), labelled
+  with each subset and n and the favourable-selection disclosure. Cited run `persist-v4-20261025T134632Z-90d621`.
 - **Figure explanations:** every graph (public and private) has a nine-part explanation from `eval/figure_notes.py`.
 
 ## Open items (owner decisions; not decided here)

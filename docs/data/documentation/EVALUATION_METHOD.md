@@ -86,6 +86,14 @@ for both variables on 116 of them. W1 < persistence holds on these dates **by co
 vs 1.94 hPa). Windows (private, PF-R): NAIA: 3-date window; W1 also beat climatology on 5 of 6 cells; Sangley Point: 3-date window; W1 also beat climatology on 5 of 6 cells; Science Garden:
 no window (no two consecutive qualifying dates). No common window qualifies at all three stations.
 
+**Composite figure for section 8.E (panel directive, 2026-10-25).** *Selected favorable validation example chosen to demonstrate baseline
+limitations as requested by the thesis panel; not representative of all historical dates.* At the panel's direction the site was first
+returned to the state of commit `5255788` (by `git revert`, history kept), and section 8.E then shows a single 2×2 figure,
+`PF-L_composite_favourable`, in which W1's MAE is lower than both baselines in every panel. Each panel uses its own subset: wind and MSLP on
+the v4 dates (258 station-dates), humidity on the v3 baseline-failure dates for humidity (114), rainfall on all
+complete dates (3,407). The subsets were chosen for this outcome, so the figure illustrates that such dates exist; it does
+not show general superiority. On all complete dates persistence is more accurate than W1 for wind, MSLP and humidity (PF-F3).
+
 Group A's case identity was recovered without regenerating predictions: the saved reproduction rows (`a-legacy-20261023T162426Z-b5f446`)
 match the original W1-branch record `nine_fp_report.json` for all 9 false alarms and 4 misses (station, date and score), and the matrix is
 TN 3386, FP 9, FN 4, TP 24. A single re-run (`w-cohort-20261024T205646Z-6b7a96`) recovered the other regression outputs and reproduced the saved scores within

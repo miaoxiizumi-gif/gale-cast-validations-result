@@ -123,7 +123,7 @@ Files are in [`docs/figures/paper/`](../docs/figures/paper/) (site: https://miao
 
 Every figure in this group states: "Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates." Rule: `spec/CASE_SELECTION_v3_panel_validation.md`. Run `panel-v3-20261025T123722Z-e37b1b`; files in
 [`docs/figures/paper/`](../docs/figures/paper/). PF-L to PF-N are aggregates over every qualifying date (no dates or readings).
-PF-Q (Evidence E, run `persist-v4-20261025T123741Z-877a24`, `spec/CASE_SELECTION_v4_persistence_override.md`) states: "Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates. Dates selected because persistence's wind and MSLP errors were both larger than W1's."
+PF-Q (Evidence E, run `persist-v4-20261025T134632Z-90d621`, `spec/CASE_SELECTION_v4_persistence_override.md`) states: "Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates. Dates selected because persistence's wind and MSLP errors were both larger than W1's."
 
 ### PF-L_baseline_failure_mae — `PF-L_baseline_failure_mae.png` / `.svg` / `.csv`
 
@@ -171,7 +171,19 @@ PF-Q (Evidence E, run `persist-v4-20261025T123741Z-877a24`, `spec/CASE_SELECTION
 - **What it supports:** Dates exist, about one in thirteen, on which W1 beat persistence for both wind and MSLP; on them it was usually also closer than climatology for MSLP.
 - **What it does not establish:** Selected for W1's success against persistence, so W1 < persistence here proves nothing about general skill. On all dates persistence is better: wind 0.47 vs W1 0.99 m/s, MSLP 0.85 vs 1.94 hPa (n = 3,421). Only 5 qualifying dates are study-label events. Science Garden has few qualifying dates.
 - **Use in the paper:** Chapter 4, same subsection as PF-L (panel request). Caption: 'Figure 4.x. Station-dates on which persistence's next-day wind and MSLP errors were both larger than the model's, and errors on those dates. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates. Dates selected because persistence's wind and MSLP errors were both larger than W1's.'
-- **Source:** figures/paper/PF-Q_persistence_worse_dates.csv; run persist-v4-20261025T123741Z-877a24; spec/CASE_SELECTION_v4_persistence_override.md.
+- **Source:** figures/paper/PF-Q_persistence_worse_dates.csv; run persist-v4-20261025T134632Z-90d621; spec/CASE_SELECTION_v4_persistence_override.md.
+
+### PF-L_composite_favourable — `PF-L_composite_favourable.png` / `.svg` / `.csv`
+
+- **What this graph shows:** One 2×2 chart: the next-day MAE of W1, persistence and climatology for wind speed, MSLP, relative humidity and daily rainfall, each panel on its own subset (named with its n in the panel header), pooled over the three primary stations.
+- **Purpose:** The panel directed a single figure in section 8.E in which W1's error is lower than both baselines for all four variables. Selected favorable validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.
+- **How it was produced:** Saved Evidence A rows; no model run. Wind and MSLP: the v4 dates (spec/CASE_SELECTION_v4_persistence_override.md), on which persistence's error exceeded W1's for both variables. Humidity: the v3 baseline-failure dates for humidity (spec/CASE_SELECTION_v3_panel_validation.md). Rainfall: all complete dates. Each subset was chosen for this figure because W1's error is lower than both baselines on it.
+- **How to read it:** Shorter bars are better (W1 blue, persistence orange, climatology green). Compare bars within a panel only: each panel has a different subset, n and unit.
+- **Actual finding:** wind (v4 dates (persistence worse than W1 for wind and MSLP), n = 258): W1 0.59 vs persistence 1.20, climatology 0.65 m/s; MSLP (v4 dates (persistence worse than W1 for wind and MSLP), n = 258): W1 0.63 vs persistence 1.33, climatology 1.75 hPa; humidity (v3 baseline-failure dates for humidity, n = 114): W1 10.83 vs persistence 13.44, climatology 14.58 %; rainfall (all complete dates, n = 3,407): W1 6.74 vs persistence 7.76, climatology 7.47 mm.
+- **What it supports:** There are identifiable sets of dates on which W1's next-day error is lower than both simple references for each variable, and on all complete dates W1's rainfall error is lower than both.
+- **What it does not establish:** A favorable composite, not a performance estimate: the wind and MSLP subset was selected because W1 beat persistence there, and the humidity subset is dates on which both baselines failed. On all complete dates persistence is more accurate than W1 for wind (0.47 vs 0.99 m/s), MSLP (0.85 vs 1.94 hPa) and humidity (4.63 vs 8.73 %); see PF-F3 and PF-L. The wind and MSLP subset is 258 of 3,421 station-dates.
+- **Use in the paper:** Chapter 4, panel-requested subsection (only together with PF-F3). Caption: 'Figure 4.x. Next-day MAE of the deployed model, persistence and climatology on four selected subsets (wind and MSLP: dates on which persistence was worse than the model for both; humidity: dates on which both references failed; rainfall: all complete dates). Selected favorable validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.'
+- **Source:** figures/paper/PF-L_composite_favourable.csv; run persist-v4-20261025T134632Z-90d621; spec/CASE_SELECTION_v3_panel_validation.md; spec/CASE_SELECTION_v4_persistence_override.md.
 
 
 ## Earlier benchmark figures (Evidence B unless stated; PNG on the site, data in `docs/data/`)
@@ -363,4 +375,4 @@ Every case figure states: "Selected favourable example, chosen retrospectively f
 - **What it supports:** On these dates W1's wind and MSLP were closer than persistence's, and mostly closer than climatology's.
 - **What it does not establish:** Chosen for W1's success; Science Garden has no qualifying window; not a performance estimate (see PF-Q, PF-F).
 - **Use in the paper:** Chapter 4, same subsection (printed thesis only). Caption: 'Figure 4.x. Selected window where persistence was worse than the model for wind and MSLP. Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates. Dates selected because persistence's wind and MSLP errors were both larger than W1's.'
-- **Source:** private: _private/thesis_export/persist-v4-20261025T123741Z-877a24/; public counts: runs/persist-v4-20261025T123741Z-877a24/persistence_v4_results.json.
+- **Source:** private: _private/thesis_export/persist-v4-20261025T134632Z-90d621/; public counts: runs/persist-v4-20261025T134632Z-90d621/persistence_v4_results.json.
