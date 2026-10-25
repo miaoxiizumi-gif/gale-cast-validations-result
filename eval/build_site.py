@@ -359,25 +359,15 @@ closer than both. Every variable is shown in the private figures, including wher
 """)
 
     # panel directive: persistence worse than W1 for wind and MSLP (Evidence E) ---------
-    D4 = X["case4"]
-    q4 = D4["qualifying"]
-    w4rows = [[s_, f"{q4[s_]['n']} of {D4['complete'][s_]:,} ({D4['share'][s_] * 100:.1f}%)",
-               f"{q4[s_]['wind']['W1']:.2f} / {q4[s_]['wind']['persistence']:.2f} / {q4[s_]['wind']['climatology']:.2f}",
-               f"{q4[s_]['mslp']['W1']:.2f} / {q4[s_]['mslp']['persistence']:.2f} / {q4[s_]['mslp']['climatology']:.2f}",
-               q4[s_]["both_beat_climatology_too"],
-               (lambda w: "—" if s_ == "pooled" else (f"{w['length']} dates; W1 also beat climatology on {w['W1_beats_climatology_cells']} of {w['of_cells']}"
-                                                     if w.get("selected") else "none (no two consecutive qualifying dates)"))(D4["windows"]["per_station"].get(s_, {}))]
-              for s_ in ["pooled", *C.PRIMARY]]
     sec("persist", "E. Dates where persistence was worse than W1 for wind and MSLP (panel directive)", f"""
 <div class="selected"><p class="selbanner"><span class="tag sel">Evidence E</span> <b>{e(FN.PERSIST)}</b></p>
 <p>The panel noted that persistence is the reference that beats W1 on average for wind and MSLP, and directed a search for dates on which
 persistence's error was larger than W1's for <b>both</b> variables (climatology not part of the filter). Rule committed before the search:
 <a href="data/CASE_SELECTION_v4_persistence_override.md">CASE_SELECTION_v4_persistence_override.md</a>. <b>W1 beats persistence on these
-dates by construction</b>; the table shows how often such dates occur and how climatology, which the rule does not fix, compares.</p>
-{table(["Scope", "Qualifying station-dates", "Wind MAE W1 / persistence / climatology (m/s)", "MSLP MAE W1 / persistence / climatology (hPa)", "Also beat climatology for both", "Window (private)"], w4rows)}
-<p>On all {PH['v4_total']} dates persistence remains more accurate: wind {PH['v4_wind_pe_all']} vs W1 {PH['v4_wind_w1_all']} m/s; MSLP
-{PH['v4_mslp_pe_all']} vs {PH['v4_mslp_w1_all']} hPa. No common window qualifies at all three stations. Exact dates are private (PAGASA terms).</p>
-{fig("PF-Q_persistence_worse_dates", "Bars: qualifying dates per station and wind and MSLP MAE on them", "<b>PF-Q.</b> How many dates had persistence worse than W1 for both wind and MSLP, and errors on them.")}
+dates by construction</b>; the chart shows how often such dates occur and how climatology, which the rule does not fix, compares.
+On all {PH['v4_total']} dates persistence remains more accurate (wind {PH['v4_wind_pe_all']} vs W1 {PH['v4_wind_w1_all']} m/s; MSLP
+{PH['v4_mslp_pe_all']} vs {PH['v4_mslp_w1_all']} hPa; Figure 8E in section 7).</p>
+{fig("PF-Q_persistence_worse_dates", "Four bar charts: qualifying dates per station; wind and MSLP error of W1, persistence and climatology on those dates; and how often W1 also beat climatology", "<b>PF-Q.</b> A: how many dates qualify. B and C: wind and MSLP error on those dates (W1 blue, persistence orange, climatology green). D: on how many of them W1 was also closer than climatology.")}
 {privnote("PF-R")}
 </div>
 """)

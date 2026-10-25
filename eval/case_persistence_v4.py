@@ -104,34 +104,58 @@ def window_fig(W, cA, q, s, dates, qual_dates, title, out, name, run):
     return S.save(fig, out, name)
 
 
+CLIM_TINTS = {"wind": "#9cc2ef", "mslp": "#5f9be2", "both": S.W1C}  # tints of the W1 colour: counts of dates where W1 also beat climatology
+SHORT = {"pooled": "All 3 stations", "NAIA": "NAIA", "Sangley Point": "Sangley Point", "Science Garden": "Science Garden"}
+
+
+def clim_counts(Pq: dict) -> dict:
+    return {"wind": round(Pq["n"] * Pq["wind"]["W1_beats_climatology_share"]), "mslp": round(Pq["n"] * Pq["mslp"]["W1_beats_climatology_share"]),
+            "both": Pq["both_beat_climatology_too"]}
+
+
 def fig_Q(P: dict, out, run) -> list[str]:
-    fig, axs = plt.subplots(1, 3, figsize=(15, 6))
-    fig.subplots_adjust(left=0.06, right=0.99, top=0.78, bottom=0.27, wspace=0.3)
+    fig, axs = plt.subplots(2, 2, figsize=(13, 10.6))
+    fig.subplots_adjust(left=0.07, right=0.985, top=0.86, bottom=0.14, wspace=0.24, hspace=0.38)
     x = np.arange(len(SCOPES))
-    ax = axs[0]
+    labels = [SHORT[s] for s in SCOPES]
+    # (a) how many dates qualify
+    ax = axs[0][0]
     ax.bar(x, [P["qualifying"][s]["n"] for s in SCOPES], color=S.W1C, width=0.55)
     for i, s in enumerate(SCOPES):
-        ax.text(i, P["qualifying"][s]["n"], f"{P['qualifying'][s]['n']}\n({P['share'][s] * 100:.1f}% of {P['complete'][s]})", ha="center", va="bottom", fontsize=7.6)
-    ax.set_xticks(x, SCOPES, fontsize=8); ax.set_ylabel("Qualifying station-dates")
+        ax.text(i, P["qualifying"][s]["n"], f"{P['qualifying'][s]['n']}\n{P['share'][s] * 100:.1f}% of {P['complete'][s]:,}", ha="center", va="bottom", fontsize=8)
+    ax.set_xticks(x, labels, fontsize=8.5); ax.set_ylabel("Qualifying station-dates")
     ax.set_ylim(0, ax.get_ylim()[1] * 1.25)
-    ax.set_title("How many dates qualify", loc="left")
-    for ax, v in zip(axs[1:], SEL):
+    ax.set_title("A. Dates on which persistence was worse for both", loc="left")
+    # (b, c) MAE on the qualifying dates
+    for ax, v, tag in ((axs[0][1], "wind", "B"), (axs[1][0], "mslp", "C")):
         for k, m in enumerate(("W1", "persistence", "climatology")):
             n, col, _, _ = S.METHOD[m]
             vals = [P["qualifying"][s][v][m] for s in SCOPES]
             xs = x + (k - 1) * 0.26
             ax.bar(xs, vals, width=0.24, color=col, label=n)
             for xi, val in zip(xs, vals):
-                ax.text(xi, val, f"{val:.2f}", ha="center", va="bottom", fontsize=7, rotation=90)
-        ax.set_xticks(x, SCOPES, fontsize=8); ax.set_ylabel(f"MAE on qualifying dates, {UNIT[v]}")
+                ax.text(xi, val, f"{val:.2f}", ha="center", va="bottom", fontsize=7.2)
+        ax.set_xticks(x, labels, fontsize=8.5); ax.set_ylabel(f"MAE on qualifying dates, {UNIT[v]}")
         ax.set_ylim(0, ax.get_ylim()[1] * 1.3)
-        ax.set_title(f"{'Wind' if v == 'wind' else 'MSLP'}: error on qualifying dates", loc="left")
-    axs[1].legend(loc="upper left", fontsize=7.5, ncol=3)
-    S.title(fig, "PF-Q. Dates on which persistence was worse than W1 for both wind and MSLP: how many, and errors on them",
-            "Evidence E (panel directive). " + LABEL + " W1 < persistence here by construction.")
+        ax.legend(loc="upper left", fontsize=8, ncol=3)
+        ax.set_title(f"{tag}. {'Wind speed' if v == 'wind' else 'Mean sea-level pressure'}: error on these dates", loc="left")
+    # (d) W1 also closer than climatology (the only comparison the rule does not fix)
+    ax = axs[1][1]
+    for k, key in enumerate(("wind", "mslp", "both")):
+        vals = [clim_counts(P["qualifying"][s])[key] for s in SCOPES]
+        xs = x + (k - 1) * 0.26
+        ax.bar(xs, vals, width=0.24, color=CLIM_TINTS[key], label={"wind": "wind", "mslp": "MSLP", "both": "both wind and MSLP"}[key])
+        for xi, val in zip(xs, vals):
+            ax.text(xi, val, str(val), ha="center", va="bottom", fontsize=7.2)
+    ax.set_xticks(x, labels, fontsize=8.5); ax.set_ylabel("Qualifying dates where W1 also beat climatology")
+    ax.set_ylim(0, ax.get_ylim()[1] * 1.15)
+    ax.set_title("D. Of these dates, W1 was also closer than climatology for…", loc="left")
+    ax.legend(loc="upper right", fontsize=8, ncol=1)
+    S.title(fig, "PF-Q. Dates on which persistence was worse than W1 for both wind and MSLP",
+            "Evidence E (panel directive). " + LABEL + " W1 < persistence here by construction.", width=150)
     S.footer(fig, ["Qualifying station-date: |persistence error| > |W1 error| for wind AND for MSLP (strict). Share = qualifying / station-dates with complete wind and MSLP. "
                    "W1 = saved neural-only next-day output (website scorecard cohort, target dates 2021-11-16 to 2024-12-30); persistence = issue-day observation; "
-                   f"climatology = station × month mean 2015-2020; truth = raw PAGASA observations. Spec: spec/CASE_SELECTION_v4_persistence_override.md. Run {run.name}."], width=200)
+                   f"climatology = station × month mean 2015-2020; truth = raw PAGASA observations. Spec: spec/CASE_SELECTION_v4_persistence_override.md. Run {run.name}."], width=175)
     return S.save(fig, out, "PF-Q_persistence_worse_dates")
 
 
@@ -197,7 +221,8 @@ def main():
     pubfigs = fig_Q(P, figdir, run)
     pd.DataFrame([{"scope": s, "complete_station_dates": P["complete"][s], "qualifying": P["qualifying"][s]["n"], "share": P["share"][s],
                    **{f"{v}_mae_{m}_qualifying": P["qualifying"][s][v][m] for v in SEL for m in ("W1", "persistence", "climatology")},
-                   **{f"{v}_mae_{m}_all": P["all_complete"][s][v][m] for v in SEL for m in ("W1", "persistence", "climatology")}}
+                   **{f"{v}_mae_{m}_all": P["all_complete"][s][v][m] for v in SEL for m in ("W1", "persistence", "climatology")},
+                   **{f"W1_also_beat_climatology_{k}": n for k, n in clim_counts(P["qualifying"][s]).items()}}
                   for s in SCOPES]).to_csv(figdir / "PF-Q_persistence_worse_dates.csv", index=False)
     monthly.to_csv(run / "qualifying_dates_by_month.csv", index=False)
     pub = {"run_id": run.name, "spec": "spec/CASE_SELECTION_v4_persistence_override.md", "label": LABEL, "source_rows": SRC_A,

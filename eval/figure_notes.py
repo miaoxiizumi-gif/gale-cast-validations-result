@@ -270,20 +270,26 @@ def persistence_notes(ctx: dict) -> dict:
     w = D["windows"]["per_station"]
     N = {}
     N["PF-Q_persistence_worse_dates"] = dict(
-        shows="How many station-dates had persistence errors larger than W1's for both wind and MSLP, and the wind and MSLP MAE of W1, "
-              "persistence and climatology on those dates, per station and pooled.",
+        shows="Four bar charts, per station and pooled: (A) how many station-dates had persistence errors larger than W1's for both wind and "
+              "MSLP; (B, C) the wind and MSLP MAE of W1, persistence and climatology on those dates; (D) on how many of them W1 was also "
+              "closer than climatology for wind, for MSLP and for both.",
         purpose="The panel directed a search for dates on which persistence, the reference that beats W1 on average for wind and MSLP, was "
                 "worse than W1 for both. " + PERSIST,
         produced="Selection v4 (spec/CASE_SELECTION_v4_persistence_override.md, committed before the search): strict |persistence error| > "
                  "|W1 error| for wind AND MSLP on the same station-date, complete records only. Saved Evidence A rows; no model run.",
-        read="Left: number (and share) of qualifying dates. Middle and right: shorter bars are better. W1 below persistence is guaranteed by "
-             "the selection; the climatology bars are the only comparison the rule does not fix.",
+        read="A: number and share of qualifying dates. B and C: shorter bars are better (W1 blue, persistence orange, climatology green). W1 "
+             "below persistence is guaranteed by the selection; the climatology bars and panel D are the only comparisons the rule does not fix.",
         finding=f"{q['pooled']['n']} of {cp['pooled']:,} station-dates qualify ({sh['pooled'] * 100:.1f}%): "
                 + ", ".join(f"{s} {q[s]['n']} ({sh[s] * 100:.1f}%)" for s in st) +
                 f". On them, wind MAE W1 {q['pooled']['wind']['W1']:.2f} vs persistence {q['pooled']['wind']['persistence']:.2f}, climatology "
                 f"{q['pooled']['wind']['climatology']:.2f} m/s; MSLP W1 {q['pooled']['mslp']['W1']:.2f} vs {q['pooled']['mslp']['persistence']:.2f} / "
-                f"{q['pooled']['mslp']['climatology']:.2f} hPa. W1 was also closer than climatology for both variables on "
-                f"{q['pooled']['both_beat_climatology_too']} of them.",
+                f"{q['pooled']['mslp']['climatology']:.2f} hPa. W1 was also closer than climatology for wind on "
+                f"{round(q['pooled']['n'] * q['pooled']['wind']['W1_beats_climatology_share'])}, for MSLP on "
+                f"{round(q['pooled']['n'] * q['pooled']['mslp']['W1_beats_climatology_share'])} and for both on "
+                f"{q['pooled']['both_beat_climatology_too']} of them. Private example windows (PF-R): " + "; ".join(
+                    f"{s} " + (f"{v['length']} consecutive dates, W1 also beat climatology on {v['W1_beats_climatology_cells']} of {v['of_cells']} "
+                               "wind/MSLP values" if v.get("selected") else "none (no two consecutive qualifying dates)") for s, v in w.items()) +
+                "; no window qualifies at all three stations.",
         supports="Dates exist, about one in thirteen, on which W1 beat persistence for both wind and MSLP; on them it was usually also closer "
                  "than climatology for MSLP.",
         limits=f"Selected for W1's success against persistence, so W1 < persistence here proves nothing about general skill. On all dates "
