@@ -50,6 +50,10 @@ Every script creates a new run directory. Never overwrite or delete a run; mark 
   `persist-v4-20261025T123741Z-877a24`: 258/3,421 station-dates (7.5%) have persistence worse than W1 for both wind and MSLP (by
   construction W1 < persistence there); windows NAIA and Sangley Point (dates private), none at Science Garden, no common window. PF-Q
   public, PF-R private. v3 rerun `panel-v3-20261025T123722Z-e37b1b` (new PF-L). Ledger P-39 extended.
+- **Panel directive, revised (2026-10-25):** PF-L is now "Figure 8E": all four panels on all complete dates (W1 / persistence /
+  climatology, 95% intervals; equal to PF-F3 to 3e-7), file `PF-L_benchmark_all_dates`, locked by `spec/FROZEN_PF-L_metrics.json` (all
+  four variables; replaces the rainfall-only lock). Baseline-failure MAE moved to PF-M's note and the section D table. Cited runs
+  `panel-v3-20261025T125659Z-284767`, `persist-v4-20261025T125716Z-da9c34`.
 - **Figure explanations:** every graph (public and private) has a nine-part explanation from `eval/figure_notes.py`.
 
 ## Open items (owner decisions; not decided here)
