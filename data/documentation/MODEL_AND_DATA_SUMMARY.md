@@ -1,10 +1,10 @@
 # Model and data summary
 
-## Deployed model W1
+## Deployed model GALE-CAST Model-W1
 
 | Item | Value |
 |---|---|
-| File | `gale_cast_model_multioutput.keras`, SHA-256 `f2db5aa93226225405914094a0855ac725734a0e2c1a2331e3ba69a8fd9d14b0` (= `gale_cast_model_multioutput_w3.keras`, label "W1") |
+| File | `gale_cast_model_multioutput.keras`, SHA-256 `f2db5aa93226225405914094a0855ac725734a0e2c1a2331e3ba69a8fd9d14b0` (= `gale_cast_model_multioutput_w3.keras`, label "GALE-CAST Model-W1") |
 | Provenance | branch `exp/precision-targeting`, `experiments/w1x1/_train_w3.py`; promoted to live in commit `1fd1ef9` (2026-09-18) |
 | Architecture | dual-stream: `input_normal` (32 days × 32 features) → LSTM(64) → Dense(32); `input_anomaly` (32 × 4) → LSTM → additive attention over time steps → LSTM(32) → Dense(16); merged; heads `gale_prob` (sigmoid) and `weather_vars` (6 regression outputs); 40,872 parameters |
 | Training | one `model.fit` on primary rows before 2020-10-15 + all Port Area rows + all supplementary rows; early stopping on the tuning year (`val_gale_prob_loss`, patience 12); no saved history or seed; no pre-training stage |
@@ -35,7 +35,7 @@ Also used in training: Port Area (3,225 rows; 746 dated inside the evaluation pe
 ## Regression provenance (what the website's regression block is)
 
 The website's wind row (MAE 0.5365 m/s, RMSE 0.7723, MASE 0.6782) is reproduced exactly (`reg-prov-20261024T205749Z-ce57af`) by:
-1. W1 neural wind output (MAE 0.987);
+1. GALE-CAST Model-W1 neural wind output (MAE 0.987);
 2. linear + isotonic MOS per station × season, cross-fitted with an 8-fold `TimeSeriesSplit` **over the evaluation rows** (399 rows
    calibrated by a fit on later evaluation rows) → MAE 0.576;
 3. a blend 0.55 × model + 0.45 × the processed wind observed **two days before the target**
@@ -44,8 +44,8 @@ The website's wind row (MAE 0.5365 m/s, RMSE 0.7723, MASE 0.6782) is reproduced 
 Same-case issue-day persistence on the same truth: MAE 0.474, RMSE
 0.800. MASE uses an in-sample lag-365 denominator (0.7912 m/s).
 The website's wind-direction row (43.40°) comes from a separate direction-only model. Chapter 4's Table 4.5 (wind 2.04 km/h = 0.5655 m/s)
-is the same pipeline run on the model **before** W1. None of these are neural W1 results.
+is the same pipeline run on the model **before** GALE-CAST Model-W1. None of these are neural GALE-CAST Model-W1 results.
 
-W1's neural-only next-day errors on the website's cases (raw truth): wind MAE 0.987 m/s (persistence 0.474,
+GALE-CAST Model-W1's neural-only next-day errors on the website's cases (raw truth): wind MAE 0.987 m/s (persistence 0.474,
 climatology 0.588); MSLP 1.94 hPa (persistence 0.85); humidity 8.73% (persistence
 4.63); rainfall 6.74 mm (persistence 7.76, climatology 7.47).

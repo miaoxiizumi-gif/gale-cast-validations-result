@@ -486,7 +486,7 @@
       "claim": "GWMs 3.69, 3.47, 3.85, 3.72; 'ready for deployment', 'definitive proof of operational utility'",
       "verdict": "Partly correct",
       "evidence": "The GWM arithmetic is correct. Usability ratings cannot establish forecast accuracy or deployment readiness.",
-      "replacement": "Evaluators rated the prototype's usability favourably (general weighted means 3.47-3.85 on a 4-point scale). These ratings describe perceived usability and do not establish forecast accuracy or operational readiness, which require prospective verification against observations."
+      "replacement": "Evaluators rated the prototype's usability positively (general weighted means 3.47-3.85 on a 4-point scale). These ratings describe perceived usability and do not establish forecast accuracy or operational readiness, which require prospective verification against observations."
     },
     {
       "id": "R-5-05",
