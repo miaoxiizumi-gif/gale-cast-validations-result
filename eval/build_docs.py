@@ -13,7 +13,8 @@ import figure_notes as FN
 import paper_ledger as PL
 import tech_stack
 
-PANEL_PUB = ["PF-L_baseline_failure_mae", "PF-M_baseline_failure_differences", "PF-N_event_onsets", "PF-Q_persistence_worse_dates"]
+PANEL_PUB = ["PF-L_baseline_failure_mae", "PF-M_baseline_failure_differences", "PF-N_event_onsets", "PF-Q_persistence_worse_dates",
+             "PF-L_composite_favourable"]
 
 DOC = C.WORKSPACE / "documentation"
 SITE = "https://miaoxiizumi-gif.github.io/gale-cast-validations-result/"
@@ -285,6 +286,14 @@ for both variables on {ph['v4_clim_both']} of them. W1 < persistence holds on th
 {ph['v4_total']} dates persistence remains better (wind {ph['v4_wind_pe_all']} vs W1 {ph['v4_wind_w1_all']} m/s; MSLP {ph['v4_mslp_pe_all']}
 vs {ph['v4_mslp_w1_all']} hPa). Windows (private, PF-R): NAIA: {ph['v4_win_na']}; Sangley Point: {ph['v4_win_sp']}; Science Garden:
 {ph['v4_win_sg']}. No common window qualifies at all three stations.
+
+**Composite figure for section 8.E (panel directive, 2026-10-25).** *Selected favorable validation example chosen to demonstrate baseline
+limitations as requested by the thesis panel; not representative of all historical dates.* At the panel's direction the site was first
+returned to the state of commit `5255788` (by `git revert`, history kept), and section 8.E then shows a single 2×2 figure,
+`PF-L_composite_favourable`, in which W1's MAE is lower than both baselines in every panel. Each panel uses its own subset: wind and MSLP on
+the v4 dates ({ph['v4_n']} station-dates), humidity on the v3 baseline-failure dates for humidity ({ph['v3_humidity_n']}), rainfall on all
+complete dates ({ph['v4_rain_all_n']}). The subsets were chosen for this outcome, so the figure illustrates that such dates exist; it does
+not show general superiority. On all complete dates persistence is more accurate than W1 for wind, MSLP and humidity (PF-F3).
 
 Group A's case identity was recovered without regenerating predictions: the saved reproduction rows (`a-legacy-20261023T162426Z-b5f446`)
 match the original W1-branch record `nine_fp_report.json` for all 9 false alarms and 4 misses (station, date and score), and the matrix is

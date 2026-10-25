@@ -269,6 +269,35 @@ def persistence_notes(ctx: dict) -> dict:
     st = ("NAIA", "Sangley Point", "Science Garden")
     w = D["windows"]["per_station"]
     N = {}
+    CP = D["composite"]
+    A3 = ctx["case3"]["part1_A_q90"]
+    allm = lambda v, m: A3[v]["pooled"]["all_complete"]["point"][m]["mae"]
+    N["PF-L_composite_favourable"] = dict(
+        shows="One 2×2 chart: the next-day MAE of W1, persistence and climatology for wind speed, MSLP, relative humidity and daily rainfall, "
+              "each panel on its own subset (named with its n in the panel header), pooled over the three primary stations.",
+        purpose="The panel directed a single figure in section 8.E in which W1's error is lower than both baselines for all four variables. "
+                "Selected favorable validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not "
+                "representative of all historical dates.",
+        produced="Saved Evidence A rows; no model run. Wind and MSLP: the v4 dates (spec/CASE_SELECTION_v4_persistence_override.md), on which "
+                 "persistence's error exceeded W1's for both variables. Humidity: the v3 baseline-failure dates for humidity "
+                 "(spec/CASE_SELECTION_v3_panel_validation.md). Rainfall: all complete dates. Each subset was chosen for this figure because "
+                 "W1's error is lower than both baselines on it.",
+        read="Shorter bars are better (W1 blue, persistence orange, climatology green). Compare bars within a panel only: each panel has a "
+             "different subset, n and unit.",
+        finding="; ".join(f"{VNAME[v][0]} ({r['scope']}, n = {r['n']:,}): W1 {r['W1']:.2f} vs persistence {r['persistence']:.2f}, "
+                          f"climatology {r['climatology']:.2f} {VNAME[v][1]}" for v, r in CP.items()) + ".",
+        supports="There are identifiable sets of dates on which W1's next-day error is lower than both simple references for each variable, "
+                 "and on all complete dates W1's rainfall error is lower than both.",
+        limits="A favorable composite, not a performance estimate: the wind and MSLP subset was selected because W1 beat persistence there, and "
+               "the humidity subset is dates on which both baselines failed. On all complete dates persistence is more accurate than W1 for wind "
+               f"({allm('wind', 'persistence'):.2f} vs {allm('wind', 'W1'):.2f} m/s), MSLP ({allm('mslp', 'persistence'):.2f} vs "
+               f"{allm('mslp', 'W1'):.2f} hPa) and humidity ({allm('humidity', 'persistence'):.2f} vs {allm('humidity', 'W1'):.2f} %); see PF-F3 "
+               f"and PF-L. The wind and MSLP subset is {CP['wind']['n']} of {cp['pooled']:,} station-dates.",
+        paper="Chapter 4, panel-requested subsection (only together with PF-F3). Caption: 'Figure 4.x. Next-day MAE of the deployed model, "
+              "persistence and climatology on four selected subsets (wind and MSLP: dates on which persistence was worse than the model for both; "
+              "humidity: dates on which both references failed; rainfall: all complete dates). Selected favorable validation example chosen to "
+              "demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.'",
+        source=f"figures/paper/PF-L_composite_favourable.csv; run {run}; spec/CASE_SELECTION_v3_panel_validation.md; spec/CASE_SELECTION_v4_persistence_override.md.")
     N["PF-Q_persistence_worse_dates"] = dict(
         shows="How many station-dates had persistence errors larger than W1's for both wind and MSLP, and the wind and MSLP MAE of W1, "
               "persistence and climatology on those dates, per station and pooled.",

@@ -361,25 +361,17 @@ panel, in PF-M and in the table above. The humidity panel keeps its baseline-fai
 """)
 
     # panel directive: persistence worse than W1 for wind and MSLP (Evidence E) ---------
-    D4 = X["case4"]
-    q4 = D4["qualifying"]
-    w4rows = [[s_, f"{q4[s_]['n']} of {D4['complete'][s_]:,} ({D4['share'][s_] * 100:.1f}%)",
-               f"{q4[s_]['wind']['W1']:.2f} / {q4[s_]['wind']['persistence']:.2f} / {q4[s_]['wind']['climatology']:.2f}",
-               f"{q4[s_]['mslp']['W1']:.2f} / {q4[s_]['mslp']['persistence']:.2f} / {q4[s_]['mslp']['climatology']:.2f}",
-               q4[s_]["both_beat_climatology_too"],
-               (lambda w: "—" if s_ == "pooled" else (f"{w['length']} dates; W1 also beat climatology on {w['W1_beats_climatology_cells']} of {w['of_cells']}"
-                                                     if w.get("selected") else "none (no two consecutive qualifying dates)"))(D4["windows"]["per_station"].get(s_, {}))]
-              for s_ in ["pooled", *C.PRIMARY]]
     sec("persist", "E. Dates where persistence was worse than W1 for wind and MSLP (panel directive)", f"""
-<div class="selected"><p class="selbanner"><span class="tag sel">Evidence E</span> <b>{e(FN.PERSIST)}</b></p>
-<p>The panel noted that persistence is the reference that beats W1 on average for wind and MSLP, and directed a search for dates on which
-persistence's error was larger than W1's for <b>both</b> variables (climatology not part of the filter). Rule committed before the search:
-<a href="data/CASE_SELECTION_v4_persistence_override.md">CASE_SELECTION_v4_persistence_override.md</a>. <b>W1 beats persistence on these
-dates by construction</b>; the table shows how often such dates occur and how climatology, which the rule does not fix, compares.</p>
-{table(["Scope", "Qualifying station-dates", "Wind MAE W1 / persistence / climatology (m/s)", "MSLP MAE W1 / persistence / climatology (hPa)", "Also beat climatology for both", "Window (private)"], w4rows)}
-<p>On all {PH['v4_total']} dates persistence remains more accurate: wind {PH['v4_wind_pe_all']} vs W1 {PH['v4_wind_w1_all']} m/s; MSLP
-{PH['v4_mslp_pe_all']} vs {PH['v4_mslp_w1_all']} hPa. No common window qualifies at all three stations. Exact dates are private (PAGASA terms).</p>
-{fig("PF-Q_persistence_worse_dates", "Bars: qualifying dates per station and wind and MSLP MAE on them", "<b>PF-Q.</b> How many dates had persistence worse than W1 for both wind and MSLP, and errors on them.")}
+<div class="selected"><p class="selbanner"><span class="tag sel">Evidence E</span> <b>Selected favorable validation example chosen to
+demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.</b></p>
+<p>By the panel's directive this section shows one composite figure in which W1's next-day error is lower than both persistence and
+climatology for all four variables. <b>Each panel uses its own subset</b>, named with its n in the panel header: wind and MSLP on the
+{PH['v4_n']} station-dates where persistence was worse than W1 for both (<a href="data/CASE_SELECTION_v4_persistence_override.md">v4 rule</a>;
+W1 &lt; persistence there by construction); humidity on the dates where both baselines failed
+(<a href="data/CASE_SELECTION_v3_panel_validation.md">v3 rule</a>); rainfall on all complete dates. On all {PH['v4_total']} complete dates
+persistence remains more accurate for wind ({PH['v4_wind_pe_all']} vs W1 {PH['v4_wind_w1_all']} m/s), MSLP ({PH['v4_mslp_pe_all']} vs
+{PH['v4_mslp_w1_all']} hPa) and humidity (regression section, PF-F3).</p>
+{fig("PF-L_composite_favourable", "Two-by-two bar chart: wind, MSLP, humidity and rainfall, each with W1, persistence and climatology error bars on its own subset", "<b>PF-L composite.</b> W1 (blue), persistence (orange) and climatology (green) next-day MAE; each panel's subset and n are in its header.")}
 {privnote("PF-R")}
 </div>
 """)
@@ -690,7 +682,7 @@ Download: <a href="data/revision_ledger.csv">CSV</a>, <a href="data/revisions.js
                    *(X["runs"]["case4"] / "figures").glob("PF-*.png")], key=lambda p: p.name)
     frows = [[e(p.stem), f'<a href="figures/paper/{p.name}">PNG</a> · <a href="figures/paper/{p.stem}.svg">SVG</a> · <a href="figures/paper/{p.stem}.csv">CSV</a>',
               next((g["evidence_group"] for g in X["pf"]["figures"] if g["figure"] == p.stem),
-                   "E: persistence-worse dates (panel directive; favourable selection)" if p.stem.startswith("PF-Q")
+                   "E: panel directive (favourable selection; not representative of all dates)" if p.stem.startswith(("PF-Q", "PF-L_composite"))
                    else "D: baseline-failure validation (panel request; not representative of all dates)")] for p in figs]
     sec("figures", "Figures for the paper (downloads)", f"""
 <p>Individually downloadable figures, PNG at 300 DPI and SVG, with the CSV of the plotted numbers. Each figure states its model and processing,
