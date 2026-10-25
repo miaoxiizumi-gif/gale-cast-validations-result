@@ -289,8 +289,8 @@ The label uses processed (forward-filled) values, as on the website; recomputed 
         cards = []
         for p in case_figures:
             if p.stem.startswith(fid + "_"):
-                links = " ? ".join(f'<a href="figures/paper/{p.stem}.{ext}">{ext.upper()}</a>' for ext in ("png", "svg", "csv"))
-                cards.append(f'<figure><a href="figures/paper/{p.name}"><img loading="lazy" src="figures/paper/{p.name}" alt="{e(p.stem)}"></a><figcaption>{e(p.stem)} ? {links}</figcaption></figure>')
+                links = " &middot; ".join(f'<a href="figures/paper/{p.stem}.{ext}">{ext.upper()}</a>' for ext in ("png", "svg", "csv"))
+                cards.append(f'<figure><a href="figures/paper/{p.name}"><img loading="lazy" src="figures/paper/{p.name}" alt="{e(p.stem)}"></a><figcaption>{e(p.stem)} &middot; {links}</figcaption></figure>')
         return "".join(cards) + FN.html(NOTES[fid], e)
     sec("cases", "C. Selected illustrative case studies", f"""
 <div class="selected"><p class="selbanner"><span class="tag sel">Evidence C</span> <b>{e(FN.SELECTED)}</b></p>
@@ -729,7 +729,8 @@ Download: <a href="data/revision_ledger.csv">CSV</a>, <a href="data/revisions.js
     figs += case_figures
     frows = [[e(p.stem), f'<a href="figures/paper/{p.name}">PNG</a> · <a href="figures/paper/{p.stem}.svg">SVG</a> · <a href="figures/paper/{p.stem}.csv">CSV</a>',
               next((g["evidence_group"] for g in X["pf"]["figures"] if g["figure"] == p.stem),
-                   "E: panel directive (selected dates; not representative of all dates)" if p.stem.startswith(("PF-Q", "PF-L_composite"))
+                   "C: selected illustrative case studies" if p.stem.startswith(("PF-H", "PF-I", "PF-J", "PF-K")) else
+                   "E: panel directive (selected dates; not representative of all dates)" if p.stem.startswith(("PF-Q", "PF-R", "PF-L_composite"))
                    else "D: baseline-failure validation (panel request; not representative of all dates)")] for p in figs]
     sec("figures", "Figures for the paper (downloads)", f"""
 <p>Individually downloadable figures, PNG at 300 DPI and SVG, with the CSV of the plotted numbers. Each figure states its model and processing,
@@ -803,7 +804,7 @@ python paper_figures.py; python build_site.py</pre>
 <ul>{runlist}</ul>
 <p>Machine-readable files: <a href="data/claims.json">claims.json</a>, <a href="data/metrics.json">metrics.json</a>, <a href="data/revisions.json">revisions.json</a>,
 <a href="data/wind_results.csv">wind_results.csv</a>, <a href="data/event_results.csv">event_results.csv</a>, <a href="data/variants_results.csv">variants_results.csv</a>.
-No row-level observations or individual predictions are published.</p>
+Only the selected case windows include station readings and individual forecasts; the full row archive is not published.</p>
 """)
 
     sec("tech-stack", "Verified implementation technology stack", tech_stack.section_html())
