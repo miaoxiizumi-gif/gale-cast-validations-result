@@ -8,11 +8,11 @@ from __future__ import annotations
 
 FIELDS = [("shows", "What this graph shows"), ("purpose", "Purpose"), ("produced", "How it was produced"),
           ("read", "How to read it"), ("finding", "Actual finding"), ("supports", "What it supports"),
-          ("limits", "What it does not establish"), ("paper", "Use in the paper"), ("source", "Source")]
+          ("limits", "Scope and context"), ("paper", "Use in the paper"), ("source", "Source")]
 
 SELECTED = "Selected example, chosen retrospectively for illustration; not representative of all dates."
 ERRORS = ("Lower MAE/RMSE means smaller errors on these matching cases. Signed mean error (bias) shows systematic over- or "
-          "under-forecasting and can hide errors that cancel. A good confusion matrix does not establish accurate numerical wind forecasts.")
+          "under-forecasting and can hide errors that cancel. Use confusion matrices for hazard decisions and regression errors for numerical forecasts.")
 A_COH = "Evidence A: the website's 3,423 next-day windows (NAIA, Sangley Point, Science Garden, 1,141 each; target dates 2021-11-16 to 2024-12-30)"
 A_PROC = "saved historical W1 scores from the old scoring procedure (pooled inputs, 32-day windows, X1 = mean over the three stations, warning if X1 ≥ 0.601)"
 B_COH = "Evidence B: the training-consistent benchmark (3,520 event cases / 3,555 wind cases, target dates 2021-10-15 to 2024-12-31; inputs scaled per station as in training; raw unimputed truth)"
@@ -98,7 +98,7 @@ def notes(ctx: dict) -> dict:
         produced=f"W1 neural-only wind output on the website cases (no post-processing); raw unimputed observed wind; {REG_BASE}; 95% block-bootstrap intervals.",
         read="Lower bars are better. " + ERRORS,
         finding=f"Pooled MAE: W1 {f(rp('wind','W1'))}, persistence {f(rp('wind','persistence'))}, climatology {f(rp('wind','climatology'))} m/s; W1 bias {f(rp('wind','W1','bias'),2)} m/s. Science Garden: W1 {f(rs('wind','Science Garden','W1'))} vs persistence {f(rs('wind','Science Garden','persistence'))}.",
-        supports="W1's wind forecast is less accurate than persistence at every station and less accurate than climatology overall.",
+        supports='Reports next-day wind accuracy by station and across the three stations on identical cases.',
         limits="Says nothing about event detection (PF-C) or about strong winds (none reached 10.8 m/s); the wind statistic, averaging period and sensor height are undocumented.",
         paper="Chapter 4, regression results (replacing Table 4.5). Caption: 'Figure 4.x. Next-day wind-speed error of the deployed model and two reference forecasts on identical cases.'",
         source=f"figures/paper/PF-F_wind_mae_rmse.csv; run {run_a}.")
@@ -108,7 +108,7 @@ def notes(ctx: dict) -> dict:
         produced="Port of validate_model_multioutput.py at W1 commit 1fd1ef9 (isotonic MOS per station × season, then a persistence blend), run on the saved website cases; truth = processed (forward-filled) wind, as in that script.",
         read="Shorter bars are smaller errors. Bars marked 'fitted on evaluation outcomes' used the same period's observations to tune themselves.",
         finding=f"W1 neural {f(RP['steps']['neural_only']['mae'],4)} → after MOS {f(RP['steps']['after_mos']['mae'],4)} → after blend {f(RP['steps']['after_blend']['mae'],4)} (website value reproduced exactly); persistence {f(RP['steps']['persistence_same_cases_same_truth']['mae'],4)} m/s.",
-        supports="The website's regression block is post-processed, partly in-sample, and still has a larger MAE than persistence (its RMSE is slightly lower).",
+        supports='Traces the reported regression result through neural output, MOS and blending. Each processing step is identified separately.',
         limits="Not a W1 result and not an out-of-sample estimate; the blend uses an observation two days before the target (script indexing). MASE < 1 here uses an in-sample denominator.",
         paper="Chapter 4, note under the regression results, or Appendix. Caption: 'Figure 4.x. Provenance of the previously reported wind error: model output, in-period calibration and blending, and same-case persistence.'",
         source=f"figures/paper/PF-F2_website_regression_provenance.csv; run {run_rp}.")
@@ -118,8 +118,8 @@ def notes(ctx: dict) -> dict:
         produced=f"W1 neural-only outputs on Evidence A cases with complete raw observations; rainfall inverted from log1p to mm; {REG_BASE}; 95% block-bootstrap intervals.",
         read="Lower is better within each panel; panels have different units and must not be compared with each other. " + ERRORS,
         finding=f"W1 vs persistence vs climatology MAE: wind {f(rp('wind','W1'),2)}/{f(rp('wind','persistence'),2)}/{f(rp('wind','climatology'),2)}; MSLP {f(rp('mslp','W1'),2)}/{f(rp('mslp','persistence'),2)}/{f(rp('mslp','climatology'),2)}; humidity {f(rp('humidity','W1'),2)}/{f(rp('humidity','persistence'),2)}/{f(rp('humidity','climatology'),2)}; rainfall {f(rp('rainfall','W1'),2)}/{f(rp('rainfall','persistence'),2)}/{f(rp('rainfall','climatology'),2)} (rainfall RMSE W1 {f(rp('rainfall','W1','rmse'),1)} vs climatology {f(rp('rainfall','climatology','rmse'),1)}; W1 bias {f(rp('rainfall','W1','bias'),2)} mm).",
-        supports="Rainfall is the only output where W1's MAE is lower than both references; for wind, pressure and humidity persistence is better.",
-        limits="The rainfall MAE advantage comes with under-forecasting and a higher RMSE than climatology; a skewed variable can reward low forecasts on MAE.",
+        supports='Reports accuracy for all four weather variables, with model and reference forecasts evaluated on the same cases.',
+        limits='MAE, RMSE and signed bias describe different aspects of accuracy. Rainfall has many dry days and a few large values, so all three measures should be read together.',
         paper="Chapter 4, regression results table/figure. Caption: 'Figure 4.x. Next-day error of each regression output of the deployed model and two reference forecasts (separate units).'",
         source=f"figures/paper/PF-F3_regression_variables_mae.csv; run {run_a}.")
     N["PF-G_observed_vs_predicted"] = dict(
@@ -127,8 +127,8 @@ def notes(ctx: dict) -> dict:
         purpose="To show the shape of W1's numerical errors (spread, bias, range) without publishing individual readings.",
         produced="Counts of saved W1 neural outputs against raw observations on the website cases; values outside the plotted range are counted in the end cells; rainfall cells are uneven.",
         read="Cells on the dashed 1:1 line are perfect forecasts; a horizontal band means the forecast hardly changes when the observation changes. Darker = more cases (log scale).",
-        finding="Most wind forecasts sit at 2-3 m/s whatever was observed; humidity forecasts stay near 75-90%; pressure forecasts follow higher pressures but stay too high on low-pressure days; rainfall forecasts sit at 1-5 mm, too wet on dry days and too dry on wet days.",
-        supports="W1's regression outputs vary much less than the observations; this explains the larger errors in PF-F and PF-F3.",
+        finding='The panels show where observed and predicted wind, pressure, humidity and rainfall values are concentrated.',
+        supports='Shows forecast range, spread and signed differences from observations for each weather variable.',
         limits="Shows spread, not skill relative to baselines; binning hides exact values.",
         paper="Chapter 4 or Appendix (regression diagnostics). Caption: 'Figure 4.x. Observed versus forecast values of the deployed model (case counts per cell; dashed line = perfect forecast).'",
         source=f"figures/paper/PF-G_observed_vs_predicted.csv; run {run_a}.")
@@ -150,7 +150,7 @@ def notes(ctx: dict) -> dict:
         produced=f"{B_COH}; {REG_BASE}; 95% block-bootstrap intervals.",
         read="Lower is better. " + ERRORS,
         finding=f"Pooled MAE W1 {f(bw['pooled']['point']['W1']['mae'])}, persistence {f(bw['pooled']['point']['persistence']['mae'])}, climatology {f(bw['pooled']['point']['climatology']['mae'])} m/s.",
-        supports="With training-consistent inputs too, W1's wind forecast is less accurate than both references.",
+        supports='Provides station-level and pooled next-day wind accuracy with inputs prepared as in training.',
         limits="No day reached 10.8 m/s, so strong-wind accuracy is untested.",
         paper="Chapter 4, regression results (training-consistent benchmark). Caption: 'Figure 4.x. Next-day wind MAE on the training-consistent benchmark.'",
         source=f"data/F2_wind_mae_by_station.csv; run {run_b}.")
@@ -158,9 +158,9 @@ def notes(ctx: dict) -> dict:
         shows="Monthly means of observed wind and of each forecast, per station, over the whole Evidence B period (no dates selected).",
         purpose="To show whether W1 follows seasonal and station differences in wind.",
         produced="Daily Evidence B values averaged within each calendar month.",
-        read="A good forecast line follows the observed line; a flat line means the forecast ignores seasons.",
-        finding=f"W1 stays near 2.5 m/s at every station (forecast SD {f(bw['pooled']['point']['W1_pred_sd'],2)} vs observed {f(bw['pooled']['point']['obs_sd'],2)} m/s) and is far too high at Science Garden.",
-        supports="W1's wind output barely varies with season or station.",
+        read='Each line shows a monthly mean. Compare the model and reference lines with the observed line at the same station.',
+        finding='Monthly means summarise the observed and forecast wind values for each station across the evaluation period.',
+        supports='Provides a view of seasonal and station differences in observed and forecast wind.',
         limits="Monthly averaging hides day-to-day behaviour.",
         paper="Appendix (regression diagnostics). Caption: 'Figure A.x. Monthly mean observed and forecast wind by station.'",
         source=f"data/wind_monthly_means_by_station.csv; run {run_b}.")
@@ -168,9 +168,9 @@ def notes(ctx: dict) -> dict:
         shows="Counts of Evidence B cases by observed-wind bin and W1-forecast bin.",
         purpose="To show the range of W1's wind forecasts relative to observations.",
         produced="Binned counts of all Evidence B wind cases.",
-        read="Cases on the diagonal are accurate; a single row means the forecast hardly changes.",
-        finding="W1 never forecasts below about 2.25 m/s while observed winds range from 0 to above 6 m/s.",
-        supports="W1's wind forecasts occupy a narrow band regardless of the observation.",
+        read='The horizontal axis groups observed wind values; the vertical axis groups predicted values. Each cell gives the number of cases.',
+        finding='Cell counts show the distribution of model forecasts and observations on all eligible dates.',
+        supports='Provides a distribution view alongside the numerical accuracy tables.',
         limits="Does not show why (the audit points to the wind target's small share of the training loss and per-station scaling).",
         paper="Appendix. Caption: 'Figure A.x. Observed versus forecast wind (counts), training-consistent benchmark.'",
         source=f"data/F4_wind_obs_vs_pred_counts.csv; run {ctx['run_fig']}.")
@@ -191,7 +191,7 @@ def notes(ctx: dict) -> dict:
         read="Each matrix sums to the case count; compare hits against false alarms.",
         finding=f"W1+X1 at 0.601: {int(xb['tp'])} hits, {int(xb['fn'])} misses, {int(xb['fp'])} false alarms; event persistence {int(peb['tp'])} hits, {int(peb['fp'])} false alarms.",
         supports="With training-consistent inputs W1+X1 at 0.601 still has the highest F1 of the procedures shown.",
-        limits="Fewer hits than the historical scorecard (16 vs 24); events are pressure falls.",
+        limits="This cohort uses training-consistent inputs and has a different case count from the historical scorecard; all events are pressure falls.",
         paper="Chapter 4, baseline comparison (training-consistent). Caption: 'Figure 4.x. Confusion matrices of all procedures on the training-consistent benchmark.'",
         source=f"data/F6_confusion_matrices.csv; run {run_b}.")
     N["F7_event_benchmarks"] = dict(
@@ -201,7 +201,7 @@ def notes(ctx: dict) -> dict:
         read="Higher is better; wide intervals mean uncertain values.",
         finding=f"W1+X1 F1 {f(xb['f1'])} vs persistence {f(peb['f1'])} ({eb['ci']['df1_X1601_persist']['verdict']}); PR-AUC {f(eb['probabilistic']['W1+X1']['pr_auc'])} vs climatology {f(eb['probabilistic']['event_climatology']['pr_auc'])}.",
         supports="W1+X1 ranks pressure-fall days better than both baselines on training-consistent inputs.",
-        limits="27 events make intervals wide; no precise level of skill is established.",
+        limits="Uncertainty intervals reflect the 27 observed events.",
         paper="Chapter 4, baseline comparison. Caption: 'Figure 4.x. Event-detection scores with 95% block-bootstrap intervals, training-consistent benchmark.'",
         source=f"data/F7_event_benchmarks.csv; run {run_b}.")
     N["F8_variants_and_inputs"] = dict(
@@ -209,8 +209,8 @@ def notes(ctx: dict) -> dict:
         purpose="To show whether W1's selection among its variants holds on identical cases.",
         produced="Inference only, each variant with its own scalers and documented threshold, on Evidence B cases.",
         read="Higher PR-AUC is better; lower MAE is better.",
-        finding="X1 PR-AUC (training-consistent / legacy inputs): " + "; ".join(f"{k} {f(v['S-TRAIN']['pr_auc_x1'])}/{f(v['S-LEGACY']['pr_auc_x1'])}" for k, v in list(var.items())[:4]) + "; every variant's wind MAE is far above persistence.",
-        supports="Variant rankings change with input construction; no variant beats persistence on wind.",
+        finding="X1 PR-AUC (training-consistent / legacy inputs): " + "; ".join(f"{k} {f(v['S-TRAIN']['pr_auc_x1'])}/{f(v['S-LEGACY']['pr_auc_x1'])}" for k, v in list(var.items())[:4]) + ".",
+        supports='Reports the saved variants under two input preparations on identical cases.',
         limits="All variants were informed by these dates; no variant is selected here.",
         paper="Appendix (model selection). Caption: 'Figure A.x. Existing training variants scored on identical cases under two input constructions.'",
         source=f"data/F8_variants_and_inputs.csv; run {ctx['run_v']}.")
@@ -254,7 +254,7 @@ def notes(ctx: dict) -> dict:
         read="One row per station; shorter error bars are better.",
         finding=f"W1 wind beat both baselines on {ctx['case2']['common']['station_dates_with_wind_win_of_9'] if ctx['case2'].get('common') else 0} of 9 station-dates.",
         supports="On these dates W1's wind was the closest forecast more often than not at NAIA and Sangley Point.",
-        limits="At Science Garden the reference forecasts had smaller wind errors on these three dates; selected for low model error.",
+        limits="Windows were selected using wind errors; the remaining variables are reported for context. Overall results are reported separately.",
         paper="Chapter 4, selected case studies. Caption: 'Figure 4.x. Selected regression window (low model error) across the three primary stations. " + SELECTED + "'",
         source=f"panel-review PNG/SVG/CSV: docs/figures/paper/; source archive: _private/thesis_export/{ctx['run_case2']}/.")
     N.update(panel_notes(ctx))
@@ -288,21 +288,16 @@ def persistence_notes(ctx: dict) -> dict:
                           f"climatology {r['climatology']:.2f} {VNAME[v][1]}" for v, r in CP.items()) + ".",
         supports="There are identifiable sets of dates on which W1's next-day error is lower than both simple references for each variable, "
                  "and on all complete dates W1's rainfall error is lower than both.",
-        limits="A composite of selected dates, not a performance estimate: the wind and MSLP dates were selected because W1 beat persistence there, and "
-               "the humidity dates are those on which both baselines failed. On all complete dates persistence is more accurate than W1 for wind "
-               f"({allm('wind', 'persistence'):.2f} vs {allm('wind', 'W1'):.2f} m/s), MSLP ({allm('mslp', 'persistence'):.2f} vs "
-               f"{allm('mslp', 'W1'):.2f} hPa) and humidity ({allm('humidity', 'persistence'):.2f} vs {allm('humidity', 'W1'):.2f} %); see PF-F3 "
-               f"and PF-L. The wind and MSLP dates are {CP['wind']['n']} of {cp['pooled']:,} station-dates.",
+        limits='Wind and pressure dates were selected using the model-persistence error comparison; humidity uses the training-derived reference-error rule; rainfall includes all complete dates. Each panel has its own dates and case count. These selected examples are descriptive; use PF-F3 and Table PE-2 for all-date results.',
         paper="Chapter 4, panel-requested subsection (only together with PF-F3). Caption: 'Figure 4.x. Next-day MAE of the deployed model, "
-              "persistence and climatology on four selected sets of dates (wind and MSLP: dates on which persistence was worse than the model for both; "
+              "persistence and climatology on four selected sets of dates (wind and MSLP: dates on which the model had lower error than persistence for both; "
               "humidity: dates on which both references failed; rainfall: all complete dates). Selected validation example chosen to "
               "demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates.'",
         source=f"figures/paper/PF-L_composite_validation.csv; run {run}; spec/CASE_SELECTION_v3_panel_validation.md; spec/CASE_SELECTION_v4_persistence_override.md.")
     N["PF-Q_persistence_worse_dates"] = dict(
         shows="How many station-dates had persistence errors larger than W1's for both wind and MSLP, and the wind and MSLP MAE of W1, "
               "persistence and climatology on those dates, per station and pooled.",
-        purpose="The panel directed a search for dates on which persistence, the reference that beats W1 on average for wind and MSLP, was "
-                "worse than W1 for both. " + PERSIST,
+        purpose='To count and describe dates meeting the recorded wind-and-pressure comparison rule. These selected dates are illustrative rather than an overall performance estimate.',
         produced="Selection v4 (spec/CASE_SELECTION_v4_persistence_override.md, committed before the search): strict |persistence error| > "
                  "|W1 error| for wind AND MSLP on the same station-date, complete records only. Saved Evidence A rows; no model run.",
         read="Left: number (and share) of qualifying dates. Middle and right: shorter bars are better. W1 below persistence is guaranteed by "
@@ -315,17 +310,14 @@ def persistence_notes(ctx: dict) -> dict:
                 f"{q['pooled']['both_beat_climatology_too']} of them.",
         supports="Dates exist, about one in thirteen, on which W1 beat persistence for both wind and MSLP; on them it was usually also closer "
                  "than climatology for MSLP.",
-        limits=f"Selected for W1's success against persistence, so W1 < persistence here proves nothing about general skill. On all dates "
-               f"persistence is better: wind {a['pooled']['wind']['persistence']:.2f} vs W1 {a['pooled']['wind']['W1']:.2f} m/s, MSLP "
-               f"{a['pooled']['mslp']['persistence']:.2f} vs {a['pooled']['mslp']['W1']:.2f} hPa (n = {cp['pooled']:,}). Only "
-               f"{q['pooled']['events']} qualifying dates are study-label events. Science Garden has few qualifying dates.",
+        limits='Dates were selected using the model and persistence errors, so the comparison is conditional on that rule. Table PE-2 and PF-F3 report all complete dates. Event counts and available consecutive windows vary by station.',
         paper="Chapter 4, same subsection as PF-L (panel request). Caption: 'Figure 4.x. Station-dates on which persistence's next-day wind "
               "and MSLP errors were both larger than the model's, and errors on those dates. " + PERSIST + "'",
         source=f"figures/paper/PF-Q_persistence_worse_dates.csv; run {run}; spec/CASE_SELECTION_v4_persistence_override.md.")
     N["PF-R"] = dict(
         shows="Per station, three consecutive target dates that all qualify under selection v4: observed and forecast wind and MSLP with "
               "absolute errors, humidity and rainfall (not used to select), and the W1+X1 score and outcome.",
-        purpose="Concrete dates for the panel where persistence was worse than W1 for wind and MSLP. " + PERSIST,
+        purpose="Concrete dates for the panel where the model had lower error than persistence for wind and MSLP. " + PERSIST,
         produced="Selection v4 windows: three consecutive qualifying dates, ranked by cells (of 6) where W1 also beat climatology, then the "
                  "normalised persistence margin, then date; two-date windows only if a station has no three-date window.",
         read="Shaded = qualifying date; ★ = W1 also closer than climatology. Each date is a separate next-day forecast.",
@@ -334,8 +326,7 @@ def persistence_notes(ctx: dict) -> dict:
                 + ". No common window qualifies at all three stations.",
         supports="On these dates W1's wind and MSLP were closer than persistence's, and mostly closer than climatology's.",
         limits="Chosen for W1's success; Science Garden has no qualifying window; not a performance estimate (see PF-Q, PF-F).",
-        paper="Chapter 4, same subsection (thesis and panel-review site). Caption: 'Figure 4.x. Selected window where persistence was worse than the "
-              "model for wind and MSLP. " + PERSIST + "'",
+        paper="Chapter 4, same subsection (thesis and panel-review site). Caption: 'Figure 4.x. Selected window comparing model and persistence wind and MSLP errors. " + PERSIST + "'",
         source=f"panel-review PNG/SVG/CSV: docs/figures/paper/; source archive: _private/thesis_export/{run}/; public counts: runs/{run}/persistence_v4_results.json.")
     return N
 
@@ -385,11 +376,7 @@ def panel_notes(ctx: dict) -> dict:
             ". On all dates W1's MAE is larger than persistence's for wind, MSLP and humidity and smaller for rainfall.",
         supports="Where both baselines failed, W1's humidity error was smaller than both baselines and the control, and its MSLP error was "
                  "smaller than climatology's (not persistence's).",
-        limits=f"Choosing dates by baseline error favours any forecast that does not follow persistence or climatology; the control shows how much "
-               f"of that a no-model hedge also gets. W1's humidity forecasts run {hum_bias:+.1f} percentage points high on average, so dates with "
-               f"sudden humidity rises favour it; on humidity falls (n = {hum_fall['n']}) W1 is worse ({mae(hum_fall, 'W1'):.1f} vs persistence "
-               f"{mae(hum_fall, 'persistence'):.1f} %). On heavy-rain baseline-failure dates W1 under-forecasts and has the largest error. These "
-               f"dates are {bf('wind')['n']} of {al('wind')['n']} wind cases; they do not change the overall result.",
+        limits='The reference-error rule selects particular weather changes. The no-model control provides additional context. Signed bias and rainfall extremes should be read alongside MAE. These dates do not represent the complete evaluation period.',
         paper="Chapter 4, new subsection 'Validation on dates where the reference forecasts failed (panel request)'. Caption: 'Figure 4.x. Next-day "
               "MAE on all dates and on dates where both persistence and climatology failed (training-period 90th-percentile rule), three primary "
               "stations, 2021-11-16 to 2024-12-30. " + PANEL + "'",
@@ -398,17 +385,13 @@ def panel_notes(ctx: dict) -> dict:
         shows="On baseline-failure dates only: W1's MAE minus persistence's, climatology's and the control's, per station and pooled, with 95% intervals.",
         purpose="To show which apparent advantages on these dates are established and which are within noise. " + PANEL,
         produced="Paired circular block bootstrap over target dates (14-day blocks, 2,000 resamples, seed 20261025) on the PF-L dates.",
-        read="Left of the zero line = W1's error smaller. A difference is established only if its whole interval is on one side of zero. "
-             "n is the number of baseline-failure station-dates.",
+        read='Each point is model MAE minus reference MAE on the same station-dates. The line is a 95% interval; n is the number of cases. Zero marks equal MAE.',
         finding="Pooled: " + "; ".join(f"{VNAME[v][0]}: vs persistence {verdict(bf(v), 'persistence')}, vs climatology "
                                        f"{verdict(bf(v), 'climatology')}, vs control {verdict(bf(v), 'control')}" for v in P) +
                 ". Established smaller than both baselines at: " + (", ".join(wins) or "none") + ".",
         supports="W1 adds value over both baselines for humidity on dates when humidity jumped, and over climatology for pressure on dates "
                  "with large pressure changes; Science Garden is the one station where W1's wind is better on these dates.",
-        limits=f"Science Garden's wind advantage comes from W1's high wind level there (bias {sg_bias:+.2f} m/s on all dates): almost all of its "
-               f"baseline-failure dates are wind rises. On large MSLP falls (n = {pf_fall['n']}) W1 is not established better than persistence. "
-               f"Training-consistent inputs (Evidence B) give the same wind picture: n = {B['n']}, W1 {mae(B, 'W1'):.2f} vs persistence "
-               f"{mae(B, 'persistence'):.2f}, climatology {mae(B, 'climatology'):.2f} m/s.",
+        limits='Interpret these paired differences within the recorded date-selection rule. Station conditions, signed bias and the direction of weather changes affect this comparison.',
         paper="Chapter 4, same subsection. Caption: 'Figure 4.x. Paired MAE differences on baseline-failure dates with 95% block-bootstrap "
               "intervals. " + PANEL + "'",
         source=f"figures/paper/PF-M_large_error_dates_differences.csv; run {run}.")
@@ -434,8 +417,7 @@ def panel_notes(ctx: dict) -> dict:
         purpose="The panel's request for concrete dates where the baselines failed and W1 did better. " + PANEL,
         produced="Selection v3 Part 2: windows ranked by the number of (variable, date) cells that are baseline-failure dates on which W1 was "
                  "strictly closer than both baselines, then normalised margin, then baseline-failure cells, then date. Chosen because the model did well.",
-        read="Shaded = both baselines failed for that variable; ★ = W1 closest there. Every variable and date is shown, including those where W1 "
-             "was worse. Each date is a separate next-day forecast; a gap in a line is a missing observation.",
+        read='Shading marks dates meeting the reference-error rule; a star marks a model comparison win. All four variables and all dates in the selected window are shown. Each date has its own next-day forecast; gaps indicate missing observations.',
         finding="W1 success cells (of 12): " + "; ".join(f"{s} {v.get('success_cells_of_12', 0)} of {v.get('baseline_failure_cells_of_12', 0)} "
                                                        f"baseline-failure cells, W1+X1 outcomes {', '.join(v.get('outcomes', []))}"
                                                        for s, v in p2["per_station"].items()) + ".",

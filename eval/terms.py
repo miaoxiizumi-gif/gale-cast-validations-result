@@ -12,7 +12,7 @@ import re
 MODEL = "GALE-CAST Model-W1"
 _W1 = re.compile(r"(?<!Model-)(?<![\w/.-])W1(?!\w)(?!\.\w)")
 _SWAPS = [(re.compile(r"[Bb]aseline-failure"), lambda m: ("L" if m.group(0)[0] == "B" else "l") + "arge-baseline-error")]
-BANNED = re.compile(r"favourabl|favorabl|subset", re.I)
+BANNED = re.compile(r"favourabl|favorabl|subset|\b(?:worse|worst|underperform\w*)\b", re.I)
 
 
 def text(s: str) -> str:

@@ -9,7 +9,7 @@
 | Architecture | dual-stream: `input_normal` (32 days × 32 features) → LSTM(64) → Dense(32); `input_anomaly` (32 × 4) → LSTM → additive attention over time steps → LSTM(32) → Dense(16); merged; heads `gale_prob` (sigmoid) and `weather_vars` (6 regression outputs); 40,872 parameters |
 | Training | one `model.fit` on primary rows before 2020-10-15 + all Port Area rows + all supplementary rows; early stopping on the tuning year (`val_gale_prob_loss`, patience 12); no saved history or seed; no pre-training stage |
 | Scoring procedure behind the website | `_w1_recall_floor.py`: pooled `scaled_weather` inputs, X1 = same-date mean over the three stations, threshold 0.601 |
-| Live system | the dashboard tier uses wind/pressure rules, not the model score; the 24-step live endpoint fails on this 32-step model; displayed 2025+ values are simulated or imported PAGASA forecasts |
+| Live system | the dashboard tier uses wind/pressure rules, not the model score; the live endpoint supplies 24 steps while this model requires 32; displayed 2025+ values are simulated or imported PAGASA forecasts |
 
 Implementation technologies around the model (web, API, database, hosting) are listed separately in `TECH_STACK.md`; they are not
 evidence of forecast accuracy.

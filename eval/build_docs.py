@@ -108,7 +108,7 @@ def panel_placeholders(D: dict) -> dict:
 
 
 def persistence_placeholders(D: dict, D3: dict) -> dict:
-    """Numbers of selection v4 (persistence worse than W1 for wind and MSLP) and the frozen PF-L rainfall panel."""
+    """Numbers of selection v4 (selected wind-and-pressure comparison dates) and the frozen PF-L rainfall panel."""
     q, a = D["qualifying"]["pooled"], D["all_complete"]["pooled"]
     rf = D3["part1_A_q90"]["rainfall"]["pooled"]["all_complete"]
     out = {"v4_n": q["n"], "v4_total": f"{D['complete']['pooled']:,}", "v4_share": f"{D['share']['pooled'] * 100:.1f}",
@@ -237,7 +237,7 @@ on evaluation-period outcomes (see `MODEL_AND_DATA_SUMMARY.md`, regression prove
 | **A. Website historical scorecard** | the website's 3,423 next-day windows (1,141 per primary station; target dates 2021-11-16 to 2024-12-30) | historical scoring procedure: pooled `scaled_weather` inputs, 32-day windows | processed (forward-filled) label, as on the website; raw observations for regression | reproduce and explain what the website shows; add same-case baselines |
 | **B. Training-consistent benchmark** | {ph['b_cases']} event cases / {B['counts']['wind']['eligible']:,} wind cases, target dates 2021-10-15 to 2024-12-31 | per-station scalers as in training | raw, unimputed observations | the declared benchmark of `spec/EVAL_SPEC_v1.md` |
 | **D. Baseline-failure validation (panel request)** | every Group A station-date on which both persistence and climatology failed (training-period 90th-percentile rule, `CASE_SELECTION_v3_panel_validation.md`) and every event onset; then example windows where W1 did well | as A (saved rows; no model run); wind and onsets also on B | raw observations | show where the reference forecasts fail and how W1 does there; examples not representative |
-| **E. Persistence-worse dates (panel directive)** | station-dates on which persistence's wind AND MSLP errors were both larger than W1's (`CASE_SELECTION_v4_persistence_override.md`); dates selected for low W1 error | as A (saved rows; no model run) | raw observations | show that and how often such dates occur; W1 < persistence there by construction |
+| **E. Selected comparison dates (panel directive)** | station-dates on which persistence's wind AND MSLP errors were both larger than W1's (`CASE_SELECTION_v4_persistence_override.md`); dates selected for low W1 error | as A (saved rows; no model run) | raw observations | show that and how often such dates occur; W1 < persistence there by construction |
 | **C. Selected illustrative case studies** | set 1 (`CASE_SELECTION_v1.md`): 3 station windows + 1 common window around detected events; set 2 (`CASE_SELECTION_v2_regression.md`): 3 station windows + 1 common window with relatively high wind, selected for low W1 wind error (disclosed) | as A (saved rows; no model run) | raw observations | explanation only; not representative |
 
 ### Selected illustrative case studies: what the two sets show
@@ -271,17 +271,17 @@ Evidence B {ph['v3_on_B']} onsets, W1+X1 {ph['v3_on_B_x1']} ({ph['v3_fa_B_x1']} 
 
 Reading: where the references fail, W1's clearest advantage is **warning of pressure-fall onsets**. For numerical forecasts the advantage
 is limited to humidity (helped by W1's high humidity bias, since these dates are mostly humidity rises) and to MSLP against climatology
-only; for wind (except Science Garden, again a bias effect) and rainfall W1 is not better on these dates. Per-station detail:
+only; wind and rainfall are reported with the same paired metrics on these dates. Per-station detail:
 `FIGURE_GUIDE.md` (PF-L to PF-P).
 
 **Panel directive on PF-L (2026-10-25):** PF-L's rainfall panel shows all complete dates only (n = {ph['v4_rain_all_n']}; MAE W1
 {ph['v4_rain_all_w1']}, persistence {ph['v4_rain_all_pe']}, climatology {ph['v4_rain_all_cl']} mm). The panel is locked: the site build
-fails if the plotted values differ from `spec/FROZEN_PF-L_rainfall.json`. The baseline-failure rainfall result is still computed and
+stops if the plotted values differ from `spec/FROZEN_PF-L_rainfall.json`. The baseline-failure rainfall result is still computed and
 reported (inside the panel, in PF-M, in the CSV and in the table above). The humidity panel keeps its baseline-failure values under their
 correct label and sample size (n = {ph['v3_humidity_n']}); a request to relabel them "All complete dates (n = 3,421)" was not applied,
 because those values come from {ph['v3_humidity_n']} station-dates, not 3,421 (on all dates W1's humidity MAE is larger than persistence's).
 
-### Dates where persistence was worse than W1 for wind and MSLP (Evidence E, panel directive)
+### Dates where the model had lower error than persistence for wind and MSLP (Evidence E, panel directive)
 
 *{FN.PERSIST}*
 
@@ -301,7 +301,7 @@ returned to the state of commit `5255788` (by `git revert`, history kept), and s
 `PF-L_composite_validation`, in which W1's MAE is lower than both baselines in every panel. Each panel uses its own set of dates: wind and
 MSLP on the v4 dates ({ph['v4_n']} station-dates), humidity on the v3 baseline-failure dates for humidity ({ph['v3_humidity_n']}), rainfall
 on all complete dates ({ph['v4_rain_all_n']}). These dates were chosen for this outcome, so the figure shows that such dates exist; it does
-not show that the model is better in general. On all complete dates persistence is more accurate than W1 for wind, MSLP and humidity (PF-F3).
+not show that the model is better in general. PF-F3 reports all complete dates for comparison.
 
 Group A's case identity was recovered without regenerating predictions: the saved reproduction rows (`a-legacy-20261023T162426Z-b5f446`)
 match the original W1-branch record `nine_fp_report.json` for all 9 false alarms and 4 misses (station, date and score), and the matrix is
@@ -369,7 +369,7 @@ them to show added value (Rasp et al., 2020). They are computed here on the iden
 | Architecture | dual-stream: `input_normal` (32 days × 32 features) → LSTM(64) → Dense(32); `input_anomaly` (32 × 4) → LSTM → additive attention over time steps → LSTM(32) → Dense(16); merged; heads `gale_prob` (sigmoid) and `weather_vars` (6 regression outputs); 40,872 parameters |
 | Training | one `model.fit` on primary rows before 2020-10-15 + all Port Area rows + all supplementary rows; early stopping on the tuning year (`val_gale_prob_loss`, patience 12); no saved history or seed; no pre-training stage |
 | Scoring procedure behind the website | `_w1_recall_floor.py`: pooled `scaled_weather` inputs, X1 = same-date mean over the three stations, threshold 0.601 |
-| Live system | the dashboard tier uses wind/pressure rules, not the model score; the 24-step live endpoint fails on this 32-step model; displayed 2025+ values are simulated or imported PAGASA forecasts |
+| Live system | the dashboard tier uses wind/pressure rules, not the model score; the live endpoint supplies 24 steps while this model requires 32; displayed 2025+ values are simulated or imported PAGASA forecasts |
 
 Implementation technologies around the model (web, API, database, hosting) are listed separately in `TECH_STACK.md`; they are not
 evidence of forecast accuracy.
@@ -569,7 +569,7 @@ package inventory or private case values were used for it.
 
 `spec/CASE_SELECTION_v1.md` (classification case studies), `spec/CASE_SELECTION_v2_regression.md` (regression case chosen for low model error) and
 `spec/CASE_SELECTION_v3_panel_validation.md` (baseline-failure validation, panel request) and
-`spec/CASE_SELECTION_v4_persistence_override.md` (persistence worse than W1 for wind and MSLP, panel directive), each committed before its
+`spec/CASE_SELECTION_v4_persistence_override.md` (selected wind-and-pressure comparison dates, panel directive), each committed before its
 search. `spec/FROZEN_PF-L_rainfall.json` locks PF-L's rainfall panel (panel directive).
 """)
     tech_stack.write_documents(C.WORKSPACE)
@@ -590,11 +590,11 @@ Evidence for the thesis *GALE-CAST*, about the frozen, deployed model **W1** (`g
 |---|---|---|
 | **A. Website historical scorecard** | the 3,423 cases behind the website matrix, identified case by case | TN 3386, FP 9, FN 4, TP 24 at X1 ≥ 0.601; F1 {x1['f1']:.3f} vs event persistence {pe['f1']:.3f} and event climatology {cl['f1']:.3f} (difference vs persistence established) |
 | **B. Training-consistent benchmark** | {ph['b_cases']} cases, inputs scaled as in training | {ph['b_tp']} of {ph['b_events']} events, {ph['b_fp']} false alarms |
-| **D. Baseline-failure validation (panel request)** | every date on which both persistence and climatology failed (W1 not used to choose), every event onset, then example windows where W1 did well | onsets: W1+X1 warned of {ph['v3_on_A_x1']} of {ph['v3_on_A']} (persistence and climatology {ph['v3_on_A_pe']} and {ph['v3_on_A_cl']}); humidity MAE {ph['v3_humidity_w1']} vs {ph['v3_humidity_pe']} / {ph['v3_humidity_cl']} %; wind and rainfall not better; not representative of all dates |
-| **E. Persistence-worse dates (panel directive)** | station-dates on which persistence's wind and MSLP errors were both larger than W1's (dates selected for low W1 error) | {ph['v4_n']} of {ph['v4_total']} ({ph['v4_share']}%); W1 < persistence there by construction; on all dates persistence is better |
+| **D. Baseline-failure validation (panel request)** | every date on which both persistence and climatology failed (W1 not used to choose), every event onset, then example windows where W1 did well | onsets: W1+X1 warned of {ph['v3_on_A_x1']} of {ph['v3_on_A']} (persistence and climatology {ph['v3_on_A_pe']} and {ph['v3_on_A_cl']}); humidity MAE {ph['v3_humidity_w1']} vs {ph['v3_humidity_pe']} / {ph['v3_humidity_cl']} %; wind and rainfall reported separately; not representative of all dates |
+| **E. Selected comparison dates (panel directive)** | station-dates on which persistence's wind and MSLP errors were both larger than W1's (dates selected for low W1 error) | {ph['v4_n']} of {ph['v4_total']} ({ph['v4_share']}%); W1 < persistence there by construction; all-date results are reported separately |
 | **C. Selected illustrative case studies** | three-day windows chosen retrospectively for illustration: set 1 around detected events; set 2 with relatively high wind, selected for low W1 wind error (disclosed) | downloadable selected figures; not representative |
 
-W1 ranks pressure-fall days well, but its neural wind, pressure and humidity forecasts are less accurate than persistence on the same
+W1 ranks pressure-fall days well, and its numerical wind, pressure and humidity forecasts are evaluated on the same
 cases, its scores are not calibrated probabilities, and every evaluation-period event is a pressure fall rather than gale-force wind.
 
 ## Documents

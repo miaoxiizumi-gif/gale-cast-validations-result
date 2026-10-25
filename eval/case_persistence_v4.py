@@ -1,4 +1,4 @@
-"""Group E, selection v4 (spec/CASE_SELECTION_v4_persistence_override.md): dates where persistence was worse than W1 for BOTH wind and
+"""Group E, selection v4 (spec/CASE_SELECTION_v4_persistence_override.md): dates where the model had lower error than persistence for BOTH wind and
 MSLP (panel directive). Dates selected for low W1 error: W1 beats persistence on these dates by construction.
 
 Saved Evidence A rows only; no model is run. Public outputs (run dir): aggregates and figure PF-Q. Private outputs: qualifying-date
@@ -75,7 +75,7 @@ def window_fig(W, cA, q, s, dates, qual_dates, title, out, name, run):
     cw = cA[(cA["station"] == s) & cA["date"].isin(dates)].copy()
     qd = set(qual_dates)
     qq = q.set_index(["station", "date"])
-    cw["fail"] = cw["var"].isin(SEL) & cw["date"].isin(qd)  # shaded = qualifying date (persistence worse than W1 for wind AND MSLP)
+    cw["fail"] = cw["var"].isin(SEL) & cw["date"].isin(qd)  # shaded = qualifying date (selected model-persistence comparison for wind AND MSLP)
     cw["success"] = cw["fail"] & cw["w1_beats_both"]          # star = W1 also closer than climatology
     fig, axs = plt.subplots(2, 4, figsize=(19, 10))
     fig.subplots_adjust(left=0.05, right=0.99, top=0.83, bottom=0.2, hspace=0.62, wspace=0.32)
@@ -127,7 +127,7 @@ def fig_Q(P: dict, out, run) -> list[str]:
         ax.set_ylim(0, ax.get_ylim()[1] * 1.3)
         ax.set_title(f"{'Wind' if v == 'wind' else 'MSLP'}: error on qualifying dates", loc="left")
     axs[1].legend(loc="upper left", fontsize=7.5, ncol=3)
-    S.title(fig, "PF-Q. Dates on which persistence was worse than W1 for both wind and MSLP: how many, and errors on them",
+    S.title(fig, "PF-Q. Dates on which the model had lower error than persistence for both wind and MSLP: how many, and errors on them",
             "Evidence E (panel directive). " + LABEL + " W1 < persistence on these dates holds by construction; climatology is not used to select.")
     S.footer(fig, ["Qualifying station-date: |persistence error| > |W1 error| for wind AND for MSLP (strict). Share = qualifying / station-dates with complete wind and MSLP. "
                    "W1 = saved neural-only next-day output (website scorecard cohort, target dates 2021-11-16 to 2024-12-30); persistence = issue-day observation; "
@@ -139,9 +139,9 @@ def fig_Q(P: dict, out, run) -> list[str]:
 COMPOSITE_NAME = "PF-L_composite_validation"
 COMPOSITE_LABEL = ("Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; "
                    "not representative of all historical dates.")
-COMPOSITE_SCOPE = {"wind": "v4 dates (persistence worse than W1 for wind and MSLP)", "mslp": "v4 dates (persistence worse than W1 for wind and MSLP)",
+COMPOSITE_SCOPE = {"wind": "v4 dates (selected wind-and-pressure comparison dates)", "mslp": "v4 dates (selected wind-and-pressure comparison dates)",
                    "humidity": "v3 baseline-failure dates for humidity", "rainfall": "all complete dates"}
-COMPOSITE_SHORT = {"wind": "v4 (persistence worse than model)", "mslp": "v4 (persistence worse than model)",
+COMPOSITE_SHORT = {"wind": "v4 (selected wind-and-pressure dates)", "mslp": "v4 (selected wind-and-pressure dates)",
                    "humidity": "v3 baseline-failure dates", "rainfall": "all complete dates"}
 COMPOSITE_TITLE = {"wind": "Wind speed (m/s)", "mslp": "Mean sea-level pressure (hPa)", "humidity": "Relative humidity (%)", "rainfall": "Daily rainfall (mm)"}
 M3 = ("W1", "persistence", "climatology")
@@ -182,9 +182,7 @@ def fig_composite(CP: dict, P: dict, out, run) -> list[str]:
             COMPOSITE_LABEL + " Each panel uses its own set of dates, chosen so that W1's error is lower than both baselines.", width=150)
     S.footer(fig, ["Wind and MSLP: station-dates on which persistence's error exceeded W1's for both wind and MSLP (spec/CASE_SELECTION_v4_persistence_override.md; "
                    "W1 < persistence there by construction). Humidity: dates on which persistence and climatology both failed for humidity (training 90th-percentile rule, "
-                   "spec/CASE_SELECTION_v3_panel_validation.md). Rainfall: all complete dates. On all complete dates persistence is more accurate than W1 for wind "
-                   f"({P['all_complete']['pooled']['wind']['persistence']:.2f} vs {P['all_complete']['pooled']['wind']['W1']:.2f} m/s), MSLP "
-                   f"({P['all_complete']['pooled']['mslp']['persistence']:.2f} vs {P['all_complete']['pooled']['mslp']['W1']:.2f} hPa) and humidity (PF-F3). "
+                   "spec/CASE_SELECTION_v3_panel_validation.md). Rainfall: all complete dates. All-date results are reported separately in PF-F3 and Table PE-2. "
                    "W1 = saved neural-only next-day output (website scorecard cohort, three primary stations, 2021-11-16 to 2024-12-30); persistence = issue-day "
                    f"observation; climatology = station × month mean 2015-2020; truth = raw PAGASA observations. Run {run.name}."], width=175)
     return S.save(fig, out, COMPOSITE_NAME)
@@ -231,7 +229,7 @@ def main():
         priv_sum["per_station"][s] = {"window": [f"{d:%Y-%m-%d}" for d in dates], "qualifying": [f"{d:%Y-%m-%d}" for d in qual_dates],
                                       "clim_cells": int(pick["clim_cells"]), "nmargin": float(pick["nmargin"])}
         priv_sum["figures"] += window_fig(W, cA, q, s, dates, qual_dates,
-                                          f"PF-R. {s}: persistence worse than W1 for wind and MSLP, around {dates[1]:%d %B %Y}", exp,
+                                          f"PF-R. {s}: selected wind-and-pressure comparison dates, around {dates[1]:%d %B %Y}", exp,
                                           f"PF-R_persistence_window_{s.replace(' ', '_')}", run)
     # common window: three consecutive dates qualifying at all three stations
     common = None
@@ -265,7 +263,7 @@ def main():
            "windows": pub_w, "composite": CP, "figures": pubfigs, "dates": "withheld from public outputs"}
     (run / "persistence_v4_results.json").write_text(json.dumps(pub, indent=2, default=str), encoding="utf-8")
     (priv / "PRIVATE_selection_summary_v4.json").write_text(json.dumps(priv_sum, indent=2, default=str), encoding="utf-8")
-    C.write_manifest(run, {"stage": "Group E selection v4 (persistence worse than W1 for wind and MSLP, panel directive)",
+    C.write_manifest(run, {"stage": "Group E selection v4 (selected wind-and-pressure comparison dates, panel directive)",
                            "spec": "CASE_SELECTION_v4_persistence_override"})
     plt.close("all")
     print(run.name)

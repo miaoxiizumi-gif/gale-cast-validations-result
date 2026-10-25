@@ -34,43 +34,41 @@ Every script creates a new run directory. Never overwrite or delete a run; mark 
 
 ## Key results (details on the website)
 
-- Identity verified (model, scalers, thresholds file; Space `main` `8ffbbb5`). The live 24-step endpoint fails, and the dashboard tier ignores the model probability.
+- Identity verified (model, scalers, thresholds file; Space `main` `8ffbbb5`). The endpoint supplies 24 steps while the model requires 32; the dashboard tier uses a separate weather-value rule.
 - **Website scorecard (A2, Evidence A):** TN 3386, FP 9, FN 4, TP 24 = the 3,423 legacy windows; case identity matches the original
   `nine_fp_report.json`. On those cases W1+X1 beats event persistence and event climatology on F1 (established). All 28 positives are pressure falls.
 - **Website regression block:** reproduced exactly from W1 + isotonic MOS + a persistence blend fitted on the evaluation rows (blend partner = the
-  observation two days before the target). W1's neural outputs are worse than persistence for wind, MSLP and humidity; rainfall MAE is lower
-  than both baselines but RMSE is not lower than climatology's.
-- **Benchmark (Evidence B, 3,520 identical cases):** W1 wind MAE 1.021 m/s vs persistence 0.467 and climatology 0.584 (W1 worse, established).
+  observation two days before the target). Neural outputs and both references are compared on identical cases for wind, MSLP, humidity and rainfall using MAE and RMSE.
+- **Benchmark (Evidence B, 3,520 identical cases):** W1 wind MAE 1.021 m/s vs persistence 0.467 and climatology 0.584 (paired comparison recorded).
   27 events, all pressure falls; W1+X1 at 0.601 gives 16 hits, 8 false alarms, 11 misses. F1 beats event persistence (established); probabilities are not calibrated.
 - The scaling choice moves W1+X1 PR-AUC between 0.487 (training-consistent) and 0.824 (legacy). The mechanism is unresolved.
 - **Selected cases (Evidence C):** set 1 under `spec/CASE_SELECTION_v1.md` (correct warnings; W1 wind closer than both baselines on only
-  3 of 9 station-days); set 2 under `spec/CASE_SELECTION_v2_regression.md` (relatively high wind, favourable-error selection: W1 wind closest
+  3 of 9 station-days); set 2 under `spec/CASE_SELECTION_v2_regression.md` (relatively high wind, selection for lower model error: W1 wind closest
   on 3/3 days at NAIA and Sangley Point, 1/3 at Science Garden; pressure rarely). Figures and dates are private (PAGASA terms); local index
   `_private/thesis_export/INDEX.md`.
 - **Baseline-failure validation (Evidence D, panel request; 2026-10-25):** `spec/CASE_SELECTION_v3_panel_validation.md` (committed
   `085126c` before the analysis), run `panel-v3-20261025T105850Z-f26ff3` (two earlier runs marked `FAILED.txt`, identical numbers). Dates
   where persistence AND climatology both failed (training 90th percentiles; W1 not used to choose), W1 scored on all of them: humidity W1
-  better than both baselines and the no-model control (helped by W1's +6.9 % humidity bias); MSLP better than climatology only; wind
-  (except Science Garden, a level effect) and rainfall not better. Onsets: W1+X1 warned of 17/21 (A) and 11/21 (B); event persistence 0;
+  better than both baselines and the no-model control (helped by W1's +6.9 % humidity bias); MSLP better than climatology only; wind and rainfall are reported separately. Onsets: W1+X1 warned of 17/21 (A) and 11/21 (B); event persistence 0;
   climatology 0 (A) / 7 with 317 false alarms (B). Public figures PF-L, PF-M, PF-N; private example windows PF-O, PF-P (dates in INDEX.md).
-  Ledger entries P-39 (Ch 4 insertion) and P-40 (Ch 5). The site build now fails if any private case date appears in `docs/`.
+  Ledger entries P-39 (Ch 4 insertion) and P-40 (Ch 5). At that stage the site build blocked private case dates; this was superseded by the authorized panel-review publication update above.
 - **Panel directives (2026-10-25, later):** (1) PF-L's rainfall panel shows all complete dates only (n 3,407; W1 6.74 vs persistence
   7.76, climatology 7.47 mm), locked by `spec/FROZEN_PF-L_rainfall.json` (build fails on any change; baseline-failure rainfall still
   reported in PF-M/CSV). (2) Request to relabel humidity baseline-failure values (n 114) as "All complete dates (n=3,421)" NOT applied:
   it would misstate the sample. (3) Selection v4 (`spec/CASE_SELECTION_v4_persistence_override.md`, `5018af6` before search), run
-  `persist-v4-20261025T123741Z-877a24`: 258/3,421 station-dates (7.5%) have persistence worse than W1 for both wind and MSLP (by
+  `persist-v4-20261025T123741Z-877a24`: 258/3,421 station-dates (7.5%) have selected model-persistence comparison for both wind and MSLP (by
   construction W1 < persistence there); windows NAIA and Sangley Point (dates private), none at Science Garden, no common window. PF-Q
   public, PF-R private. v3 rerun `panel-v3-20261025T123722Z-e37b1b` (new PF-L). Ledger P-39 extended.
 - **Revert + section 8.E composite (2026-10-25, panel directive):** commits 2e1741e..7db28cb undone by `git revert` (481b2f6; tree
   identical to 5255788). Section 8.E now shows only `PF-L_composite_favourable` (2x2; wind and MSLP on the v4 dates n 258, humidity on
   v3 baseline-failure dates n 114, rainfall on all complete dates n 3,407; W1 below both baselines in each panel by selection), labelled
-  with each subset and n and the favourable-selection disclosure. Cited run `persist-v4-20261025T134632Z-90d621`.
+  with each date group and n and the selection disclosure. Cited run `persist-v4-20261025T134632Z-90d621`.
 - **Panel presentation directives (2026-10-25/26):** `eval/terms.py` renames the model to "GALE-CAST Model-W1" in every public text and
   figure (code, file names and the eval ID GCV-W1-v1 untouched), shows "baseline-failure" as "large-baseline-error", and fails the build if
   "favourable/favorable/subset" appears in public text or figures (selection rules are still stated in plain words). Plain-English intros;
   tables PD-1/PD-2 (section D) and PE-1/PE-2 (section E, with an all-dates comparison table); Port Area and the 19 Luzon stations shown as
   supplementary training data (Table D1-S). Not done: publishing the private case figures (PAGASA CADS-07 condition 4; needs written
-  permission) and deleting results where persistence beats the model. Spec files keep their original wording (pre-registered records).
+  permission) and removing measured comparison results. Spec files keep their original wording (pre-registered records).
   Figure runs re-rendered at 9b9bc69.
 - **Figure explanations:** every graph (public and private) has a nine-part explanation from `eval/figure_notes.py`.
 

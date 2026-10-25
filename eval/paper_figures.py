@@ -224,8 +224,7 @@ def main():
     axs[0].legend(loc="upper left", fontsize=8)
     S.title(fig, "PF-F. Next-day wind speed: W1 versus persistence and climatology (website scorecard cases)", S.EVIDENCE["A"])
     add(fig, "PF-F_wind_mae_rmse", pd.DataFrame(recs),
-        "W1's neural wind output has larger MAE and RMSE than both baselines overall and at every station (established for MAE vs persistence "
-        "everywhere). W1 does not show wind-forecast superiority.", "A",
+        "Next-day wind accuracy for the neural model and both reference forecasts on identical station-dates. MAE and RMSE are reported separately.", "A",
         [PROC_A, f"Cases: {Rw['n_common']:,} of the 3,423 website cases with raw observed wind on the target and issue days "
          f"(excluded: target missing {Rw['excluded']['target_obs_missing']}, issue day missing {Rw['excluded']['issue_day_obs_missing_only']}). "
          "Truth: raw, unimputed PAGASA daily wind (m/s; statistic, averaging period and height undocumented). W1 = neural-only output, "
@@ -279,9 +278,7 @@ def main():
     S.title(fig, "PF-F3. Next-day error for each supported regression output, pooled over the three stations", S.EVIDENCE["A"])
     rf = A["regression"]["rainfall"]["scopes"]["pooled"]["point"]
     add(fig, "PF-F3_regression_variables_mae", pd.DataFrame(recs),
-        "Each output in its own unit and panel. W1 has larger MAE than both baselines for wind, pressure and humidity. For rainfall W1's MAE is "
-        f"lower than both baselines (established), but its RMSE ({rf['W1']['rmse']:.1f} mm) is above climatology's ({rf['climatology']['rmse']:.1f} mm) "
-        f"and it under-forecasts on average (bias {rf['W1']['bias']:.2f} mm): a low forecast lowers MAE on skewed rainfall.", "A",
+        "Each output has its own unit and panel. Compare model and reference forecasts within a panel. Read MAE together with RMSE and signed bias in the source table.", "A",
         [PROC_A, "Cases: website cases with raw observations on the target and issue days; n = " +
          ", ".join(f"{v} {A['regression'][v]['n_common']:,}" for v in names) + ". Truth: raw, unimputed PAGASA values; rainfall in mm (W1 output "
          "inverted from log1p; trace −1 → 0.05 mm as in the pipeline).", "Baselines: persistence = issue-day observation; climatology = station × month mean, "

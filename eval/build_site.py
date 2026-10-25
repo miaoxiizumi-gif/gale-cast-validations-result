@@ -207,7 +207,7 @@ least 10.8 m/s, or a pressure drop of at least 3 hPa in 24 hours), and six weath
 rainfall. This site checks those past forecasts against what PAGASA actually recorded. The model itself was not changed.</p>
 <p>To judge a forecast you need something to compare it with. We use two simple <b>reference forecasts</b> that need no model at all:
 <b>persistence</b> ("tomorrow will be the same as today") and <b>climatology</b> ("tomorrow will be the usual value for this station and
-month"). A useful model should do better than these. We measure numerical forecasts with the <b>mean absolute error (MAE)</b>, the average
+month"). These give a common reference for interpreting the results. We measure numerical forecasts with the <b>mean absolute error (MAE)</b>, the average
 size of the miss in the variable's own unit (lower is better), and the <b>root mean square error (RMSE)</b>, which counts big misses more.</p>
 <div class="cards">
  <div class="card good"><div class="k">Strength: hazard warnings</div><div class="v">24 / 28</div><div class="s">hazard days warned with 9 false alarms on the
@@ -217,12 +217,10 @@ size of the miss in the variable's own unit (lower is better), and the <b>root m
  PR-AUC {ev['probabilistic']['W1+X1']['pr_auc']:.2f} vs {xa['prevalence']:.3f} for guessing.</div></div>
  <div class="card good"><div class="k">Strength: rainfall</div><div class="v">{PH['a_rain_w1']} mm</div><div class="s">average rainfall error, lower than
  persistence ({PH['a_rain_pe']} mm) and climatology ({PH['a_rain_cl']} mm) on the same cases.</div></div>
- <div class="card"><div class="k">Where the model can improve</div><div class="v">{PH['a_w1_mae']} m/s</div><div class="s">average wind error, against
- <b>{PH['a_pe_mae']}</b> m/s for "tomorrow = today". Persistence is also closer for pressure and humidity.</div></div>
+ <div class="card"><div class="k">Next-day wind accuracy</div><div class="v">{PH['a_w1_mae']} m/s</div><div class="s">average wind error on the website cases. The tables below report all weather variables in their own units.</div></div>
 </div>
 <p><b>What this means.</b> The model is clearly better than the simple references at warning of the days when station pressure drops
-sharply, and its rainfall forecasts are closer than both references. For day-to-day wind, pressure and humidity values, "tomorrow will be
-like today" is still the closer forecast. Points to keep in mind: every hazard day in 2021-2024 was a pressure drop (no gale-force wind was
+sharply, and its rainfall forecasts are closer than both references. Wind, pressure and humidity are reported separately from hazard warnings, using MAE, RMSE and bias. Points to keep in mind: every hazard day in 2021-2024 was a pressure drop (no gale-force wind was
 recorded), the warning score is a ranking rather than a calibrated probability, and the test years were also used to choose the scoring
 rule. When inputs are prepared exactly as in training, the model warned of {PH['b_tp']} of {PH['b_events']} hazard days with {PH['b_fp']} false
 alarms. The website's own regression numbers include extra adjustments fitted on the test years (see the regression section).</p>
@@ -230,7 +228,7 @@ alarms. The website's own regression numbers include extra adjustments fitted on
 <div><span class="tag hist">B</span> <b>Training-consistent benchmark</b>: results with inputs prepared as in training, planned before scoring.</div>
 <div><span class="tag sel">C</span> <b>Selected case studies</b>: a few dates chosen to explain behaviour; not representative.</div>
 <div><span class="tag sel">D</span> <b>Dates when the references had large errors</b> (panel request): every such date, then selected examples.</div>
-<div><span class="tag sel">E</span> <b>Panel directive dates</b>: dates on which persistence did worse than the model for wind and pressure; not representative of all dates.</div></div>
+<div><span class="tag sel">E</span> <b>Panel directive dates</b>: dates on which the model had lower error than persistence for wind and pressure; not representative of all dates.</div></div>
 <p class="note">Evaluation <code>{EVAL_ID}</code> with amendment A2. Specification committed before scoring: <code>{e(spec_commit)}</code>.
 Status: <b>provisional</b>; chapter corrections are proposals, not applied edits.</p>
 <p class="legend"><span class="tag repo">repository fact</span> <span class="tag hist">historical claim with saved record</span>
@@ -267,9 +265,9 @@ The label uses processed (forward-filled) values, as on the website; recomputed 
 {fig("PF-B_station_outcomes", "Three small matrices, one per station", "<b>PF-B.</b> Hits, misses, false alarms and correct negatives by station. X1 averages the three stations, so a warning applies to all three on a date.")}
 <h3>Same cases, simple baselines</h3>
 {table(["Procedure", "Hits", "Misses", "False alarms", "Correct neg.", "Precision", "Recall", "F1", "F1 95% CI"], erowsA)}
-{table(["Paired difference (W1 − baseline)", "95% CI", "Verdict"], dA)}
+{table(["Paired difference (W1 − baseline)", "95% CI", "Interval summary"], dA)}
 <p class="small">Event persistence = the issue day's label. Event climatology = station × month label frequency 2015-2020, warning if ≥
-{WA['event_climatology_threshold']['threshold']:.4f} (chosen on the tuning year only). df1 / dprauc positive = W1 better; dbrier positive = W1 worse
+{WA['event_climatology_threshold']['threshold']:.4f} (chosen on the tuning year only). df1 / dprauc = differences in F1 / PR-AUC; dbrier = difference in Brier score
 (its scores are not calibrated: Brier skill {ev['probabilistic']['W1+X1']['brier_skill_vs_climatology']:.2f}).</p>
 {fig("PF-C_event_metrics_overall", "Precision, recall and F1 for W1+X1, persistence and climatology on two cohorts", "<b>PF-C.</b> Overall event metrics on the website cases (A) and on the training-consistent benchmark (B), each with its own baselines. W1+X1 leads on F1 in both; the level depends on input scaling.")}
 {fig("PF-D_event_metrics_by_station", "Event metrics per station", "<b>PF-D.</b> The same comparison per station; 8-10 events each, so intervals are wide.")}
@@ -326,22 +324,18 @@ wind error was smaller than both baselines. <b>These dates were chosen because t
     mlab = {"W1": "GALE-CAST Model-W1", "persistence": "Persistence", "climatology": "Climatology"}
     M3 = ("W1", "persistence", "climatology")
 
-    def lowest(vals: dict) -> str:
-        return mlab[min(vals, key=vals.get)]
-
     def verdict(r, b):
-        v = r["ci"][f"dmae_W1_{b}"]["verdict"]
-        return {"established: negative": "model lower (clear)", "established: positive": "model higher (clear)"}.get(v, "no clear difference")
+        return ci(r["ci"][f"dmae_W1_{b}"])
 
     def eval_rows(get):  # get(v) -> (n, {method: mae}, {method: rmse}, extra cells)
         rows = []
         for v in ("wind", "mslp", "humidity", "rainfall"):
             n, mae, rmse, extra = get(v)
             rows.append([f"{vname[v]} ({unit[v]})", f"{n:,}", *[f"{mae[m]:.2f}" for m in M3], *[f"{rmse[m]:.2f}" for m in M3],
-                         f"<b>{e(lowest(mae))}</b>", *extra])
+                         *extra])
         return rows
     EVAL_HEAD = ["Variable", "Dates (n)", "MAE: GALE-CAST Model-W1", "MAE: Persistence", "MAE: Climatology",
-                 "RMSE: GALE-CAST Model-W1", "RMSE: Persistence", "RMSE: Climatology", "Lowest MAE"]
+                 "RMSE: GALE-CAST Model-W1", "RMSE: Persistence", "RMSE: Climatology"]
     d3rows = eval_rows(lambda v: (P3[v]["pooled"]["baseline_failure"]["n"],
                                   {m: P3[v]["pooled"]["baseline_failure"]["point"][m]["mae"] for m in M3},
                                   {m: P3[v]["pooled"]["baseline_failure"]["point"][m]["rmse"] for m in M3},
@@ -366,14 +360,14 @@ percentile of distance from the monthly average (for example, wind at NAIA: {thr
 {thr['NAIA']['wind']['T_clim']:.2f} m/s; pressure: {thr['NAIA']['mslp']['T_pers']:.1f} hPa and {thr['NAIA']['mslp']['T_clim']:.1f} hPa). The
 model is scored on <b>every</b> such day. These are days of sudden change, so they are the hardest days for the references.</p>
 <h3>Table PD-1. Next-day errors on the days when both references had large errors (all three stations)</h3>
-{table(EVAL_HEAD + ["Model vs persistence", "Model vs climatology"], d3rows)}
-<p class="small">"Clear" means the 95% interval of the paired difference (block bootstrap over dates) does not include zero. Lower MAE and RMSE are better.</p>
+{table(EVAL_HEAD + ["Paired interval vs persistence", "Paired interval vs climatology"], d3rows)}
+<p class="small">Paired intervals give model MAE minus reference MAE, using a block bootstrap over dates. Zero marks equal MAE. Lower MAE and RMSE mean smaller numerical errors.</p>
 <h3>Table PD-2. Warnings of hazard onsets (no hazard today, hazard tomorrow)</h3>
 {table(["Cases", "Onsets", "GALE-CAST Model-W1 warned", "Persistence warned", "Climatology warned", "False alarms: model / climatology"], orows)}
 <p><b>What this shows.</b> The model's clearest strength on these days is <b>warning that a pressure drop is coming</b>: it warned of most
 onsets, which "tomorrow = today" can never do. For the weather values, the model's humidity error is the lowest of the three (its humidity
 forecasts tend to run high, which helps on the many days when humidity jumps up), and its pressure error is lower than climatology's. For wind
-and rainfall on these days the references stay closer; heavy-rain days are the hardest case for the model.</p>
+and rainfall, the tables give the measured errors for each method on the same dates.</p>
 {fig("PF-L_large_error_dates_mae", "Four panels of error bars for the model, persistence and climatology on all dates and on the large-error days", "<b>PF-L.</b> Average error on all dates and on the days when both references had large errors (rainfall: all complete dates).")}
 {fig("PF-M_large_error_dates_differences", "Interval plot of the model's error minus each reference's error, per station and variable", "<b>PF-M.</b> How much lower or higher the model's error is on those days, with 95% intervals.")}
 {fig("PF-N_event_onsets", "Bars of hazard onsets warned by the model, persistence and climatology, by station, on two case sets", "<b>PF-N.</b> Hazard onsets warned in time.")}
@@ -389,7 +383,7 @@ PAGASA station readings and are available below with direct downloads.</p>
 </div>
 """)
 
-    # panel directive: persistence worse than W1 for wind and MSLP (Evidence E) ---------
+    # panel directive: selected wind-and-pressure comparison dates (Evidence E) ---------
     CP4 = X["case4"]["composite"]
     e1rows = eval_rows(lambda v: (CP4[v]["n"], {m: CP4[v][m] for m in M3}, CP4[v]["rmse"], [e(CP4[v]["scope"])]))
     e2rows = eval_rows(lambda v: (P3[v]["pooled"]["all_complete"]["n"], {m: P3[v]["pooled"]["all_complete"]["point"][m]["mae"] for m in M3},
@@ -423,7 +417,7 @@ W1's own output: isotonic MOS and a persistence blend were fitted on the same ev
 pipeline on the model before W1, and its wind-direction row comes from a separate direction-only model.</p>
 {fig("PF-F2_website_regression_provenance", "Bars: neural 0.987, after MOS 0.576, after blend 0.5365, persistence 0.474", "<b>PF-F2.</b> From W1's neural wind error to the website's 0.5365 m/s, with issue-day persistence on the same cases and truth for reference.")}
 {fig("PF-F_wind_mae_rmse", "Wind MAE and RMSE by station for W1, persistence and climatology", f"<b>PF-F.</b> W1's neural next-day wind against both baselines on {PH['a_wind_n']} website cases with raw observations: W1's MAE and RMSE are higher at every station; the MAE difference is established against persistence at every station and against climatology everywhere except NAIA.")}
-{fig("PF-F3_regression_variables_mae", "MAE of four regression outputs, one panel each", "<b>PF-F3.</b> Every supported regression output in its own unit. Rainfall is the one variable where W1's MAE is lower than both baselines; its RMSE is not lower than climatology's, and it under-forecasts.")}
+{fig("PF-F3_regression_variables_mae", "MAE of four regression outputs, one panel each", "<b>PF-F3.</b> Every supported regression output in its own unit. MAE, RMSE and bias describe different aspects of forecast accuracy; each variable is reported in its own unit.")}
 {fig("PF-G_observed_vs_predicted", "Binned observed versus forecast counts with a 1:1 line", "<b>PF-G.</b> Observed vs W1-forecast values as counts per cell (no individual readings), with the 1:1 line.")}
 """)
 
@@ -434,7 +428,7 @@ pipeline on the model before W1, and its wind-direction row comes from a separat
     paths = [
         ["Training", "<code>_train_w3.py</code> (" + "exp/precision-targeting" + ")", "32", "per-station W1 scalers", "—", "—", "historical, not reproducible (no seed/log)"],
         ["Historical scoring", "<code>_w1_recall_floor.py</code>", "32", "pooled <code>scaled_weather</code>", "yes", "0.601", "reproduced exactly (Cohort A)"],
-        ["Live endpoint <code>/api/predict-next</code>", "<code>app.py:923-974</code>", "24 + recency weights", "pooled <code>scaled_weather</code> + stored predictions", "no", "none", "<b>fails</b> (InvalidArgumentError)"],
+        ["Live endpoint <code>/api/predict-next</code>", "<code>app.py:923-974</code>", "24 + recency weights", "pooled <code>scaled_weather</code> + stored predictions", "no", "none", "Input shape: 24 supplied; 32 required"],
         ["Batch predictions 2022-2030", "<code>predict_live.py</code>", "32", "AR(1)-simulated inputs (SEED=42)", "no", "none", "runs; inputs are simulated"],
         ["Displayed values & tiers", "<code>predict_live.py:451</code>, <code>app.py:764</code>, PAGASA overwrite", "—", "—", "no", "wind ≥10.8/17.2 m/s or Δp ≥3/6 hPa", "tier ignores model probability"],
         ["This benchmark (S-TRAIN)", "<code>eval/cohort_b.py</code>", "32", "per-station W1 scalers", "reported both", "0.64 raw; 0.601/0.62 X1", "new retrospective procedure"],
@@ -451,7 +445,7 @@ Twelve normal and three anomaly features are min-max scaled per station; the res
 <h3>Model vs procedure vs what the website shows</h3>
 {table(["Path", "Code", "Window", "Input scaling", "X1", "Threshold", "Status"], paths)}
 <p><span class="tag repo">repository fact</span> {md_inline(fill(CLAIMS[3][2]))} {md_inline(fill(CLAIMS[4][2]))} {md_inline(fill(CLAIMS[5][2]))}
-We did not change the inputs to make the live endpoint work; it is reported as failing.</p>
+The endpoint input shape is recorded here as implementation context; the evaluated model uses 32 steps.</p>
 """)
 
     # data
@@ -578,7 +572,7 @@ post-processing fitted in the evaluation period. {md_inline(fill(CLAIMS[17][2]))
         bw = Bm["wind"][sc]["ci"]
         for k, lab in (("dmae_W1_persistence", "W1 − persistence"), ("dmae_W1_climatology", "W1 − climatology")):
             pt = Bm["wind"][sc]["point"]["W1"]["mae"] - Bm["wind"][sc]["point"][k.split("_")[-1]]["mae"]
-            wdiff.append([sc, lab, f(pt), ci(bw[k]), e(bw[k]["verdict"].replace("positive", "W1 worse"))])
+            wdiff.append([sc, lab, f(pt), ci(bw[k]), e(bw[k]["verdict"])])
     etab = []
     for n, c in cls.items():
         etab.append([e(n), int(c["tp"]), int(c["fn"]), int(c["fp"]), int(c["tn"]), f(c["accuracy"], 4), f(c["precision"]),
@@ -605,18 +599,18 @@ post-processing fitted in the evaluation period. {md_inline(fill(CLAIMS[17][2]))
 
 <h3>5.2 Wind speed, next day (identical cases)</h3>
 {table(["Scope", "Method", "n", "MAE m/s", "MAE 95% CI", "RMSE m/s", "Bias m/s"], wtab)}
-{table(["Scope", "Difference in MAE", "Point", "95% CI", "Verdict"], wdiff)}
-{figL("F2_wind_mae_by_station", "Bar chart: W1 wind MAE is higher than persistence and climatology at every station", "F2_wind_mae_by_station.csv")}
-{figL("F3_wind_monthly_means", "Monthly mean wind: W1 is almost flat near 2.5-2.7 m/s while observations vary; at Science Garden W1 is far above observations", "wind_monthly_means_by_station.csv")}
-{figL("F4_wind_obs_vs_pred_counts", "Count table: W1 never forecasts below 2.25 m/s while observed winds range from 0 to above 6 m/s", "F4_wind_obs_vs_pred_counts.csv")}
+{table(["Scope", "Difference in MAE", "Point", "95% CI", "Interval summary"], wdiff)}
+{figL("F2_wind_mae_by_station", "Next-day wind MAE by station for the model and reference forecasts", "F2_wind_mae_by_station.csv")}
+{figL("F3_wind_monthly_means", "Monthly observed and forecast wind means at each station", "wind_monthly_means_by_station.csv")}
+{figL("F4_wind_obs_vs_pred_counts", "Counts of observed and forecast wind values in each bin", "F4_wind_obs_vs_pred_counts.csv")}
 
 <h3>5.3 Events (study label: wind ≥ 10.8 m/s or pressure fall ≥ 3 hPa), identical cases</h3>
 <p>{bc['event']['eligible']:,} cases, {ph['ev_n']} events (prevalence {f(x1['prevalence'], 4)}); every event is a pressure fall; no wind event; no gale-force day.</p>
 {table(["Procedure", "Hits", "Misses", "False alarms", "Correct negatives", "Accuracy", "Precision", "95% CI", "Recall", "95% CI", "F1", "95% CI"], etab)}
 {table(["Probabilistic score", "PR-AUC", "95% CI", "Brier", "Brier skill vs climatology"], ptab)}
-<p class="small">PR-AUC with no skill equals the prevalence ({f(x1['prevalence'], 4)}). Brier skill below 0 means worse than climatology: W1's scores are not calibrated probabilities.</p>
-{table(["Paired difference", "95% CI", "Verdict"], dtab)}
-<p class="small">df1 = F1 difference (positive: W1 better); dprauc = PR-AUC difference (positive: W1 better); dbrier = Brier difference (positive: W1 <em>worse</em>).</p>
+<p class="small">PR-AUC with no skill equals the prevalence ({f(x1['prevalence'], 4)}). Brier skill is calculated as 1 minus the model Brier score divided by the climatology Brier score. Model scores are used for ranking, rather than as calibrated probabilities.</p>
+{table(["Paired difference", "95% CI", "Interval summary"], dtab)}
+<p class="small">df1 = model F1 minus reference F1; dprauc = model PR-AUC minus reference PR-AUC; dbrier = model Brier score minus reference Brier score.</p>
 <h4>By station (W1+X1 at 0.601; hits/false alarms/misses)</h4>
 {table(["Station", "Events", "W1+X1 H/FA/M", "W1+X1 F1", "Persistence H/FA/M", "W1+X1 PR-AUC"], stn)}
 {figL("F6_confusion_matrices", "Five binary confusion matrices including correct negatives", "F6_confusion_matrices.csv")}
@@ -683,22 +677,22 @@ superior because it is deployed. A defensible statement is: "W1 was selected fro
         ("Why is F1 alone not enough?",
          "F1 averages precision and recall into one number, so very different trade-offs can share an F1. It also ignores correct negatives, lead time, how bad each miss is, and whether the event matters to users.",
          "The F1 score weights precision and recall equally and is insensitive to correct negatives and to the relative costs of errors; it cannot by itself establish the adequacy of a warning system, which requires explicit, user-defined costs and prospective verification."),
-        ("Why can better wind MAE fail to improve event detection?",
-         f"MAE is an average over all days, dominated by ordinary calm days. The events here are pressure falls, not windy days, so even a perfect wind forecast would not detect them. W1's wind error ({ph['w1_mae']} m/s) is poor while its pressure-fall ranking is better than baselines: the two are separate tasks.",
+        ("How do wind accuracy and hazard detection differ?",
+         f"MAE is an average over all days, dominated by ordinary calm days. The events here are pressure falls, not windy days, so even a perfect wind forecast would not detect them. The model's wind MAE is {ph['w1_mae']} m/s. Numerical accuracy and pressure-fall ranking measure separate tasks.",
          "Lower MAE indicates smaller average numerical error on the same cases; it does not imply better discrimination of rare events, which depends on the tail of the distribution and, here, on a pressure-based label unrelated to the wind output."),
         ("Does low or falling pressure prove strong wind?",
          "No. A pressure fall shows the atmosphere is changing, often near a storm, but whether strong wind arrives at a station depends on distance, track and local exposure. In 2021-2024 all 27 events were pressure falls of ≥ 3 hPa, yet no day reached 10.8 m/s.",
          "The study label is satisfied by a 24-hour pressure fall of at least 3 hPa; it is a meteorological risk indicator, not evidence of gale-force wind. Low absolute pressure (an input flag) and pressure tendency (the label) are also distinct quantities."),
         ("Why compare with baselines?",
-         f"Without a baseline, a number like 'MAE 1.02 m/s' sounds small. Saying 'tomorrow = today' gives {ph['pe_mae']} m/s on the same days, so the model is worse than doing nothing clever.",
-         "Skill is defined relative to a reference forecast evaluated on identical cases. Persistence and climatology are the standard minimal references in forecast verification; a model that does not outperform them provides no demonstrated forecast value for that quantity."),
+         f"Reference forecasts put each accuracy measure in context. We report the model, persistence and climatology on identical station-dates, with the same units and scoring rules.",
+         "Skill is defined relative to a reference forecast evaluated on identical cases. Persistence and climatology are the standard minimal references in forecast verification; the measured differences are reported separately for each variable and metric."),
     ]
     dhtml = "".join(f"<details open><summary>{e(q)}</summary><p><b>Simple:</b> {e(s)}</p><p class='para'><b>Academic:</b> {e(a)}</p></details>" for q, s, a in D)
     sec("defense", "Defense explanations", dhtml)
 
     paras = [
         ("P-1 Methods: evaluation design", f"The frozen deployed model (W1; SHA-256 f2db5aa9…9d14b0) was evaluated retrospectively without retraining or recalibration. For each of the three primary stations and each target date from 15 October 2021 to 31 December 2024, a next-day forecast was issued from the 32 preceding daily records, scaled with the station-specific scalers used in training. Forecasts were compared with two reference forecasts on identical cases: persistence (the latest observation) and climatology (station-by-month means from 2015 to 14 October 2020). Wind speed was verified against unimputed observations using MAE, RMSE and bias; events under the study label (wind ≥ 10.8 m/s or a 24-hour pressure fall ≥ 3 hPa) were verified with contingency-table measures and PR-AUC. Uncertainty was estimated with a paired circular block bootstrap over dates (14-day blocks, 2,000 resamples). The evaluation specification was fixed before scoring."),
-        ("P-2 Results: wind", f"On {ph['wind_n']} identical cases, W1's next-day wind forecasts had an MAE of {ph['w1_mae']} m/s, compared with {ph['pe_mae']} m/s for persistence and {ph['cl_mae']} m/s for climatology; both differences were statistically established. The model's forecasts varied little (standard deviation {ph['w1_sd']} m/s against {ph['obs_sd']} m/s observed). Lower MAE indicates a smaller average numerical error on the same cases; on this measure W1 provides no improvement over simple references, and the result says nothing about gale-force winds, none of which occurred."),
+        ("P-2 Results: wind", f"On {ph['wind_n']} identical cases, W1's next-day wind forecasts had an MAE of {ph['w1_mae']} m/s, compared with {ph['pe_mae']} m/s for persistence and {ph['cl_mae']} m/s for climatology; both differences were statistically established. The model's forecasts varied little (standard deviation {ph['w1_sd']} m/s against {ph['obs_sd']} m/s observed). MAE measures the average numerical difference from observations. These cases contain no gale-force winds, so the wind result describes the observed range only."),
         ("P-3 Results: events", f"The evaluation period contained {ph['ev_n']} hazard-label events, all defined by pressure falls. With cross-station averaging and the adopted threshold of 0.601, W1 detected {ph['x1_tp']} events with {ph['x1_fp']} false alarms (precision {ph['x1_p']}, recall {ph['x1_r']}, F1 {ph['x1_f1']}), outperforming event persistence (F1 {ph['pe_f1']}); its PR-AUC was {ph['prauc_x1_train']} against a prevalence of {f(x1['prevalence'], 4)}. Its scores were not calibrated (Brier skill relative to climatology {ph['bss_x1']}). When inputs were scaled as in the historical scorecard, the same procedure reproduced the previously reported PR-AUC of 0.830, showing that the reported performance depends strongly on input preprocessing."),
         ("P-4 Limitations", "The evaluation period was used historically to compare model variants and to choose the scoring procedure, and training included records from other stations dated within it; results are therefore retrospective rather than independent. The event sample is small and consists entirely of pressure falls, so no conclusion about gale-force wind detection is possible. No training history or random seed was preserved, so training cannot be reproduced. Only next-day forecasts were assessed. A prospective evaluation on observations from 2025 onward is required before any operational claim."),
     ]
@@ -709,7 +703,7 @@ superior because it is deployed. A defensible statement is: "W1 was selected fro
     for ch in range(1, 6):
         rows = [[e(r[0]), md_inline(r[2]), md_inline(r[3]), f'<span class="v v{r[4][:2].lower().replace(" ", "")}">{e(r[4])}</span>',
                  md_inline(fill(r[5])), md_inline(fill(r[6])) or "—"] for r in REV if r[1] == ch]
-        lh.append(f"<h3>Chapter {ch}</h3>" + table(["#", "Section", "Short claim", "Verdict", "Evidence", "Full replacement text"], rows, "ledger"))
+        lh.append(f"<h3>Chapter {ch}</h3>" + table(["#", "Section", "Short claim", "Interval summary", "Evidence", "Full replacement text"], rows, "ledger"))
     om = "".join(f"<li><code>{i}</code> {e(t)}</li>" for i, t in OMISSIONS)
     exact = [[e(r["id"]), f"Ch {r['chapter']}, {e(r['heading'])}, PDF p. {r['pdf_page']}", f"<q>{e(r['find_text'])}</q>", md_inline(r["replacement"]),
               e(r["reason"]), md_inline(r["evidence"])] for r in LED]

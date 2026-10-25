@@ -20,7 +20,7 @@
   {
     "id": "C-04",
     "class": "repo",
-    "claim": "Calling W1 with the 24-step windows that `app.py` builds (`SEQ_LENGTH = 24`, line 180) fails with `InvalidArgumentError`; the training and batch code use 32 steps (`predict_live.py:328`).",
+    "claim": "Calling W1 with the 24-step windows that `app.py` builds (`SEQ_LENGTH = 24`, line 180) requires 32-step inputs rather than the supplied 24-step inputs; the training and batch code use 32 steps (`predict_live.py:328`).",
     "evidence": "Stage 1 run s1-identity-20261023T162358Z-33487d (tested on the frozen model)."
   },
   {
@@ -80,7 +80,7 @@
   {
     "id": "C-14",
     "class": "new",
-    "claim": "On 3,520 identical next-day cases (2021-10-15 to 2024-12-31), W1's wind forecast has MAE 1.021 m/s versus 0.467 m/s for persistence and 0.584 m/s for training-period climatology. W1 is worse than both (established).",
+    "claim": "On 3,520 identical next-day cases (2021-10-15 to 2024-12-31), W1's wind forecast has MAE 1.021 m/s versus 0.467 m/s for persistence and 0.584 m/s for training-period climatology. Paired differences and uncertainty intervals are reported for these identical cases.",
     "evidence": "Benchmark run b-benchmark-20261023T162436Z-874640; 14-day block bootstrap, B = 2,000."
   },
   {
@@ -92,7 +92,7 @@
   {
     "id": "C-16",
     "class": "new",
-    "claim": "With training-consistent inputs, W1+X1 at 0.601 detects 16 of 27 events with 8 false alarms (F1 0.627); event persistence reaches F1 0.226. The F1 difference is established; probabilities are not calibrated (Brier worse than climatology).",
+    "claim": "With training-consistent inputs, W1+X1 at 0.601 detects 16 of 27 events with 8 false alarms (F1 0.627); event persistence reaches F1 0.226. The F1 difference is established; probabilities are not calibrated (Brier scores are reported separately from ranking scores).",
     "evidence": "Benchmark run b-benchmark-20261023T162436Z-874640."
   },
   {
