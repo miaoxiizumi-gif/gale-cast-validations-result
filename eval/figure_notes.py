@@ -262,9 +262,6 @@ def notes(ctx: dict) -> dict:
     return N
 
 
-PERSIST = PANEL + " Dates selected because persistence's wind and MSLP errors were both larger than W1's."
-
-
 def persistence_notes(ctx: dict) -> dict:
     """Evidence E (spec/CASE_SELECTION_v4_persistence_override.md): public PF-Q, private PF-R."""
     D, run = ctx["case4"], ctx["run_case4"]
@@ -316,7 +313,8 @@ def persistence_notes(ctx: dict) -> dict:
 
 PANEL = ("Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; "
          "not representative of all historical dates.")
-VNAME = {"wind": ("wind", "m/s"), "mslp": ("MSLP", "hPa"), "humidity": ("humidity", "%"), "rainfall": ("rainfall", "mm")}
+PERSIST = PANEL + " Dates selected because persistence's wind and MSLP errors were both larger than W1's."
+VNAME ={"wind": ("wind", "m/s"), "mslp": ("MSLP", "hPa"), "humidity": ("humidity", "%"), "rainfall": ("rainfall", "mm")}
 BF_RULE = ("baseline-failure date = |persistence error| ≥ the station's 2015-2020 90th percentile of day-to-day change AND |climatology error| ≥ "
            "the station's 2015-2020 90th percentile of deviation from its month mean (W1 not used)")
 
