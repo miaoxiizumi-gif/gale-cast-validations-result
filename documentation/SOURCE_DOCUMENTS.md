@@ -46,5 +46,4 @@ package inventory or private case values were used for it.
 `spec/CASE_SELECTION_v1.md` (classification case studies), `spec/CASE_SELECTION_v2_regression.md` (favourable regression case) and
 `spec/CASE_SELECTION_v3_panel_validation.md` (baseline-failure validation, panel request) and
 `spec/CASE_SELECTION_v4_persistence_override.md` (persistence worse than W1 for wind and MSLP, panel directive), each committed before its
-search. `spec/FROZEN_PF-L_metrics.json` locks all four PF-L ("Figure 8E") panels to their all-complete-date values (panel directive,
-replacing the earlier rainfall-only lock `FROZEN_PF-L_rainfall.json`).
+search. `spec/FROZEN_PF-L_rainfall.json` locks PF-L's rainfall panel (panel directive).

@@ -13,7 +13,7 @@ import figure_notes as FN
 import paper_ledger as PL
 import tech_stack
 
-PANEL_PUB = ["PF-L_benchmark_all_dates", "PF-M_baseline_failure_differences", "PF-N_event_onsets", "PF-Q_persistence_worse_dates"]
+PANEL_PUB = ["PF-L_baseline_failure_mae", "PF-M_baseline_failure_differences", "PF-N_event_onsets", "PF-Q_persistence_worse_dates"]
 
 DOC = C.WORKSPACE / "documentation"
 SITE = "https://miaoxiizumi-gif.github.io/gale-cast-validations-result/"
@@ -106,17 +106,13 @@ def panel_placeholders(D: dict) -> dict:
 
 
 def persistence_placeholders(D: dict, D3: dict) -> dict:
-    """Numbers of selection v4 (persistence worse than W1 for wind and MSLP) and the locked PF-L (all complete dates) panels."""
+    """Numbers of selection v4 (persistence worse than W1 for wind and MSLP) and the frozen PF-L rainfall panel."""
     q, a = D["qualifying"]["pooled"], D["all_complete"]["pooled"]
+    rf = D3["part1_A_q90"]["rainfall"]["pooled"]["all_complete"]
     out = {"v4_n": q["n"], "v4_total": f"{D['complete']['pooled']:,}", "v4_share": f"{D['share']['pooled'] * 100:.1f}",
-           "v4_clim_both": q["both_beat_climatology_too"], "v4_events": q["events"]}
-    for v, k in (("wind", "wind"), ("mslp", "mslp"), ("humidity", "hum"), ("rainfall", "rain")):
-        r = D3["part1_A_q90"][v]["pooled"]["all_complete"]
-        out[f"pfl_{k}_n"] = f"{r['n']:,}"
-        for m, mk in (("W1", "w1"), ("persistence", "pe"), ("climatology", "cl")):
-            out[f"pfl_{k}_{mk}"] = f"{r['point'][m]['mae']:.2f}"
-    out.update({"v4_rain_all_n": out["pfl_rain_n"], "v4_rain_all_w1": out["pfl_rain_w1"], "v4_rain_all_pe": out["pfl_rain_pe"],
-                "v4_rain_all_cl": out["pfl_rain_cl"]})
+           "v4_clim_both": q["both_beat_climatology_too"], "v4_events": q["events"],
+           "v4_rain_all_n": f"{rf['n']:,}", "v4_rain_all_w1": f"{rf['point']['W1']['mae']:.2f}",
+           "v4_rain_all_pe": f"{rf['point']['persistence']['mae']:.2f}", "v4_rain_all_cl": f"{rf['point']['climatology']['mae']:.2f}"}
     for v in ("wind", "mslp"):
         for m, k in (("W1", "w1"), ("persistence", "pe"), ("climatology", "cl")):
             out[f"v4_{v}_{k}"] = f"{q[v][m]:.2f}"
@@ -269,20 +265,12 @@ is limited to humidity (helped by W1's high humidity bias, since these dates are
 only; for wind (except Science Garden, again a bias effect) and rainfall W1 is not better on these dates. Per-station detail:
 `FIGURE_GUIDE.md` (PF-L to PF-P).
 
-**Panel directive on PF-L / "Figure 8E" (2026-10-25, revised):** all four PF-L panels show **all complete dates**, W1 against
-persistence and climatology, with no subset mixed in:
-
-| Variable | n | MAE W1 | MAE persistence | MAE climatology |
-|---|---|---|---|---|
-| Wind (m/s) | {ph['pfl_wind_n']} | {ph['pfl_wind_w1']} | {ph['pfl_wind_pe']} | {ph['pfl_wind_cl']} |
-| MSLP (hPa) | {ph['pfl_mslp_n']} | {ph['pfl_mslp_w1']} | {ph['pfl_mslp_pe']} | {ph['pfl_mslp_cl']} |
-| Humidity (%) | {ph['pfl_hum_n']} | {ph['pfl_hum_w1']} | {ph['pfl_hum_pe']} | {ph['pfl_hum_cl']} |
-| Rainfall (mm) | {ph['pfl_rain_n']} | {ph['pfl_rain_w1']} | {ph['pfl_rain_pe']} | {ph['pfl_rain_cl']} |
-
-These are the same values as PF-F3. They are locked: the site build fails if the plotted values differ from `spec/FROZEN_PF-L_metrics.json`
-(all four variables). The baseline-failure results (table above) are plotted in PF-M. An earlier version of PF-L mixed all-date and
-baseline-failure groups; an interim request to label the humidity baseline-failure values (n = {ph['v3_humidity_n']}) as all complete dates
-was not applied, and the revised directive replaced it with the true all-date values.
+**Panel directive on PF-L (2026-10-25):** PF-L's rainfall panel shows all complete dates only (n = {ph['v4_rain_all_n']}; MAE W1
+{ph['v4_rain_all_w1']}, persistence {ph['v4_rain_all_pe']}, climatology {ph['v4_rain_all_cl']} mm). The panel is locked: the site build
+fails if the plotted values differ from `spec/FROZEN_PF-L_rainfall.json`. The baseline-failure rainfall result is still computed and
+reported (inside the panel, in PF-M, in the CSV and in the table above). The humidity panel keeps its baseline-failure values under their
+correct label and sample size (n = {ph['v3_humidity_n']}); a request to relabel them "All complete dates (n = 3,421)" was not applied,
+because those values come from {ph['v3_humidity_n']} station-dates, not 3,421 (on all dates W1's humidity MAE is larger than persistence's).
 
 ### Dates where persistence was worse than W1 for wind and MSLP (Evidence E, panel directive)
 
@@ -479,8 +467,7 @@ Files are in [`docs/figures/paper/`](../docs/figures/paper/) (site: {SITE}#figur
 ## Baseline-failure validation figures (Evidence D, panel request; public aggregates)
 
 Every figure in this group states: "{FN.PANEL}" Rule: `spec/CASE_SELECTION_v3_panel_validation.md`. Run `{ph['run_case3']}`; files in
-[`docs/figures/paper/`](../docs/figures/paper/). PF-L ("Figure 8E") shows all complete dates (locked, `spec/FROZEN_PF-L_metrics.json`);
-PF-M and PF-N are aggregates over every qualifying date (no dates or readings).
+[`docs/figures/paper/`](../docs/figures/paper/). PF-L to PF-N are aggregates over every qualifying date (no dates or readings).
 PF-Q (Evidence E, run `{ph['run_case4']}`, `spec/CASE_SELECTION_v4_persistence_override.md`) states: "{FN.PERSIST}"
 
 """ + "\n".join(FN.markdown(f"{i} — `{i}.png` / `.svg` / `.csv`", NOTES[i]) for i in PANEL_PUB) + f"""
@@ -566,8 +553,7 @@ package inventory or private case values were used for it.
 `spec/CASE_SELECTION_v1.md` (classification case studies), `spec/CASE_SELECTION_v2_regression.md` (favourable regression case) and
 `spec/CASE_SELECTION_v3_panel_validation.md` (baseline-failure validation, panel request) and
 `spec/CASE_SELECTION_v4_persistence_override.md` (persistence worse than W1 for wind and MSLP, panel directive), each committed before its
-search. `spec/FROZEN_PF-L_metrics.json` locks all four PF-L ("Figure 8E") panels to their all-complete-date values (panel directive,
-replacing the earlier rainfall-only lock `FROZEN_PF-L_rainfall.json`).
+search. `spec/FROZEN_PF-L_rainfall.json` locks PF-L's rainfall panel (panel directive).
 """)
     tech_stack.write_documents(C.WORKSPACE)
 

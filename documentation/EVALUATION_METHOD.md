@@ -65,20 +65,12 @@ is limited to humidity (helped by W1's high humidity bias, since these dates are
 only; for wind (except Science Garden, again a bias effect) and rainfall W1 is not better on these dates. Per-station detail:
 `FIGURE_GUIDE.md` (PF-L to PF-P).
 
-**Panel directive on PF-L / "Figure 8E" (2026-10-25, revised):** all four PF-L panels show **all complete dates**, W1 against
-persistence and climatology, with no subset mixed in:
-
-| Variable | n | MAE W1 | MAE persistence | MAE climatology |
-|---|---|---|---|---|
-| Wind (m/s) | 3,421 | 0.99 | 0.47 | 0.59 |
-| MSLP (hPa) | 3,423 | 1.94 | 0.85 | 1.59 |
-| Humidity (%) | 3,421 | 8.73 | 4.63 | 5.40 |
-| Rainfall (mm) | 3,407 | 6.74 | 7.76 | 7.47 |
-
-These are the same values as PF-F3. They are locked: the site build fails if the plotted values differ from `spec/FROZEN_PF-L_metrics.json`
-(all four variables). The baseline-failure results (table above) are plotted in PF-M. An earlier version of PF-L mixed all-date and
-baseline-failure groups; an interim request to label the humidity baseline-failure values (n = 114) as all complete dates
-was not applied, and the revised directive replaced it with the true all-date values.
+**Panel directive on PF-L (2026-10-25):** PF-L's rainfall panel shows all complete dates only (n = 3,407; MAE W1
+6.74, persistence 7.76, climatology 7.47 mm). The panel is locked: the site build
+fails if the plotted values differ from `spec/FROZEN_PF-L_rainfall.json`. The baseline-failure rainfall result is still computed and
+reported (inside the panel, in PF-M, in the CSV and in the table above). The humidity panel keeps its baseline-failure values under their
+correct label and sample size (n = 114); a request to relabel them "All complete dates (n = 3,421)" was not applied,
+because those values come from 114 station-dates, not 3,421 (on all dates W1's humidity MAE is larger than persistence's).
 
 ### Dates where persistence was worse than W1 for wind and MSLP (Evidence E, panel directive)
 

@@ -115,7 +115,7 @@ def main():
     for p in (C.WORKSPACE / "documentation").glob("*"):
         shutil.copy(p, DOCS / "data" / "documentation" / p.name)
     for p in ("AMENDMENT_A2_website_cohort.md", "CASE_SELECTION_v1.md", "CASE_SELECTION_v2_regression.md", "CASE_SELECTION_v3_panel_validation.md",
-              "CASE_SELECTION_v4_persistence_override.md", "FROZEN_PF-L_metrics.json"):
+              "CASE_SELECTION_v4_persistence_override.md", "FROZEN_PF-L_rainfall.json"):
         shutil.copy(C.WORKSPACE / "spec" / p, DOCS / "data" / p)
     shutil.copy(runs["b"] / "wind_monthly_means_by_station.csv", DOCS / "data")
     shutil.copy(runs["b"] / "event_outcomes_monthly_by_station.csv", DOCS / "data")
@@ -331,11 +331,6 @@ station's month mean (for example wind at NAIA: {thr['NAIA']['wind']['T_pers']:.
 {thr['NAIA']['mslp']['T_pers']:.1f} hPa and {thr['NAIA']['mslp']['T_clim']:.1f} hPa). W1 is scored on <b>every</b> such date, and only then are
 example windows picked. A no-model <b>control</b> (the average of the two baselines) shows how much of any advantage a simple hedge also gets,
 because choosing dates by baseline error favours any forecast that does not copy a baseline.</p>
-<h3>Figure 8E (PF-L): the full benchmark on all complete dates</h3>
-<p>By the panel's revised directive (2026-10-25), all four panels show <b>all complete dates</b>, W1 against persistence and climatology,
-with no subset mixed in. The values are locked: the site build fails if they differ from
-<a href="data/FROZEN_PF-L_metrics.json">FROZEN_PF-L_metrics.json</a>. They match PF-F3 in the regression section.</p>
-{fig("PF-L_benchmark_all_dates", "Four panels of MAE bars with intervals for W1, persistence and climatology on all complete dates", "<b>PF-L (Figure 8E).</b> Next-day MAE on all complete dates: W1 is more accurate than both references for rainfall; persistence is more accurate for wind, MSLP and humidity.")}
 <h3>Part 1: every baseline-failure date (pooled; 95% block-bootstrap verdicts)</h3>
 {table(["Variable", "Dates", "MAE W1 / persistence / climatology / control", "W1 vs persistence", "W1 vs climatology", "W1 vs control"], d3rows)}
 <h3>Event onsets: the change persistence cannot foresee</h3>
@@ -345,6 +340,7 @@ do by construction. For numerical forecasts the picture is mixed: W1's humidity 
 forecast high humidity on dates that are mostly humidity rises); its pressure error is smaller than climatology's but not persistence's; its wind
 error (except at Science Garden, again a level effect) and rainfall error are not smaller. These dates do not change the overall comparison
 in the regression section.</p>
+{fig("PF-L_baseline_failure_mae", "Four panels of MAE bars for W1, persistence, climatology and control on all dates and on baseline-failure dates", "<b>PF-L.</b> MAE on all dates versus dates where both baselines failed.")}
 {fig("PF-M_baseline_failure_differences", "Interval plot of W1 minus baseline MAE per station and variable", "<b>PF-M.</b> Which differences on baseline-failure dates are established.")}
 {fig("PF-N_event_onsets", "Bars of onsets warned by W1+X1, persistence and climatology, by station, on two cohorts", "<b>PF-N.</b> Warnings of event onsets.")}
 <h3>Part 2: selected example windows (favourable by design; private figures)</h3>
@@ -355,19 +351,35 @@ closer than both. Every variable is shown in the private figures, including wher
 <p>Common window (all three stations): {p2['common']['success_cells_of_36'] if p2.get('common') else 0} W1 successes among
 {p2['common']['baseline_failure_cells_of_36'] if p2.get('common') else 0} baseline-failure cells of 36.</p>
 {privnote("PF-O")}{privnote("PF-P")}
+<h3>Panel directive on PF-L (2026-10-25)</h3>
+<p>PF-L's rainfall panel shows <b>all complete dates only</b> (n = {PH['v4_rain_all_n']}; MAE W1 {PH['v4_rain_all_w1']}, persistence
+{PH['v4_rain_all_pe']}, climatology {PH['v4_rain_all_cl']} mm). It is locked: the site build fails if the plotted values differ from
+<a href="data/FROZEN_PF-L_rainfall.json">FROZEN_PF-L_rainfall.json</a>. The baseline-failure rainfall result is still reported inside the
+panel, in PF-M and in the table above. The humidity panel keeps its baseline-failure values under their correct label and sample size
+(n = {PH['v3_humidity_n']}).</p>
 </div>
 """)
 
     # panel directive: persistence worse than W1 for wind and MSLP (Evidence E) ---------
+    D4 = X["case4"]
+    q4 = D4["qualifying"]
+    w4rows = [[s_, f"{q4[s_]['n']} of {D4['complete'][s_]:,} ({D4['share'][s_] * 100:.1f}%)",
+               f"{q4[s_]['wind']['W1']:.2f} / {q4[s_]['wind']['persistence']:.2f} / {q4[s_]['wind']['climatology']:.2f}",
+               f"{q4[s_]['mslp']['W1']:.2f} / {q4[s_]['mslp']['persistence']:.2f} / {q4[s_]['mslp']['climatology']:.2f}",
+               q4[s_]["both_beat_climatology_too"],
+               (lambda w: "—" if s_ == "pooled" else (f"{w['length']} dates; W1 also beat climatology on {w['W1_beats_climatology_cells']} of {w['of_cells']}"
+                                                     if w.get("selected") else "none (no two consecutive qualifying dates)"))(D4["windows"]["per_station"].get(s_, {}))]
+              for s_ in ["pooled", *C.PRIMARY]]
     sec("persist", "E. Dates where persistence was worse than W1 for wind and MSLP (panel directive)", f"""
 <div class="selected"><p class="selbanner"><span class="tag sel">Evidence E</span> <b>{e(FN.PERSIST)}</b></p>
 <p>The panel noted that persistence is the reference that beats W1 on average for wind and MSLP, and directed a search for dates on which
 persistence's error was larger than W1's for <b>both</b> variables (climatology not part of the filter). Rule committed before the search:
 <a href="data/CASE_SELECTION_v4_persistence_override.md">CASE_SELECTION_v4_persistence_override.md</a>. <b>W1 beats persistence on these
-dates by construction</b>; the chart shows how often such dates occur and how climatology, which the rule does not fix, compares.
-On all {PH['v4_total']} dates persistence remains more accurate (wind {PH['v4_wind_pe_all']} vs W1 {PH['v4_wind_w1_all']} m/s; MSLP
-{PH['v4_mslp_pe_all']} vs {PH['v4_mslp_w1_all']} hPa; Figure 8E in section 7).</p>
-{fig("PF-Q_persistence_worse_dates", "Four bar charts: qualifying dates per station; wind and MSLP error of W1, persistence and climatology on those dates; and how often W1 also beat climatology", "<b>PF-Q.</b> A: how many dates qualify. B and C: wind and MSLP error on those dates (W1 blue, persistence orange, climatology green). D: on how many of them W1 was also closer than climatology.")}
+dates by construction</b>; the table shows how often such dates occur and how climatology, which the rule does not fix, compares.</p>
+{table(["Scope", "Qualifying station-dates", "Wind MAE W1 / persistence / climatology (m/s)", "MSLP MAE W1 / persistence / climatology (hPa)", "Also beat climatology for both", "Window (private)"], w4rows)}
+<p>On all {PH['v4_total']} dates persistence remains more accurate: wind {PH['v4_wind_pe_all']} vs W1 {PH['v4_wind_w1_all']} m/s; MSLP
+{PH['v4_mslp_pe_all']} vs {PH['v4_mslp_w1_all']} hPa. No common window qualifies at all three stations. Exact dates are private (PAGASA terms).</p>
+{fig("PF-Q_persistence_worse_dates", "Bars: qualifying dates per station and wind and MSLP MAE on them", "<b>PF-Q.</b> How many dates had persistence worse than W1 for both wind and MSLP, and errors on them.")}
 {privnote("PF-R")}
 </div>
 """)
@@ -816,17 +828,14 @@ No row-level observations or individual predictions are published.</p>
             private_dates.update(w.get("window", []))
     assert private_dates, "no private case dates loaded for the scan"
 
-    # panel directive: every PF-L ("Figure 8E") panel is locked to its frozen all-complete-date values
-    frozen = J(C.WORKSPACE / "spec" / "FROZEN_PF-L_metrics.json")
-    plotted = pd.read_csv(DOCS / "figures" / "paper" / "PF-L_benchmark_all_dates.csv")
-    assert sorted(plotted["variable"].unique()) == sorted(frozen["variables"]), "PF-L must plot exactly the locked variables"
-    for v, fz in frozen["variables"].items():
-        rv = X["case3"]["part1_A_q90"][v]["pooled"]["all_complete"]
-        pv = plotted[plotted["variable"] == v].set_index("method")
-        assert rv["n"] == fz["n"] and (pv["n"] == fz["n"]).all(), f"PF-L {v}: n differs from spec/FROZEN_PF-L_metrics.json"
-        for m, val in fz["mae"].items():
-            assert abs(rv["point"][m]["mae"] - val) < 1e-9 and abs(pv.loc[m, "mae"] - val) < 1e-9, \
-                f"PF-L {v} {m}: MAE differs from spec/FROZEN_PF-L_metrics.json"
+    # panel directive: PF-L's rainfall panel is locked to its frozen 'All complete dates' values
+    frozen = J(C.WORKSPACE / "spec" / "FROZEN_PF-L_rainfall.json")
+    rf = X["case3"]["part1_A_q90"]["rainfall"]["pooled"]["all_complete"]
+    assert rf["n"] == frozen["n"] and all(abs(rf["point"][m]["mae"] - frozen["mae"][m]) < 1e-9 for m in frozen["mae"]), \
+        "PF-L rainfall panel differs from spec/FROZEN_PF-L_rainfall.json"
+    shown = pd.read_csv(DOCS / "figures" / "paper" / "PF-L_baseline_failure_mae.csv")
+    shown = shown[(shown["variable"] == "rainfall") & shown["shown_in_PF-L"]]
+    assert list(shown["group"]) == ["all_complete"], "PF-L rainfall panel must show 'all_complete' only"
     bad = []
     for p in DOCS.rglob("*"):
         if p.is_file() and p.suffix in (".html", ".md", ".json", ".csv", ".css"):
