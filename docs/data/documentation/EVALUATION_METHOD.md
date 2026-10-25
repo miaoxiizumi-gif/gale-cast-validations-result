@@ -23,6 +23,7 @@ on evaluation-period outcomes (see `MODEL_AND_DATA_SUMMARY.md`, regression prove
 | **A. Website historical scorecard** | the website's 3,423 next-day windows (1,141 per primary station; target dates 2021-11-16 to 2024-12-30) | historical scoring procedure: pooled `scaled_weather` inputs, 32-day windows | processed (forward-filled) label, as on the website; raw observations for regression | reproduce and explain what the website shows; add same-case baselines |
 | **B. Training-consistent benchmark** | 3,520 event cases / 3,520 wind cases, target dates 2021-10-15 to 2024-12-31 | per-station scalers as in training | raw, unimputed observations | the declared benchmark of `spec/EVAL_SPEC_v1.md` |
 | **D. Baseline-failure validation (panel request)** | every Group A station-date on which both persistence and climatology failed (training-period 90th-percentile rule, `CASE_SELECTION_v3_panel_validation.md`) and every event onset; then favourable example windows | as A (saved rows; no model run); wind and onsets also on B | raw observations | show where the reference forecasts fail and how W1 does there; examples not representative |
+| **E. Persistence-worse dates (panel directive)** | station-dates on which persistence's wind AND MSLP errors were both larger than W1's (`CASE_SELECTION_v4_persistence_override.md`); favourable-error selection | as A (saved rows; no model run) | raw observations | show that and how often such dates occur; W1 < persistence there by construction |
 | **C. Selected illustrative case studies** | set 1 (`CASE_SELECTION_v1.md`): 3 station windows + 1 common window around detected events; set 2 (`CASE_SELECTION_v2_regression.md`): 3 station windows + 1 common window with relatively high wind and favourable W1 wind error (favourable-error selection, disclosed) | as A (saved rows; no model run) | raw observations | explanation only; not representative |
 
 ### Selected illustrative case studies: what the two sets show
@@ -63,6 +64,27 @@ Reading: where the references fail, W1's clearest advantage is **warning of pres
 is limited to humidity (helped by W1's high humidity bias, since these dates are mostly humidity rises) and to MSLP against climatology
 only; for wind (except Science Garden, again a bias effect) and rainfall W1 is not better on these dates. Per-station detail:
 `FIGURE_GUIDE.md` (PF-L to PF-P).
+
+**Panel directive on PF-L (2026-10-25):** PF-L's rainfall panel shows all complete dates only (n = 3,407; MAE W1
+6.74, persistence 7.76, climatology 7.47 mm). The panel is locked: the site build
+fails if the plotted values differ from `spec/FROZEN_PF-L_rainfall.json`. The baseline-failure rainfall result is still computed and
+reported (inside the panel, in PF-M, in the CSV and in the table above). The humidity panel keeps its baseline-failure values under their
+correct label and sample size (n = 114); a request to relabel them "All complete dates (n = 3,421)" was not applied,
+because those values come from 114 station-dates, not 3,421 (on all dates W1's humidity MAE is larger than persistence's).
+
+### Dates where persistence was worse than W1 for wind and MSLP (Evidence E, panel directive)
+
+*Selected validation example chosen to demonstrate baseline limitations as requested by the thesis panel; not representative of all historical dates. Dates selected because persistence's wind and MSLP errors were both larger than W1's.*
+
+The panel noted that persistence is the reference that beats W1 on average for wind and MSLP, and directed a search for target dates on
+which persistence's error was larger than W1's for **both** (climatology not part of the filter). `spec/CASE_SELECTION_v4_persistence_override.md`
+was committed before the search. 258 of 3,421 complete station-dates qualify (7.5%; NAIA 115,
+Sangley Point 115, Science Garden 28). On them, wind MAE is W1 0.59 vs persistence 1.20
+and climatology 0.65 m/s; MSLP W1 0.63 vs 1.33 / 1.75 hPa; W1 also beat climatology
+for both variables on 116 of them. W1 < persistence holds on these dates **by construction**. On all
+3,421 dates persistence remains better (wind 0.47 vs W1 0.99 m/s; MSLP 0.85
+vs 1.94 hPa). Windows (private, PF-R): NAIA: 3-date window; W1 also beat climatology on 5 of 6 cells; Sangley Point: 3-date window; W1 also beat climatology on 5 of 6 cells; Science Garden:
+no window (no two consecutive qualifying dates). No common window qualifies at all three stations.
 
 Group A's case identity was recovered without regenerating predictions: the saved reproduction rows (`a-legacy-20261023T162426Z-b5f446`)
 match the original W1-branch record `nine_fp_report.json` for all 9 false alarms and 4 misses (station, date and score), and the matrix is

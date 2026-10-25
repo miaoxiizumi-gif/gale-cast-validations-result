@@ -1,0 +1,1 @@
+Superseded: PF-L rainfall panel changed by panel directive (2026-10-25); numbers identical. Still the source of spec/FROZEN_PF-L_rainfall.json.
