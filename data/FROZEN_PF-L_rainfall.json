@@ -1,0 +1,22 @@
+{
+  "figure": "PF-L_baseline_failure_mae",
+  "panel": "rainfall",
+  "group_shown": "all_complete",
+  "mandate": "Thesis panel directive, 2026-10-25: PF-L's rainfall panel displays 'All complete dates' only; locked against future rebuilds.",
+  "source_run": "panel-v3-20261025T105850Z-f26ff3",
+  "cohort": "Evidence A website-scorecard rows, pooled NAIA / Sangley Point / Science Garden, target dates 2021-11-16 to 2024-12-30",
+  "n": 3407,
+  "mae": {
+    "W1": 6.736798829321985,
+    "persistence": 7.758673319636042,
+    "climatology": 7.4720555163211975,
+    "control": 7.157011692959844
+  },
+  "rmse": {
+    "W1": 17.09287971074184,
+    "persistence": 19.216647525496388,
+    "climatology": 16.123881700248266,
+    "control": 15.79948440882269
+  },
+  "check": "eval/build_site.py fails if the latest panel-v3 run's rainfall all-complete n or MAE differ (tolerance 1e-9) or if PF-L shows any other rainfall group."
+}
